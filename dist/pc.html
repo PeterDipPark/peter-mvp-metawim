@@ -1,0 +1,42 @@
+<html>
+	<head>		
+		<meta charset="utf-8">
+	    <title>Peter MVP - MetaWim</title>
+	    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no' />
+	    <style>
+	    	* {
+	    		font-family: inconsolatamedium, Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+			    font-weight: normal;
+			    font-size: 12px;
+	    	}
+	        body {
+	            margin: 0;
+	            overflow: hidden;
+	            background-color: #333333;
+	        }
+	        div#ui {
+	        	height: 10vh;
+	        	width: 100vw;
+	        }
+	        	div#ui input {
+	        		width: 100% !important;
+	        	}
+
+	        canvas {
+	        	height: 90vh;
+	        	width: 100vw;
+	        }
+	    </style>	    
+		<script src="metawim.js?v=5" ></script>
+	</head>
+	<body>
+		<div id="ui"></div>
+		<canvas id='application'></canvas>
+		<script type="text/javascript">
+			const test = new MetaWim({
+				canvas:document.getElementById('application'),
+				ui:document.getElementById('ui')
+			});
+		</script>
+	</body>
+</html>
