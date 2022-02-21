@@ -33,6 +33,17 @@ export const sortArrayByNumericValue = function(array, direction) {
 }
 
 /**
+ * [normalizeRotationInputValue description]
+ * @param  {[type]} pc_rot    [description]
+ * @param  {[type]} pc_offset [description]
+ * @return {[type]}           [description]
+ */
+export const normalizeRotationInputValue = function(pc_rot, pc_offset) {
+  //return (pc_rot===0)?pc_offset:((pc_rot===360)?0:fixFloat(pc_offset-pc_rot));
+  return (pc_rot===0||pc_rot===360)?pc_offset:fixFloat(pc_offset-pc_rot);
+}
+
+/**
  * [htmlToDomFragment description]
  * @param  {[type]} s [description]
  * @return {[type]}   [description]

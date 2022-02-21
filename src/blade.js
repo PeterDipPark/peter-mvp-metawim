@@ -6,11 +6,12 @@ import {
 			Morph,
 			MorphInstance,
 			MeshInstance,
-			Entity
+			Entity,
+			Quat
 		} from 'playcanvas';
 
 
-import {meshPositions, meshIndices, meshUvs, meshMorphPositions, meshMorphs} from './model';
+import {meshPositions, meshIndices, meshUvs, meshMorphPositions } from './model';
 import Material from './material';
 import { defaultColors } from './colors';
 import BladeControls from './bladecontrols';
@@ -30,19 +31,42 @@ export default class Blade {
 		constructor({...props}) {
 
 			// Props
-			const { name, graphicsDevice, controls } = props;	    	
+			const { 
+				name
+				,graphicsDevice
+				,controls
+				,meshMorphsIndex
+				,bladeRotationOffset
+				,bladeRotation
+			} = props;	    	
 			this.name = name;
 			this.graphicsDevice = graphicsDevice;
-
-			// Blade meshMorphs (Indexes)
-			this.meshMorphsIndex = meshMorphs;
+			this.meshMorphsIndex = meshMorphsIndex;
+			this.bladeRotationOffset = bladeRotationOffset;
+			this.bladeRotation = bladeRotation
 
 			// Create Material
 			this.material = new Material({color:defaultColors[this.name] || defaultColors['blank']});
 
+
+			// Rotation
+			this.rotation = {
+				x: 0,
+				y: 0,
+				z: 0
+			};
+			this.quads = {	
+				x: new Quat()
+				,y: new Quat()
+				,z: new Quat()
+				,f: new Quat()
+			};
+
 			// Create Controls
 			this.hasControls = (controls === true);
 			this.controls = null;
+
+
 
 			// Init
 			this.init();
@@ -72,7 +96,10 @@ export default class Blade {
 			this.createMeshInstance();
 
 			// Create Entity
-			this.createEntity();
+			this.createEntity();			
+
+			// Set Initial Rotateion
+	        this.setRotation(this.bladeRotation);
 
 			// Create Controls
 			this.createControls();
@@ -118,12 +145,48 @@ export default class Blade {
 
 		/**
 		 * [setRotation description]
-		 * @param {[type]} coords [description]
+		 * @param {[type]} coords      [description]
+		 * @param {[type]} opt_control [description]
 		 */
-		setRotation(coords) {
-			this.entity.rotateLocal(coords.z, coords.y, coords.x);
-			// this.entity.rotate(coords.z, coords.y, coords.x);
+		setRotation(coords, opt_control) {
+
+			// Update Rotation
+			this.rotation = { ...this.rotation, ...coords };
+
+			if (opt_control !== undefined && this.hasControls) {
+				// Via controls
+				this.controls.getControls().observers[opt_control].observer.set('progress', this.rotation[opt_control]); 
+			} else {
+
+				// Calculate		        
+		        this.quads.y.setFromEulerAngles(0, this.rotation.y, 0);
+		        this.quads.x.setFromEulerAngles(this.rotation.x, 0, 0);
+		        this.quads.z.setFromEulerAngles(0, 0, this.rotation.z);
+		        this.quads.f.setFromEulerAngles(0, 0, 0);
+		        this.quads.f.mul(this.quads.y).mul(this.quads.x).mul(this.quads.z);
+
+		        // Set Rotation
+		        this.entity.setLocalRotation(this.quads.f);
+		    }
 		}
+
+		/**
+		 * [getRotation description]
+		 * @param  {[type]} opt_key [description]
+		 * @return {[type]}         [description]
+		 */
+		getRotation(opt_key) {
+			return (opt_key!==undefined)?this.rotation[opt_key]:this.rotation;
+			// return this.entity.getLocalRotation();
+			// return this.entity.getLocalEulerAngles();
+		}
+
+		getBladeRotation(opt_key) {
+			return (opt_key!==undefined)?this.bladeRotation[opt_key]:this.bladeRotation;
+			// return this.entity.getLocalRotation();
+			// return this.entity.getLocalEulerAngles();
+		}
+
 
 		/**
 		 * [updateMorphtarget description]
@@ -251,6 +314,8 @@ export default class Blade {
 				this.controls = new BladeControls({
 					name: this.name
 					,meshMorphsIndex: this.meshMorphsIndex
+					,bladeRotationOffset: this.bladeRotationOffset
+					,bladeRotation: this.bladeRotation
 				});
 
 			}

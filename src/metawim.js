@@ -37,6 +37,7 @@ export default class MetaWim {
 				this.count = count || 16;
 
 				// Rotation
+				this.rotationOffset = 90; // default offset to correct 0 degrees state (to TOP)
 				this.rotationStep = fixFloat(360/this.count);
 
 				// Scene
@@ -227,7 +228,7 @@ export default class MetaWim {
 		createBlades() {
 
 			let blade, name;
-			let rot = 90; // shift to top
+			let rot = 0; //this.rotationOffset; // shift to top
 			// for (var i = this.count; i >= 1; i--) {
 			for (var i = 1; i <= this.count; i++) {
 				//rotationStep
@@ -238,10 +239,14 @@ export default class MetaWim {
 					name: name
 					,graphicsDevice: this.app.graphicsDevice
 					,controls: this.ui !== null
+					,meshMorphsIndex: this.meshMorphsIndex
+					,bladeRotationStep: this.rotationStep
+					,bladeRotationOffset: this.rotationOffset
+					,bladeRotation: {x:0,y:0,z:rot}
 				});
 				// Rotate
-				blade.setRotation({z:0,y:0,x:rot});
-				rot-=this.rotationStep;
+				// rot-=this.rotationStep;
+				rot+=this.rotationStep;
 				// Add 
 				this.blades[name] = blade;				
 				
@@ -261,6 +266,8 @@ export default class MetaWim {
 				this.allcontrols = new BladeControls({
 					name: "all"
 					,meshMorphsIndex: this.meshMorphsIndex
+					,bladeRotationOffset: this.rotationOffset
+					,bladeRotation: {x:0,y:0,z:0}
 				});
 
 			}
@@ -292,12 +299,25 @@ export default class MetaWim {
 					// Assign callback to all observer
     				for (let id in allobserver) {
     					allobserver[id].observer.on('progress:set', function(newValue, oldValue) {
-							// Change Morph targets for all blades
-							for (let b in this.scope.blades) {
-								this.scope.blades[b].updateMorphtarget(this.idx,newValue, this.id);
-							}
+    						// Mutate
+    						switch(this.type) {
+    							case "morph":
+									// Change Morph targets for all blades
+									for (let b in this.scope.blades) {
+										this.scope.blades[b].updateMorphtarget(this.idx,newValue, this.id);
+									}
+									break;
+								case "rotation":
+    								// Rotate All
+    								for (let b in this.scope.blades) {
+										const rot = fixFloat((this.scope.blades[b].getBladeRotation(this.idx) + newValue) % 360);
+    									this.scope.blades[b].setRotation({[this.idx]:rot}, this.id);
+									}
+									break;
+    						}							
 						}.bind({
 							scope: this
+							,type: allobserver[id].type
 							,idx: allobserver[id].idx
 							,id: id
 						}));
@@ -318,11 +338,21 @@ export default class MetaWim {
 	    				// Assign callback to all observers
 	    				for (let id in observers) {
 	    					observers[id].observer.on('progress:set', function(newValue, oldValue) {
-								// Change Morph target
-								this.scope.blades[b].updateMorphtarget(this.idx,newValue);
+	    						// Mutate
+	    						switch(this.type) {
+	    							case "morph":
+	    								// Change Morph target
+										this.scope.blades[b].updateMorphtarget(this.idx,newValue);
+										break;
+									case "rotation":
+	    								// Rotate Blade
+    									this.scope.blades[b].setRotation({[this.idx]:newValue});
+										break;
+	    						}
 							}.bind({
-								scope: this,						
-								idx: observers[id].idx
+								scope: this								
+								,type: observers[id].type
+								,idx: observers[id].idx
 							}));
 	    				};
 	    				// Add DOM

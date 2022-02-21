@@ -81,6 +81,15 @@ export default class Material {
 			this.material = new StandardMaterial();
 			this.material.emissive = this.color;
 			this.material.cull = CULLFACE_NONE; // front and back face visible (https://developer.playcanvas.com/en/api/pc.Material.html#cull)
+
+			this.material.depthTest = false;
+			this.material.depthWrite = false;
+			this.material.specular.set(1, 1, 1);			
+			this.material.bumpiness = 0;
+			this.material.shininess = 50;
+			this.material.metalness = 0.3;
+			this.material.useMetalness = true;
+			
 			this.material.update();
 
 			return;
