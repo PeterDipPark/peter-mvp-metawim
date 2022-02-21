@@ -20,6 +20,18 @@ export const sortObjectArrayByKey = function(array, key, direction) {
   return array.sort((a, b) => (a[key] > b[key]) ? sort*1 : sort*-1);
 }
 
+
+/**
+ * [sortArrayByNumericValue description]
+ * @param  {[type]} array     [description]
+ * @param  {[type]} direction [description]
+ * @return {[type]}           [description]
+ */
+export const sortArrayByNumericValue = function(array, direction) {
+  const sort =  direction.toLowerCase() === "desc" ? -1 : 1; 
+  return array.sort((a, b) => (a > b) ? sort*1 : sort*-1);
+}
+
 /**
  * [htmlToDomFragment description]
  * @param  {[type]} s [description]

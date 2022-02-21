@@ -9,10 +9,11 @@ import {
 			Entity
 		} from 'playcanvas';
 
-import {meshPositions, meshIndices, meshUvs, meshMorphPositions} from './model';
+
+import {meshPositions, meshIndices, meshUvs, meshMorphPositions, meshMorphs} from './model';
 import Material from './material';
 import { defaultColors } from './colors';
-
+import BladeControls from './bladecontrols';
 
 export default class Blade {
 
@@ -27,17 +28,21 @@ export default class Blade {
 		 * @return {[type]}                  [description]
 		 */
 		constructor({...props}) {
-			
-			// Super
-			const { name, graphicsDevice } = props;
-	    	
+
 			// Props
+			const { name, graphicsDevice, controls } = props;	    	
 			this.name = name;
 			this.graphicsDevice = graphicsDevice;
 
+			// Blade meshMorphs (Indexes)
+			this.meshMorphsIndex = meshMorphs;
 
 			// Create Material
 			this.material = new Material({color:defaultColors[this.name] || defaultColors['blank']});
+
+			// Create Controls
+			this.hasControls = (controls === true);
+			this.controls = null;
 
 			// Init
 			this.init();
@@ -69,6 +74,9 @@ export default class Blade {
 			// Create Entity
 			this.createEntity();
 
+			// Create Controls
+			this.createControls();
+
 		}
 
 	////////////////////////
@@ -92,6 +100,23 @@ export default class Blade {
 		}
 
 		/**
+		 * [getMeshMorphsIndex description]
+		 * @return {[type]} [description]
+		 */
+		getMeshMorphsIndex() {
+			return this.meshMorphsIndex;
+		}
+
+		/**
+		 * [getControls description]
+		 * @param  {[type]} opt_key [description]
+		 * @return {[type]}         [description]
+		 */
+		getControls(opt_key) {
+			return this.controls.getControls(opt_key);
+		}
+
+		/**
 		 * [setRotation description]
 		 * @param {[type]} coords [description]
 		 */
@@ -100,10 +125,23 @@ export default class Blade {
 			// this.entity.rotate(coords.z, coords.y, coords.x);
 		}
 
-		updateMorphtarget(idx,weight, opt_ent) {
+		/**
+		 * [updateMorphtarget description]
+		 * @param  {[type]} idx         [description]
+		 * @param  {[type]} weight      [description]
+		 * @param  {[type]} opt_control [description]
+		 * @return {[type]}             [description]
+		 */
+		updateMorphtarget(idx,weight,opt_control) {
 
-			// console.warn("change mt ["+idx+"] from:", this.morphInstance.getWeight(idx), "to:", weight);
-			this.morphInstance.setWeight(idx,weight);
+			// Change Morph Weight		
+			if (opt_control !== undefined && this.hasControls) {
+				// Via controls
+				this.controls.getControls().observers[opt_control].observer.set('progress', weight); 
+			} else {
+				// Directly
+				this.morphInstance.setWeight(idx,weight);	
+			}
 
 		}
 
@@ -198,6 +236,24 @@ export default class Blade {
 			this.entity.addComponent("render", {
 			    meshInstances: [this.meshInstance],
 			});
+
+		}
+
+		/**
+		 * [createControls description]
+		 * @return {[type]} [description]
+		 */
+		createControls() {
+
+			// Has UI
+			if (this.hasControls === true) {
+			
+				this.controls = new BladeControls({
+					name: this.name
+					,meshMorphsIndex: this.meshMorphsIndex
+				});
+
+			}
 
 		}
 }

@@ -8,23 +8,35 @@
 	    		font-family: inconsolatamedium, Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
 			    font-weight: normal;
 			    font-size: 12px;
+
 	    	}
 	        body {
 	            margin: 0;
 	            overflow: hidden;
 	            background-color: #333333;
+				display: flex;
+				flex-direction: row;
+				justify-content: flex-start;
+				flex-wrap: wrap;
 	        }
 	        div#ui {
-	        	height: 10vh;
-	        	width: 100vw;
+	        	/*height: 10vh;
+	        	width: 100vw;*/
+	        	height: 100%;
+	        	width: 25vw;
+	        	overflow-y: scroll;
+	        	overflow-x: hidden;
 	        }
 	        	div#ui input {
 	        		width: 100% !important;
 	        	}
 
 	        canvas {
-	        	height: 90vh;
-	        	width: 100vw;
+	        	/*height: 90vh;
+	        	width: 100vw;*/
+	        	height: 100%;
+	        	width: 75vw;
+
 	        }
 	    </style>	    
 		<script src="metawim.js?v=5" ></script>
