@@ -9,3 +9,6 @@ node_modules/
 
 # SFTP config
 dist/sftp-config.json
+
+# Temp sources
+src/temp/
