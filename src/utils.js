@@ -43,6 +43,14 @@ export const normalizeRotationInputValue = function(pc_rot, pc_offset) {
   return (pc_rot===0||pc_rot===360)?pc_offset:fixFloat(pc_offset-pc_rot);
 }
 
+export const objectMap = function(obj, fn) {
+  return Object.fromEntries(
+    Object.entries(obj).map(
+      ([k, v], i) => [k, fn(v, k, i)]
+    )
+  )
+}
+
 /**
  * [htmlToDomFragment description]
  * @param  {[type]} s [description]

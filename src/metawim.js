@@ -8,9 +8,11 @@ import {
 // METAWIM
 import Blade from './blade';
 import Scene from './scene';
+import BladeControls from './bladecontrols';
+import States from './states';
 import { meshMorphs } from './model';
-import { fixFloat, sortArrayByNumericValue } from './utils'
-import BladeControls from './bladecontrols'
+import { fixFloat, sortArrayByNumericValue } from './utils';
+
 
 export default class MetaWim {
 	
@@ -47,22 +49,29 @@ export default class MetaWim {
 				// Blades			
 				this.blades = {};
 				
-				// All Controls
+				// All (Blades) Controls
 				this.meshMorphsIndex = meshMorphs;
 				this.allcontrols = null;
 
+				// States
+				this.states = new States({
+					controls: (this.ui !== null)
+				});
 
-				
-				this.animation = true;
 
-				this.morphWeight = 0;
-            	this.morphTarget = 0;
+				// Temp
 
-	    	// Listeners					  
-            	
-            	if (this.animation) {
-	    			//this.app.on("update", this.update, this);
-	    		}
+					// Animation
+									
+						this.animation = true;
+						this.morphWeight = 0;
+		            	this.morphTarget = 0;
+
+			    	// Listeners					  
+		            	
+		            	if (this.animation) {
+			    			//this.app.on("update", this.update, this);
+			    		}
 	    		
 
 			// Init
@@ -292,6 +301,58 @@ export default class MetaWim {
 		addControls() {
 
 			if (this.ui !== null) {
+				
+				// STATES				
+
+					// Get observers
+					const statesobserver = this.states.getControls("observers");
+					// Assign callback to all observer
+    				for (let id in statesobserver) {
+    					statesobserver[id].observer.on('progress:set', function(newValue, oldValue) {
+    						// Mutate
+    						switch(this.type) {
+    							case "export":
+									// Export state to console
+									this.scope.exportState()
+									break;
+								case "state":
+									// Apply state
+									const state = this.scope.states.getState(this.idx);
+									console.log("change state ["+this.idx+"]", state, newValue);
+									// Change States
+									for (let presetBlade in state.preset) {
+										for (let presetType in state.preset[presetBlade]) {
+											switch(presetType) {
+												case "morphing":
+
+													break;
+												case "rotation":
+													// keys
+													for (let presetKey in state.preset[presetBlade][presetType]) {
+														const value = fixFloat(newValue*state.preset[presetBlade][presetType][presetKey]);
+														console.log("rot", presetBlade, {[presetKey]:value});
+														this.scope.blades[presetBlade].setRotation({[presetKey]:value});
+													}
+													break;
+											}
+										}
+									}
+
+									// for (let b in this.scope.blades) {
+									// 	this.scope.blades[b].updateMorphtarget(this.idx,newValue, this.id);
+									// }
+									break;
+    						}							
+						}.bind({
+							scope: this
+							,type: statesobserver[id].type
+							,idx: statesobserver[id].idx
+							,id: id
+						}));
+    				};
+					// Add DOM
+    				this.ui.appendChild(this.states.getControls("ui"));
+
 				// ALL
 					
 					// Get observers
@@ -359,6 +420,24 @@ export default class MetaWim {
 	    				this.ui.appendChild(this.blades[b].getControls("ui"));
 	    			}
     		}
+
+		}
+
+
+
+		exportState() {
+
+			const currentState = {}; 
+			for (let b in this.blades) {
+				const rotation = this.blades[b].getStateRotation();
+				const morphing = this.blades[b].getStateMorphing();
+				currentState[b] = { 
+					morphing: {...{}, ...morphing }
+					,rotation: {...{}, ...rotation }
+				}; 
+			}
+			
+			console.info("Copy the object to some key of the presetStates object in the ./presets module\n", currentState);
 
 		}
 

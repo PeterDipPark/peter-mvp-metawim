@@ -49,6 +49,9 @@ export default class Blade {
 			this.material = new Material({color:defaultColors[this.name] || defaultColors['blank']});
 
 
+			// Morphing
+			this.morphing = this.meshMorphsIndex.reduce((acc,curr)=> (acc[curr.id]=0,acc),{}); // default is 0
+
 			// Rotation
 			this.rotation = {
 				x: 0,
@@ -150,13 +153,15 @@ export default class Blade {
 		 */
 		setRotation(coords, opt_control) {
 
-			// Update Rotation
-			this.rotation = { ...this.rotation, ...coords };
+			
 
 			if (opt_control !== undefined && this.hasControls) {
 				// Via controls
-				this.controls.getControls().observers[opt_control].observer.set('progress', this.rotation[opt_control]); 
+				this.controls.getControls().observers[opt_control].observer.set('progress', coords[opt_control]); 
 			} else {
+
+				// Update Rotation
+				this.rotation = { ...this.rotation, ...coords };
 
 				// Calculate		        
 		        this.quads.y.setFromEulerAngles(0, this.rotation.y, 0);
@@ -187,23 +192,36 @@ export default class Blade {
 			// return this.entity.getLocalEulerAngles();
 		}
 
+		getStateRotation() {
+			return this.rotation;
+		}
+		getStateMorphing() {
+			return this.morphing;
+		}
+
 
 		/**
 		 * [updateMorphtarget description]
-		 * @param  {[type]} idx         [description]
+		 * @param  {[type]} index        [description]
 		 * @param  {[type]} weight      [description]
 		 * @param  {[type]} opt_control [description]
 		 * @return {[type]}             [description]
 		 */
-		updateMorphtarget(idx,weight,opt_control) {
+		updateMorphtarget(index,weight,opt_control) {
+
+			
 
 			// Change Morph Weight		
 			if (opt_control !== undefined && this.hasControls) {
 				// Via controls
 				this.controls.getControls().observers[opt_control].observer.set('progress', weight); 
 			} else {
+
+				// Update Morphing
+				this.morphing[this.meshMorphsIndex.find( ({ idx }) => idx === index ).id] = weight;
+
 				// Directly
-				this.morphInstance.setWeight(idx,weight);	
+				this.morphInstance.setWeight(index,weight);	
 			}
 
 		}
