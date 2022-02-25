@@ -43,12 +43,26 @@ export const normalizeRotationInputValue = function(pc_rot, pc_offset) {
   return (pc_rot===0||pc_rot===360)?pc_offset:fixFloat(pc_offset-pc_rot);
 }
 
+/**
+ * [objectMap description]
+ * @param  {[type]}   obj [description]
+ * @param  {Function} fn  [description]
+ * @return {[type]}       [description]
+ */
 export const objectMap = function(obj, fn) {
   return Object.fromEntries(
     Object.entries(obj).map(
       ([k, v], i) => [k, fn(v, k, i)]
     )
   )
+}
+
+export const exportJson = function(name, data) {
+    const hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+    hiddenElement.target = '_blank';
+    hiddenElement.download = name+".json";
+    hiddenElement.click();
 }
 
 /**
