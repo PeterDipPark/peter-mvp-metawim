@@ -157,11 +157,17 @@ export default class Blade {
 
 			if (opt_control !== undefined && this.hasControls) {
 				// Via controls
-				this.controls.getControls().observers[opt_control].observer.set('progress', coords[opt_control]); 
+				if (Array.isArray(opt_control)) {
+					for (var i = 0; i < opt_control.length; i++) {
+						this.controls.getControls().observers[opt_control[i]].observer.set('progress', coords[opt_control[i]]);
+					};
+				} else {
+					this.controls.getControls().observers[opt_control].observer.set('progress', coords[opt_control]); 
+				}
 			} else {
 
 				// Update Rotation
-				this.rotation = { ...this.rotation, ...coords };
+				this.rotation = { ...this.rotation, ...coords };					
 
 				// Calculate		        
 		        this.quads.y.setFromEulerAngles(0, this.rotation.y, 0);

@@ -33,7 +33,7 @@ export default class StatesControls {
 				,bladeRotation
 			} = props;
 			this.name = name;
-			this.states = states || {};
+			this.states = states || {};			
 
 	    	// Controls
 	    	this.controls = {
@@ -75,7 +75,7 @@ export default class StatesControls {
 
 			return opt_key ? this.controls[opt_key] : this.controls;
 
-		}
+		}		
 
 	////////////////////////
 	// METHODS
@@ -187,6 +187,7 @@ export default class StatesControls {
 						statesStateContainer.appendChild(stateLabelContainer);
 
 						// Slider
+						/*
 						const stateObserver = new Observer({
 							progress: 0
 						});						
@@ -217,7 +218,34 @@ export default class StatesControls {
 						});
 						stateSlider.link(stateObserver,'progress');
 						statesStateContainer.appendChild(stateSlider.dom);
-
+						*/
+						// Button
+						const stateObserver = new Observer({progress: 1});
+						// Observer Callback is set from the main class
+						// stateObserver.on('progress:set', function(value) {
+						// 	console.log("value 4", value);
+						// }.bind(this));
+						const stateButton = new Button({
+							enabled: true,
+							height: null,
+							icon: "E401",
+							size: "",
+							tabIndex:0,
+							text:"Run state",
+							width:null
+						});
+						// Link observer
+						stateButton.link(stateObserver,'progress');
+						// Add button to state export container
+						statesStateContainer.appendChild(stateButton.dom);
+						// Add Export Container to States Container
+						// statesContainer.appendChild(statesExportContainer);
+						// Add Listener to Button
+						stateButton.on('click', function(value) {
+							// Dispatch event (toggle)
+							const oldValue = stateObserver.get("progress");						
+							stateObserver.set("progress", -1*oldValue);
+						});
 
 						// Add
 						this.controls.observers[state] = {

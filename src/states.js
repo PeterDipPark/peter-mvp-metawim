@@ -27,7 +27,7 @@ export default class States {
 				return {
 					preset: v 		// state values
 					,time: 0		// time now (ms)
-					,duration: 200 	// total (ms)
+					,duration: 500 	// total (ms)
 				}
 			});
 
