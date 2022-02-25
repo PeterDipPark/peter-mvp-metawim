@@ -231,7 +231,7 @@ export default class StatesControls {
 							icon: "E401",
 							size: "",
 							tabIndex:0,
-							text:"Run state",
+							text:"Run",
 							width:null
 						});
 						// Link observer
@@ -271,6 +271,8 @@ export default class StatesControls {
 						width:null
 					});
 					statesExportLabelContainer.appendChild(statesExportLabel.dom);
+					statesExportLabel.dom.style.color = "#00FF00";
+					statesExportLabelContainer.style.marginTop = "15px";
 					statesContainer.appendChild(statesExportLabelContainer);
 
 					// Button
@@ -286,12 +288,13 @@ export default class StatesControls {
 						icon: "E401",
 						size: "",
 						tabIndex:0,
-						text:"Export to console",
+						text:"Add",
 						width:null
 					});
 					// Link observer
 					exportButton.link(observerButton,'progress');
 					// Add button to state export container
+					statesExportContainer.style.marginBottom = "15px";
 					statesExportContainer.appendChild(exportButton.dom);
 					// Add Export Container to States Container
 					statesContainer.appendChild(statesExportContainer);
@@ -312,6 +315,122 @@ export default class StatesControls {
 				// Add Blader to UI DOM
 					this.controls.ui.appendChild(statesContainer);
 	
+		}
+
+		addStateControl(state) {
+
+			// Container
+				const statesContainer = document.createElement("DIV");
+
+			// States name
+				// const statesNameContainer = document.createElement("DIV");
+				// const statesLabel = new Label({
+				// 	enabled: true,
+				// 	height: null,
+				// 	text: state.toUpperCase(),
+				// 	tabIndex:0,
+				// 	width:null
+				// });
+				// statesNameContainer.appendChild(statesLabel.dom);
+				// statesLabel.dom.style.color = "#FF0000";
+				// statesNameContainer.style.marginTop = statesNameContainer.style.marginBottom = "15px";
+				// statesContainer.appendChild(statesNameContainer);
+
+			// States Controls					
+				const statesStateContainer = document.createElement("DIV");
+				// const states = this.states;
+				// // console.warn("populate controls for presetStates", states);
+				// // Loop add states
+				// for (let state in states) {
+
+
+					// Label
+					const stateLabelContainer = document.createElement("DIV");
+					const stateLabel = new Label({
+						enabled: true,
+						height: null,
+						text: "state: "+state,
+						tabIndex:0,
+						width:null
+					});
+					stateLabelContainer.appendChild(stateLabel.dom);
+					statesStateContainer.appendChild(stateLabelContainer);
+
+					// Slider
+					/*
+					const stateObserver = new Observer({
+						progress: 0
+					});						
+					// observer.on('progress:set', function(value) {
+					// 	// Change All blades morphTarget idx weight to value
+					// 	console.log("v", value);
+					// 	// for (let b in this.scope.blades) {
+					// 	// 	this.scope.blades[b].updateMorphtarget(this.idx,value);
+					// 	// }
+					// 	this.scope.updateMorphtarget.apply(this, [this.idx,value]);
+
+					// }.bind({
+					// 	scope: this,						
+					// 	idx: meshMorphs[i].idx
+					// }));
+					const stateSlider = new SliderInput({
+					    enabled: true, 
+						height: null,
+						max: 1,
+						min: 0,				
+						binding: new BindingTwoWay(),
+						pre: 0,
+						sliderMax: 1,
+						sliderMin: 0,
+						step: 0,
+						tabIndex: 0,
+						width: null
+					});
+					stateSlider.link(stateObserver,'progress');
+					statesStateContainer.appendChild(stateSlider.dom);
+					*/
+					// Button
+					const stateObserver = new Observer({progress: 1});
+					// Observer Callback is set from the main class
+					// stateObserver.on('progress:set', function(value) {
+					// 	console.log("value 4", value);
+					// }.bind(this));
+					const stateButton = new Button({
+						enabled: true,
+						height: null,
+						icon: "E401",
+						size: "",
+						tabIndex:0,
+						text:"Run",
+						width:null
+					});
+					// Link observer
+					stateButton.link(stateObserver,'progress');
+					// Add button to state export container
+					statesStateContainer.appendChild(stateButton.dom);
+					// Add Export Container to States Container
+					// statesContainer.appendChild(statesExportContainer);
+					// Add Listener to Button
+					stateButton.on('click', function(value) {
+						// Dispatch event (toggle)
+						const oldValue = stateObserver.get("progress");
+						stateObserver.set("progress", -1*oldValue);
+					});
+
+					// Add
+					this.controls.observers[state] = {
+						idx: state
+						,observer: stateObserver
+						,type: "state"
+					};
+				
+				// };
+				//
+				// Add State to States Container
+				statesContainer.appendChild(statesStateContainer);
+
+			// Add Blader to UI DOM
+			this.controls.ui.appendChild(statesContainer);
 		}
 
 }

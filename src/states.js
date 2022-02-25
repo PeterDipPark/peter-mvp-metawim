@@ -62,7 +62,18 @@ export default class States {
 
 		setState(id, state) {
 
-			this.states[id] = state;
+			this.states[id] = {
+					preset: state 		// state values
+					,time: 0		// time now (ms)
+					,duration: 500 	// total (ms)
+				};
+
+			// Has UI
+			if (this.hasControls === true) {
+			
+				this.controls.addStateControl(id);
+
+			}
 		
 		}
 
