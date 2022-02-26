@@ -59,7 +59,11 @@ export default class States {
 	// GETTERS / SETTERS
 	////////////////////////
 
-
+		/**
+		 * [setState description]
+		 * @param {[type]} id    [description]
+		 * @param {[type]} state [description]
+		 */
 		setState(id, state) {
 
 			this.states[id] = {
@@ -77,6 +81,11 @@ export default class States {
 		
 		}
 
+		/**
+		 * [getState description]
+		 * @param  {[type]} id [description]
+		 * @return {[type]}    [description]
+		 */
 		getState(id) {
 
 			return this.states[id];
@@ -96,7 +105,10 @@ export default class States {
 	// METHODS
 	////////////////////////
 
-
+		/**
+		 * [createControls description]
+		 * @return {[type]} [description]
+		 */
 		createControls() {
 
 			// Has UI

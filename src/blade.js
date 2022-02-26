@@ -152,9 +152,7 @@ export default class Blade {
 		 * @param {[type]} opt_control [description]
 		 */
 		setRotation(coords, opt_control) {
-
-			
-
+		
 			if (opt_control !== undefined && this.hasControls) {
 				// Via controls
 				if (Array.isArray(opt_control)) {
@@ -192,15 +190,29 @@ export default class Blade {
 			// return this.entity.getLocalEulerAngles();
 		}
 
+		/**
+		 * [getBladeRotation description]
+		 * @param  {[type]} opt_key [description]
+		 * @return {[type]}         [description]
+		 */
 		getBladeRotation(opt_key) {
 			return (opt_key!==undefined)?this.bladeRotation[opt_key]:this.bladeRotation;
 			// return this.entity.getLocalRotation();
 			// return this.entity.getLocalEulerAngles();
 		}
 
+		/**
+		 * [getStateRotation description]
+		 * @return {[type]} [description]
+		 */
 		getStateRotation() {
 			return this.rotation;
 		}
+
+		/**
+		 * [getStateMorphing description]
+		 * @return {[type]} [description]
+		 */
 		getStateMorphing() {
 			return this.morphing;
 		}
