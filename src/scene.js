@@ -4,6 +4,10 @@ import {
 			Entity
 		} from 'playcanvas';
 
+// Scripts
+import CreateOrbitCamera from './orbitcamera';
+import CreateMouseInput from './mouseinput';
+import CreateTouchInput from './touchinput';
 
 export default class Scene {
 
@@ -17,10 +21,14 @@ export default class Scene {
 		 * @param  {...[type]} options.props [description]
 		 * @return {[type]}                  [description]
 		 */
-		constructor() {
+		constructor(app) {
+
+			// App
+			this.app = app;
 
 			// Init
-			this.init();		
+			this.init();
+
 	        
 		}
 
@@ -38,10 +46,12 @@ export default class Scene {
 			// Create Light
 			this.createLight();
 
-			// Create Camera
-			this.createCamera();
+			// Create Camera - DEPRECATED (use Orbit Camera)
+			// this.createCamera();
+			// this.scene.setCameraView(); // Default View
 	    	
-
+			// Create Scipts
+			this.createScripts();
 		}
 
 	////////////////////////
@@ -66,6 +76,10 @@ export default class Scene {
 
 		getLight() {
 			return this.light
+		}
+
+		getScripts() {			
+			return this.scripts;
 		}
 
 	////////////////////////
@@ -108,6 +122,32 @@ export default class Scene {
 		    this.camera.addComponent("camera", {
 		        clearColor: new Color(0.2, 0.2, 0.2),
 		    });
+
+		}
+
+
+		createScripts() {			
+				
+			// Scripts
+			this.scripts = new Entity();
+			this.scripts.name = "scripts";
+			this.scripts.addComponent("script");
+			// Orbit Camera
+			this.scripts.script.create("orbitCamera", CreateOrbitCamera({
+				app: this.app
+				,defaultZoom: 20
+				,canZoom: true
+			}));
+			// Mouse Input
+			this.scripts.script.create("mouseInput", CreateMouseInput({
+				app: this.app
+			}));
+			// Touch Input
+			this.scripts.script.create("touchInput", CreateTouchInput({
+				app: this.app
+			}));
+
+
 
 		}
 }

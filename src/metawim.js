@@ -2,7 +2,12 @@
 import {
 	Application,
 	FILLMODE_NONE,
-	RESOLUTION_AUTO
+	RESOLUTION_AUTO,
+	Mouse,
+	TouchDevice,
+	// TEST
+	// CLEARFLAG_COLOR,
+	// CLEARFLAG_DEPTH
 } from 'playcanvas';
 
 // METAWIM
@@ -12,7 +17,6 @@ import BladeControls from './bladecontrols';
 import States from './states';
 import { meshMorphs } from './model';
 import { fixFloat, sortArrayByNumericValue, exportJson } from './utils';
-
 
 export default class MetaWim {
 	
@@ -24,16 +28,59 @@ export default class MetaWim {
 		constructor({...props}) {
 			
 			// Super 
-				const { canvas, ui, count } = props;
+				const { canvas, ui, count } = props;			
 
 			// Props 
 				
 				// Controls
 				this.ui = ui || null;
 
-				// App
-				this.app = new Application(canvas, {});
-				this.app.root.name = "MetaWim";				
+				// App (see options at https://developer.playcanvas.com/en/api/pc.Application.html#Application)
+				this.app = new Application(canvas, {
+					mouse: new Mouse(canvas)
+					,touch: new TouchDevice(canvas)
+					,graphicsDeviceOptions: window.CONTEXT_OPTIONS
+				});
+				this.app.root.name = "MetaWim";
+
+// console.log("window.CONTEXT_OPTIONS,", window.CONTEXT_OPTIONS);
+// const gl = canvas.getContext("webgl");
+// console.log(gl);
+// // gl.clearColor(0.5, 0, 0, 0.5);
+// // gl.clear(gl.COLOR_BUFFER_BIT);
+// // 
+// this.app.graphicsDevice.clear({
+//     color: [1, 1, 0, 1],
+//     depth: 1,
+//     flags: CLEARFLAG_COLOR | CLEARFLAG_DEPTH
+// });
+
+// var settings = {
+//     physics: {
+//         gravity: [0, -9.8, 0]
+//     },
+//     render: {
+//         fog_end: 1000,
+//         tonemapping: 0,
+//         skybox: null,
+//         fog_density: 0.01,
+//         gamma_correction: 1,
+//         exposure: 1,
+//         fog_start: 1,
+//         global_ambient: [0, 0, 0],
+//         skyboxIntensity: 1,
+//         skyboxRotation: [0, 0, 0],
+//         fog_color: [0, 0, 0],
+//         lightmapMode: 1,
+//         fog: 'none',
+//         lightmapMaxResolution: 2048,
+//         skyboxMip: 2,
+//         lightmapSizeMultiplier: 16
+//     }
+// };
+// this.app.applySceneSettings(settings);
+
+
 
 				// Count of blades
 				this.count = count || 16;
@@ -43,8 +90,8 @@ export default class MetaWim {
 				this.rotationStep = fixFloat(360/this.count);
 
 				// Scene
-				this.scene = new Scene();
-				this.scene.setCameraView(); // Default View
+				this.scene = new Scene(this.app);
+
 
 				// Blades			
 				this.blades = {};
@@ -126,9 +173,11 @@ export default class MetaWim {
 			// Add Light
 				this.app.root.addChild(this.scene.getLight());
 
-			// Add Camera
-				this.app.root.addChild(this.scene.getCamera());			
-		    	
+			// Add Camera - DEPRECATED (use script camera)
+				// this.app.root.addChild(this.scene.getCamera());			
+		    
+		    // Add Scripts			    	
+		    	this.app.root.addChild(this.scene.getScripts());		    
 
 	    	// Add Blades
 	    		this.addBlades();
@@ -145,7 +194,8 @@ export default class MetaWim {
 	    		// 	this.blades['blade16'].updateMorphtarget(0,1, 'm_Cutout_Left');
 	    		// 	// this.app.off();
 	    		// }.bind(this), 2000);
-
+				
+				
 		}
 
 	////////////////////////
