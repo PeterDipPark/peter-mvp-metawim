@@ -29,7 +29,7 @@ See https://www.dropbox.com/s/gl29xzsssnmjmuz/PP%20embedINwebflowAndWIMstar.mov?
 
 There’s two elements I want to highlight …that maybe can be realized at least to some extent. 
 
-A. the general relationship we discussed between PP 2D geometry and PC 3D geometry…ideally these are completely linked, propagating both ways(PP reflects PC and vice versa) ...able to synchronize continuously. Meaning the WIMstar sliders( see below item B) will be an always active modeling tool.
-B. WIMstar macros…meaning (WF)sliders impacting current WIMstar profile pushing global profile(all 16 Blades towards certain global macros (iPhone etc)  …ideally this should also impact the PP 2D version(not crucial tho if this reverse pipeline is complex)
+1. (A) the general relationship we discussed between PP 2D geometry and PC 3D geometry…ideally these are completely linked, propagating both ways(PP reflects PC and vice versa) ...able to synchronize continuously. Meaning the WIMstar sliders( see below item B) will be an always active modeling tool.
+2. (B) WIMstar macros…meaning (WF)sliders impacting current WIMstar profile pushing global profile(all 16 Blades towards certain global macros (iPhone etc)  …ideally this should also impact the PP 2D version(not crucial tho if this reverse pipeline is complex)
 
 It just hit me that you already have this sliders/macros ability implemented as PC sliders. Maybe it is pretty easy to replicate( at least some of)  these sliders in WF. One simpler scenario could be that we offer 4 WF sliders as macros, driving all 16 PC sliders towards a limited set of macros. This would for example allow us to offer one slider driving the parameter "product design” (ie. Driving a set of  PC sliders towards an iPhone design. And another WF slider of 4 in total, driving a set of PC sliders towards a macro representing "engineering design”
