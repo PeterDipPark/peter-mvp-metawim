@@ -21,7 +21,13 @@ export default class Scene {
 		 * @param  {...[type]} options.props [description]
 		 * @return {[type]}                  [description]
 		 */
-		constructor(app) {
+		constructor({...props}) {
+
+			// Props
+			const { app, count } = props;
+
+			// Count
+			this.count = count;
 
 			// App
 			this.app = app;
@@ -46,7 +52,7 @@ export default class Scene {
 			// Create Light
 			this.createLight();
 
-			// Create Camera - DEPRECATED (use Orbit Camera)
+			// Create Camera - DEPRECATED (use script oribitCamera)
 			// this.createCamera();
 			// this.scene.setCameraView(); // Default View
 	    	
@@ -59,19 +65,22 @@ export default class Scene {
 	////////////////////////
 	
 		/**
-		 * [setCameraView description]
+		 * [setCameraView description] - DEPRECATED (use script oribitCamera)
 		 * @param {[type]} opt_translation [description]
 		 * @param {[type]} opt_lookat      [description]
 		 */
-		setCameraView(opt_translation, opt_lookat) {
+		// setCameraView(opt_translation, opt_lookat) {
 
-			this.camera.translate(0, 0, 20);
-	    	this.camera.lookAt(Vec3.ZERO);
-	    	
-		}
+		// 	this.camera.translate(0, 0, 20);
+		// 	this.camera.lookAt(Vec3.ZERO);
+
+		// }
 
 		getCamera() {
-			return this.camera;
+			// DEPRECATED (use script oribitCamera)
+				// return this.camera;
+			// SCRIPT camera
+				return this.scripts.script.orbitCamera.entity;
 		}
 
 		getLight() {
@@ -111,19 +120,19 @@ export default class Scene {
 		}
 
 		/**
-		 * [createCamera description]
+		 * [createCamera description] - DEPRECATED (use script oribitCamera)
 		 * @return {[type]} [description]
 		 */
-		createCamera() {
+		// createCamera() {
 
-			// Create an Entity with a camera component
-		    this.camera = new Entity();
-		    this.camera.name = "camera";
-		    this.camera.addComponent("camera", {
-		        clearColor: new Color(0.2, 0.2, 0.2),
-		    });
+		// 	// Create an Entity with a camera component
+		// 	this.camera = new Entity();
+		// 	this.camera.name = "camera";
+		// 	this.camera.addComponent("camera", {
+		// 		clearColor: new Color(0.2, 0.2, 0.2),
+		// 	});
 
-		}
+		// }
 
 
 		createScripts() {			
@@ -135,6 +144,7 @@ export default class Scene {
 			// Orbit Camera
 			this.scripts.script.create("orbitCamera", CreateOrbitCamera({
 				app: this.app
+				,count: this.count
 				,defaultZoom: 20
 				,canZoom: true
 			}));
@@ -146,8 +156,6 @@ export default class Scene {
 			this.scripts.script.create("touchInput", CreateTouchInput({
 				app: this.app
 			}));
-
-
-
+			
 		}
 }

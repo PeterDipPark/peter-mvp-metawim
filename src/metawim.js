@@ -90,7 +90,10 @@ export default class MetaWim {
 				this.rotationStep = fixFloat(360/this.count);
 
 				// Scene
-				this.scene = new Scene(this.app);
+				this.scene = new Scene({
+					app: this.app
+					,count: this.count
+				});
 
 
 				// Blades			
@@ -173,7 +176,7 @@ export default class MetaWim {
 			// Add Light
 				this.app.root.addChild(this.scene.getLight());
 
-			// Add Camera - DEPRECATED (use script camera)
+			// Add Camera - DEPRECATED (use script oribitCamera)
 				// this.app.root.addChild(this.scene.getCamera());			
 		    
 		    // Add Scripts			    	
@@ -194,6 +197,9 @@ export default class MetaWim {
 	    		// 	this.blades['blade16'].updateMorphtarget(0,1, 'm_Cutout_Left');
 	    		// 	// this.app.off();
 	    		// }.bind(this), 2000);
+				
+				// console.log("this.app.scene.layers", this.app.scene.layers);
+
 				
 				
 		}
@@ -296,6 +302,8 @@ export default class MetaWim {
 				// Create
 				blade = new Blade({
 					name: name
+					,index: i
+					,layers: this.app.scene.layers
 					,graphicsDevice: this.app.graphicsDevice
 					,controls: this.ui !== null
 					,meshMorphsIndex: this.meshMorphsIndex

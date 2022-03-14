@@ -2,9 +2,13 @@ import {
 			StandardMaterial,
 			Color,
 			CULLFACE_NONE,
-			BLEND_NORMAL,
+			// TEST
+			BLEND_PREMULTIPLIED,
+			BLEND_NORMAL,			
 			FRESNEL_NONE,
-			SPECULAR_PHONG
+			SPECULAR_PHONG,
+			BLEND_MULTIPLICATIVE,
+
 		} from 'playcanvas';
 
 import { fixFloat } from './utils';
@@ -24,10 +28,11 @@ export default class Material {
 		constructor({...props}) {
 			
 			// Super
-			const { color } = props;
+			const { color, depth } = props;
 	    	
 			// Props
 			this.color = new Color(fixFloat(color.r/255),fixFloat(color.g/255),fixFloat(color.b/255)); // rgb values in 0.0-1.0 scale
+			this.depth = depth;
 
 			// Init
 			this.init();
@@ -82,8 +87,17 @@ export default class Material {
 			this.material.emissive = this.color;
 			this.material.cull = CULLFACE_NONE; // front and back face visible (https://developer.playcanvas.com/en/api/pc.Material.html#cull)
 
-			this.material.depthTest = false;
-			this.material.depthWrite = false;
+			// OLD - not depth test/write
+				// this.material.depthTest = false;
+				// this.material.depthWrite = false;
+
+			// NEW - render depth
+				this.material.depthTest = true;
+				this.material.depthWrite = true;
+				// // this.material.alphaToCoverage = true; ???				
+				// this.material.slopeDepthBias = 100*this.depth;
+				// this.material.depthBias = 100*this.depth;
+				
 			this.material.specular.set(1, 1, 1);			
 			this.material.bumpiness = 0;
 			this.material.shininess = 50;

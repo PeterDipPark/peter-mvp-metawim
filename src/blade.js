@@ -7,7 +7,16 @@ import {
 			MorphInstance,
 			MeshInstance,
 			Entity,
-			Quat
+			Quat,
+			// TEST
+			Layer,
+			SORTMODE_MANUAL,
+			SORTMODE_NONE,
+			SORTMODE_MATERIALMESH,
+			SORTMODE_BACK2FRONT,
+			SORTMODE_FRONT2BACK,
+			SHADER_DEPTH,
+			SHADER_FORWARDHDR,
 		} from 'playcanvas';
 
 
@@ -15,6 +24,7 @@ import {meshPositions, meshIndices, meshUvs, meshMorphPositions } from './model'
 import Material from './material';
 import { defaultColors } from './colors';
 import BladeControls from './bladecontrols';
+import { fixFloat } from './utils'
 
 export default class Blade {
 
@@ -33,6 +43,8 @@ export default class Blade {
 			// Props
 			const { 
 				name
+				,index
+				,layers
 				,graphicsDevice
 				,controls
 				,meshMorphsIndex
@@ -40,13 +52,18 @@ export default class Blade {
 				,bladeRotation
 			} = props;	    	
 			this.name = name;
+			this.index = index;
+			this.layers = layers;
 			this.graphicsDevice = graphicsDevice;
 			this.meshMorphsIndex = meshMorphsIndex;
 			this.bladeRotationOffset = bladeRotationOffset;
 			this.bladeRotation = bladeRotation
 
 			// Create Material
-			this.material = new Material({color:defaultColors[this.name] || defaultColors['blank']});
+			this.material = new Material({
+				color:defaultColors[this.name] || defaultColors['blank']
+				,depth: this.index
+			});
 
 
 			// Morphing
@@ -176,6 +193,7 @@ export default class Blade {
 
 		        // Set Rotation
 		        this.entity.setLocalRotation(this.quads.f);
+		        
 		    }
 		}
 
@@ -330,12 +348,27 @@ export default class Blade {
 		 */
 		createEntity() {
 
-			this.entity = new Entity();
-			this.entity.name = this.name;
-			this.entity.addComponent("render", {
-			    meshInstances: [this.meshInstance],
-			});
 
+			// Create Custom Layer that will holde the entity
+				this.layer = new Layer();
+				this.layer.id = this.layer.name = this.name;
+				this.layer.opaqueSortMode = SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;				
+				// customLayer.passThrough = true;
+				// customLayer.clearDepthBuffer = true;			
+				this.layers.insert(this.layer, 1);
+
+			// Create Entity
+				this.entity = new Entity();
+				this.entity.name = this.name;
+				this.entity.addComponent("render", {
+				    meshInstances: [this.meshInstance],
+				});
+
+			// Add Cutom layer to Entity
+				this.entity.render.layers = [this.layer.id];
+
+			// PUSH in Z-dir so we stack blades
+				this.entity.translate(0, 0, -fixFloat(this.index/1000));
 		}
 
 		/**

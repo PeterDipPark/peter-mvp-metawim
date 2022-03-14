@@ -4,11 +4,12 @@ import * as pc from 'playcanvas';
 const CreateOrbitCamera = ({...props}) => {
 
 	// Props
-	const { app, defaultZoom, canZoom } = props;
+	const { app, count, defaultZoom, canZoom } = props;
 
 	// Orbit Camera
 	var OrbitCamera = pc.createScript('orbitCamera', app);
 
+	OrbitCamera.attributes.add('layerCount', {type: 'number', default: count, title: 'Custom layers count'});
 	OrbitCamera.attributes.add('distanceDefault', {type: 'number', default: defaultZoom, title: 'Distance Default'});
 	OrbitCamera.attributes.add('distanceMax', {type: 'number', default: canZoom === true && defaultZoom !==null ? 0: defaultZoom, title: 'Distance Max', description: 'Setting this at 0 will give an infinite distance limit'});
 	OrbitCamera.attributes.add('distanceMin', {type: 'number', default: canZoom === true && defaultZoom !==null ? 0: defaultZoom, title: 'Distance Min'});
@@ -172,10 +173,19 @@ const CreateOrbitCamera = ({...props}) => {
 	OrbitCamera.prototype.initialize = function () {
 
 		// CUSTOM - Create Camera
-		this.entity.addComponent("camera", {
-			clearColorBuffer: true,
-			clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
-		});
+			this.entity.addComponent("camera", {
+				clearColorBuffer: true,
+				clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+				// NEW
+				// ,projection: pc.PROJECTION_ORTHOGRAPHIC
+				// ,cullFaces: false
+			});
+
+			var layers = this.entity.camera.layers;
+			for (var i = 1; i < this.layerCount+1; i++) {
+				layers.push("blade"+i);
+			};		
+			this.entity.camera.layers = layers;
 
 		// BAU
 
