@@ -5,9 +5,7 @@ import {
 	RESOLUTION_AUTO,
 	Mouse,
 	TouchDevice,
-	// TEST
-	// CLEARFLAG_COLOR,
-	// CLEARFLAG_DEPTH
+	Color,
 } from 'playcanvas';
 
 // METAWIM
@@ -30,56 +28,27 @@ export default class MetaWim {
 			// Super 
 				const { canvas, ui, count } = props;			
 
-			// Props 
-				
+			// Props
+
 				// Controls
 				this.ui = ui || null;
+
+				// Canvas context (see options at https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext)
+				const gl = canvas.getContext("webgl2", {
+					alpha: true
+					,antialias: true
+					,powerPreference: "high-performance"
+					,premultipliedAlpha: true
+				});
+				gl.alpha = true;
 
 				// App (see options at https://developer.playcanvas.com/en/api/pc.Application.html#Application)
 				this.app = new Application(canvas, {
 					mouse: new Mouse(canvas)
 					,touch: new TouchDevice(canvas)
-					,graphicsDeviceOptions: window.CONTEXT_OPTIONS
+					,graphicsDeviceOptions: gl
 				});
 				this.app.root.name = "MetaWim";
-
-// console.log("window.CONTEXT_OPTIONS,", window.CONTEXT_OPTIONS);
-// const gl = canvas.getContext("webgl");
-// console.log(gl);
-// // gl.clearColor(0.5, 0, 0, 0.5);
-// // gl.clear(gl.COLOR_BUFFER_BIT);
-// // 
-// this.app.graphicsDevice.clear({
-//     color: [1, 1, 0, 1],
-//     depth: 1,
-//     flags: CLEARFLAG_COLOR | CLEARFLAG_DEPTH
-// });
-
-// var settings = {
-//     physics: {
-//         gravity: [0, -9.8, 0]
-//     },
-//     render: {
-//         fog_end: 1000,
-//         tonemapping: 0,
-//         skybox: null,
-//         fog_density: 0.01,
-//         gamma_correction: 1,
-//         exposure: 1,
-//         fog_start: 1,
-//         global_ambient: [0, 0, 0],
-//         skyboxIntensity: 1,
-//         skyboxRotation: [0, 0, 0],
-//         fog_color: [0, 0, 0],
-//         lightmapMode: 1,
-//         fog: 'none',
-//         lightmapMaxResolution: 2048,
-//         skyboxMip: 2,
-//         lightmapSizeMultiplier: 16
-//     }
-// };
-// this.app.applySceneSettings(settings);
-
 
 
 				// Count of blades
@@ -94,7 +63,7 @@ export default class MetaWim {
 					app: this.app
 					,count: this.count
 				});
-
+				this.app.scene.ambientLight = new Color(1, 1, 1);
 
 				// Blades			
 				this.blades = {};
@@ -192,6 +161,14 @@ export default class MetaWim {
 	    		this.app.start();
 
 
+	    		// var worldLayer = this.app.scene.layers.getLayerByName('World');
+    			// // worldLayer.clearDepthBuffer = true;
+    			// worldLayer.enabled = false;
+
+    			// var depthLayer = this.app.scene.layers.getLayerByName('Depth');	    	
+    			// depthLayer.clearDepthBuffer = true;
+    			// depthLayer.enabled = false;
+
 	    	// Test
 	    		// setTimeout(function () {
 	    		// 	this.blades['blade16'].updateMorphtarget(0,1, 'm_Cutout_Left');
@@ -199,6 +176,7 @@ export default class MetaWim {
 	    		// }.bind(this), 2000);
 				
 				// console.log("this.app.scene.layers", this.app.scene.layers);
+				// console.log("this.app", this.app);
 
 				
 				

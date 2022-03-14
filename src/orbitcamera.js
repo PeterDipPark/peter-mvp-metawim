@@ -172,21 +172,77 @@ const CreateOrbitCamera = ({...props}) => {
 
 	OrbitCamera.prototype.initialize = function () {
 
-		// CUSTOM - Create Camera
-			this.entity.addComponent("camera", {
-				clearColorBuffer: true,
-				clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
-				// NEW
-				// ,projection: pc.PROJECTION_ORTHOGRAPHIC
-				// ,cullFaces: false
-			});
+		// CUSTOM - Create Camera			
 
-			var layers = this.entity.camera.layers;
-			for (var i = 1; i < this.layerCount+1; i++) {
-				layers.push("blade"+i);
-			};		
-			this.entity.camera.layers = layers;
+			// WORKING
+				// this.entity.addComponent("camera", {
+				// 	clearColorBuffer: true,
+				// 	clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+				// 	// NEW
+				// 	// ,projection: pc.PROJECTION_ORTHOGRAPHIC
+				// 	// ,cullFaces: false
+				// 	// ,clearDepthBuffer: true
+				// });
+				// var layers = this.entity.camera.layers;
+				// for (var i = 1; i < this.layerCount+1; i++) {
+				// 	layers.push("blade"+i);
+				// };		
+				// this.entity.camera.layers = layers;
 
+			// TEST 
+			
+				// const worldLayer = this.app.scene.layers.getLayerByName("World");
+				// const layers = [worldLayer.id];
+				
+				// this.entity.addComponent("camera", {
+				// 	clearColorBuffer: false
+				// 	// clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+				// 	// NEW
+				// 	// ,projection: pc.PROJECTION_ORTHOGRAPHIC
+				// 	// ,cullFaces: false
+				// 	,clearDepthBuffer: false
+				// });
+				// // var layers = this.entity.camera.layers;
+				// for (var i = 1; i < this.layerCount+1; i++) {
+				// 	layers.push("blade"+i);
+				// };		
+				// this.entity.camera.layers = layers;
+				
+
+			// TEST
+				
+				this.entity.addComponent("camera", {
+					clearColorBuffer: false
+					// ,clearColor: new pc.Color(0, 0, 0, 0) // new pc.Color(0.2, 0.2, 0.2),
+					// NEW
+					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
+					// ,cullFaces: false
+					,clearDepthBuffer: false
+				});
+				for (var i = 1; i < this.layerCount+1; i++) {
+					var entity = new pc.Entity();
+					entity.addComponent('camera', {
+					    // nearClip: 1,
+					    // farClip: 100,
+					    // fov: 55
+					    //
+					    // clearColorBuffer: true
+						// ,clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+					    // ,clearDepthBuffer: true
+					    
+					    clearDepthBuffer: false
+					    ,priority: i
+					    // ,projection: pc.PROJECTION_ORTHOGRAPHIC
+					    // ,frustumCulling: true
+					    ,clearColorBuffer: false
+					    
+					});
+					entity.camera.layers = ["blade"+i];
+
+					this.entity.addChild(entity);
+				};		
+				
+			
 		// BAU
 
 	    var self = this;

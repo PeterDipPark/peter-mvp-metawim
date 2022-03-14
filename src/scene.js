@@ -47,7 +47,7 @@ export default class Scene {
 		 * [init description]
 		 * @return {[type]} [description]
 		 */
-		init() {
+		init() {			
 
 			// Create Light
 			this.createLight();
@@ -108,14 +108,24 @@ export default class Scene {
 	            type: "omni", //"directional",
 	            color: new Color(1, 1, 1),
 	            castShadows: false,
+	            // range: 100,
 	            // shadowBias: 0.2,
 	            // shadowDistance: 25,
 	            // normalOffsetBias: 0.05,
 	            // shadowResolution: 2048,
 	        });
 
-	        // set the direction for our light
-	        this.light.setLocalEulerAngles(45, 30, 0);	        
+	        // const worldLayer = this.app.scene.layers.getLayerByName("World");
+	        // var layers = [worldLayer.id];
+
+	        const layers = [];
+	        for (var i = 1; i < this.count+1; i++) {
+	        	layers.push("blade"+i);
+	        }
+	        this.light.light.layers = layers;
+
+	        // set the direction for our light - DEPRECATED (for directional light)
+	        // this.light.setLocalEulerAngles(45, 30, 0);	        
 
 		}
 
