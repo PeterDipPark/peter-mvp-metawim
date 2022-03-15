@@ -12,3 +12,4 @@ dist/sftp-config.json
 
 # Temp sources
 src/temp/
+dist/test/

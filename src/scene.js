@@ -182,8 +182,8 @@ export default class Scene {
 			this.scripts.script.create("orbitCamera", CreateOrbitCamera({
 				app: this.app
 				,count: this.count
-				,defaultZoom: 20
-				,canZoom: true
+				,defaultZoom: 20.1
+				,canZoom: false
 			}));
 			// Mouse Input
 			this.scripts.script.create("mouseInput", CreateMouseInput({

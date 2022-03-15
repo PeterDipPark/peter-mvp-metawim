@@ -2,6 +2,7 @@
 import {
 	Application,
 	FILLMODE_NONE,
+	FILLMODE_FILL_WINDOW,
 	RESOLUTION_AUTO,
 	Mouse,
 	TouchDevice,
@@ -200,6 +201,7 @@ export default class MetaWim {
 		setupCanvas() {
 
 			this.app.setCanvasFillMode(FILLMODE_NONE); // https://developer.playcanvas.com/en/api/pc.Application.html#fillMode
+			//this.app.setCanvasFillMode(FILLMODE_FILL_WINDOW);
 	    	this.app.setCanvasResolution(RESOLUTION_AUTO);
 
 		}
@@ -400,6 +402,8 @@ export default class MetaWim {
 	    				// Add DOM
 	    				this.ui.appendChild(this.blades[b].getControls("ui"));
 	    			}
+    		
+	    		// Add to parent	    		
     		}
 
 		}
