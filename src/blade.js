@@ -349,32 +349,46 @@ export default class Blade {
 		 */
 		createEntity() {
 
+			if ("use layers" === "no") {
 
-			// get the world layer index
-    		const worldLayer = this.layers.getLayerByName("World");
-    		const idx = this.layers.getTransparentIndex(worldLayer);
+				// get the world layer index
+	    		const worldLayer = this.layers.getLayerByName("World");
+	    		const idx = this.layers.getTransparentIndex(worldLayer);
 
-			// Create Custom Layer that will holde the entity
-				this.layer = new Layer();
-				this.layer.id = this.layer.name = this.name;
-				this.layer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;				
-				// customLayer.passThrough = true;
-				// this.layer.clearDepthBuffer = true;
-				// this.layer.shaderPass = SHADER_DEPTH;
-				this.layers.insert(this.layer, idx+1);
+				// Create Custom Layer that will holde the entity
+					this.layer = new Layer();
+					this.layer.id = this.layer.name = this.name;
+					this.layer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;				
+					// customLayer.passThrough = true;
+					// this.layer.clearDepthBuffer = true;
+					// this.layer.shaderPass = SHADER_DEPTH;
+					this.layers.insert(this.layer, idx+1);
 
-			// Create Entity
-				this.entity = new Entity();
-				this.entity.name = this.name;
-				this.entity.addComponent("render", {
-				    meshInstances: [this.meshInstance],
-				});
+				// Create Entity
+					this.entity = new Entity();
+					this.entity.name = this.name;
+					this.entity.addComponent("render", {
+					    meshInstances: [this.meshInstance],
+					});
 
-			// Add Cutom layer to Entity
-				this.entity.render.layers = [this.layer.id];
+				// Add Cutom layer to Entity
+					this.entity.render.layers = [this.layer.id];
+
+			} else {
+
+				// Create Entity
+					this.entity = new Entity();
+					this.entity.name = this.name;
+					this.entity.addComponent("render", {
+					    meshInstances: [this.meshInstance],
+					});
+
+			}
 
 			// PUSH in Z-dir so we stack blades
 				// this.entity.translate(0, 0, (this.index/1000));
+				// this.entity.translate(0, 0, -fixFloat(this.index/1000));
+
 				this.entity.translate(0, 0, -fixFloat(this.index/1000));
 		}
 

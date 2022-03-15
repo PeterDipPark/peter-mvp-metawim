@@ -4,7 +4,8 @@ import {
 			CULLFACE_NONE,
 			// TEST
 			BLEND_PREMULTIPLIED,
-			BLEND_NORMAL,			
+			BLEND_NORMAL,
+			BLEND_ADDITIVE,
 			FRESNEL_NONE,
 			SPECULAR_PHONG,
 			BLEND_MULTIPLICATIVE,
@@ -96,10 +97,52 @@ export default class Material {
 			// NEW 
 				
 
-				this.material.opacity = 1; // opacity doesn't work with depthWrite/Test
-				this.material.diffuse = this.color;
+					// DIFFUSE COLOR and OPACITV
+					
+						
+						//this.material.opacity = 0.5; // opacity doesn't work with depthWrite/Test
+						
+						this.material.diffuse = this.color;
+						this.material.depthTest = true; //true;
+						this.material.depthWrite = true; //true;
+				
+						// this.material.depthBias = this.depth;
+						// 
+						// this.material.useMorphPosition = true;
+						// this.material.useMorphNormal = true;
+						// this.material.useInstancing = true;
 
-
+					// TEXTURE
+						
+						/*
+						// Create a 8x8x24-bit texture
+							var texture = new Texture(this.graphicsDevice, {
+							    width: 8,
+							    height: 8,
+							    format: PIXELFORMAT_R8_G8_B8_A8,
+							    // premultiplyAlpha: true
+							});
+						// Fill the texture with a gradient
+							// var pixels = texture.lock();
+							// var count = 0;
+							// for (var i = 0; i < 8; i++) {
+							//     for (var j = 0; j < 8; j++) {
+							//         pixels[count++] = i * 32;
+							//         pixels[count++] = j * 32;
+							//         pixels[count++] = 255;
+							//     }
+							// }
+							// texture.unlock();
+						// Set from IMG
+							texture.setSource(document.getElementById("texture"));
+							texture.diffuseMapChannel = "rgba";
+						// Add to material
+							this.material.diffuseMap = texture;
+						*/
+					
+				// this.material.alphaToCoverage = true;
+				// this.material.slopeDepthBias = 10*this.depth;
+				
 				//this.material.redWrite=this.material.greenWrite=this.material.blueWrite=this.material.alphaWrite=false;
 
 				// this.material.alphaFade = 0.5;
@@ -107,15 +150,6 @@ export default class Material {
 				// this.material.blend = false;
 				// this.material.blendSrc = BLENDMODE_SRC_ALPHA;
 				// this.material.blendDst = BLENDMODE_ONE_MINUS_SRC_ALPHA;
-				
-				// TEXTURE (TBD)
-				// var texture = new Texture(this.graphicsDevice, {
-				//     width: 8,
-				//     height: 8,
-				//     format: PIXELFORMAT_R8_G8_B8_A8,
-				//     premultiplyAlpha: true
-				// });
-				// this.material.diffuseMap = texture;
 				
 
 				// this.material.emissiveTint = true;
@@ -135,12 +169,11 @@ export default class Material {
 				// this.material.depthWrite = false;
 
 			// NEW - render depth
-				this.material.depthTest = true; //true;
-				this.material.depthWrite = true; //true;
+				
 				// // this.material.alphaToCoverage = true; ???				
 				// this.material.slopeDepthBias = 1*this.depth;
-				// this.material.depthBias = 10*this.depth;
-				this.material.blendType = BLEND_NORMAL;
+				// this.material.depthBias = this.depth;
+									this.material.blendType = BLEND_NORMAL;
 				// this.material.alphaTest = true;
 				// this.material.alphaWrite = true;
 				// this.material.alphaToCoverage = false;

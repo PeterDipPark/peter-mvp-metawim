@@ -8,6 +8,7 @@ import {
 import CreateOrbitCamera from './orbitcamera';
 import CreateMouseInput from './mouseinput';
 import CreateTouchInput from './touchinput';
+import SceneControls from "./scenecontrols";
 
 export default class Scene {
 
@@ -24,13 +25,17 @@ export default class Scene {
 		constructor({...props}) {
 
 			// Props
-			const { app, count } = props;
+			const { controls, app, count } = props;
 
 			// Count
 			this.count = count;
 
 			// App
 			this.app = app;
+
+			// Create Controls
+			this.hasControls = (controls === true);
+			this.controls = null;
 
 			// Init
 			this.init();
@@ -58,6 +63,9 @@ export default class Scene {
 	    	
 			// Create Scipts
 			this.createScripts();
+
+			// Create Controls
+			this.createControls();
 		}
 
 	////////////////////////
@@ -91,6 +99,21 @@ export default class Scene {
 			return this.scripts;
 		}
 
+		resetCamera() {
+			this.scripts.script.orbitCamera.fire('reset');
+		}
+
+
+		/**
+		 * [getControls description]
+		 * @param  {[type]} opt_key [description]
+		 * @return {[type]}         [description]
+		 */
+		getControls(opt_key) {
+			return this.controls.getControls(opt_key);
+		}
+
+
 	////////////////////////
 	// METHODS
 	////////////////////////
@@ -118,11 +141,15 @@ export default class Scene {
 	        // const worldLayer = this.app.scene.layers.getLayerByName("World");
 	        // var layers = [worldLayer.id];
 
-	        const layers = [];
-	        for (var i = 1; i < this.count+1; i++) {
-	        	layers.push("blade"+i);
-	        }
-	        this.light.light.layers = layers;
+	        if ("use layers" === "no") {
+	        	
+	        	const layers = this.light.light.layers;
+		        for (var i = 1; i < this.count+1; i++) {
+		        	layers.push("blade"+i);
+		        }
+		        this.light.light.layers = layers;
+
+		    }
 
 	        // set the direction for our light - DEPRECATED (for directional light)
 	        // this.light.setLocalEulerAngles(45, 30, 0);	        
@@ -167,5 +194,33 @@ export default class Scene {
 				app: this.app
 			}));
 			
+
+			
+			// TEST RESET orbitCamera
+			// setTimeout(function() {
+			// 	console.log("fire...");
+			// 	this.resetCamera();
+			// }.bind(this), 5000);
+			
+
+		}
+
+
+		/**
+		 * [createControls description]
+		 * @return {[type]} [description]
+		 */
+		createControls() {
+
+			// Has UI
+			if (this.hasControls === true) {
+			
+				this.controls = new SceneControls({
+					name: "scene"
+					,camera: this.scripts.script.orbitCamera !== undefined
+				});
+
+			}
+
 		}
 }

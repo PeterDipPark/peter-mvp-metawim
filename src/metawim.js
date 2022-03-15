@@ -38,9 +38,9 @@ export default class MetaWim {
 					alpha: true
 					,antialias: true
 					,powerPreference: "high-performance"
-					,premultipliedAlpha: true
+					// ,premultipliedAlpha: true
 				});
-				gl.alpha = true;
+				// gl.alpha = false // true;
 
 				// App (see options at https://developer.playcanvas.com/en/api/pc.Application.html#Application)
 				this.app = new Application(canvas, {
@@ -62,6 +62,7 @@ export default class MetaWim {
 				this.scene = new Scene({
 					app: this.app
 					,count: this.count
+					,controls: this.ui !== null
 				});
 				this.app.scene.ambientLight = new Color(1, 1, 1);
 
@@ -78,20 +79,6 @@ export default class MetaWim {
 				});
 				this.lastState = {};
 
-				// Temp
-
-					// Animation
-									
-						this.animation = true;
-						this.morphWeight = 0;
-		            	this.morphTarget = 0;
-
-			    	// Listeners					  
-		            	
-		            	if (this.animation) {
-			    			//this.app.on("update", this.update, this);
-			    		}
-	    		
 
 			// Init
 				this.init();
@@ -118,7 +105,7 @@ export default class MetaWim {
 
 	    	// Create Blades
 			this.createBlades();			
-			
+
 			// Create All Controls
 			this.createAllControls();
 
@@ -193,52 +180,6 @@ export default class MetaWim {
 		 */
 		update(dt) {
 
-			let mw;
-
-			// Change morph weight
-            if (this.morphWeight<100) {
-                this.morphWeight++;
-
-                if (this.morphTarget === meshMorphs.length-1) {
-                	this.morphTarget = 0;
-                }
-
-                mw = Math.min(Math.max(this.morphWeight/100, 0), 1);
-
-                // DIRECTLY 
-					// for (let b in this.blades) {
-					// 	this.blades[b].updateMorphtarget(this.morphTarget,mw);
-					// 	// controls
-					// 	if (this.observers[b] && this.observers[b][this.morphTarget]) {
-					// 		this.observers[b][this.morphTarget].set('progress', mw);
-					// 	}
-					// }
-				// THROUGH CONTROLS
-					this.observer[this.morphTarget].set('progress', mw);
-
-            } else if (this.morphWeight<=200) {
-                this.morphWeight++;
-
-                mw = Math.min(Math.max((200-this.morphWeight)/100, 0), 1);
-
-                // DIRECTLY 
-					// for (let b in this.blades) {
-					// 	this.blades[b].updateMorphtarget(this.morphTarget,mw);
-					// 	// controls
-					// 	if (this.observers[b] && this.observers[b][this.morphTarget]) {
-					// 		this.observers[b][this.morphTarget].set('progress', mw);
-					// 	}
-					// }
-
-				// THROUGH CONTROLS
-					this.observer[this.morphTarget].set('progress', mw);
-
-            } else {
-
-                this.morphWeight = 0;   
-
-                this.morphTarget++;
-            }
 
 		}
 
@@ -338,7 +279,31 @@ export default class MetaWim {
 
 			if (this.ui !== null) {
 				
-					
+				// SCENE
+				
+					// Get observers
+					const sceneobserver = this.scene.getControls("observers");
+					// Assign callback to all observer
+    				for (let id in sceneobserver) {
+    					sceneobserver[id].observer.on('progress:set', function(newValue, oldValue) {
+    						// Mutate
+    						switch(this.type) {
+								case "camera":
+									// Reset
+									this.scope.scene.resetCamera();
+									break;
+    						}    						
+						}.bind({
+							scope: this
+							,type: sceneobserver[id].type
+							,idx: sceneobserver[id].idx
+							,id: id
+						}));
+    				};
+					// Add DOM
+    				this.ui.appendChild(this.scene.getControls("ui"));
+
+
 
 				// STATES				
 

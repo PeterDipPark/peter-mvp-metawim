@@ -38,7 +38,6 @@ const CreateOrbitCamera = ({...props}) => {
 	    description: 'Frames the entity or scene at the start of the application."'
 	});
 
-
 	// Property to get and set the distance between the pivot point and camera
 	// Clamped between this.distanceMin and this.distanceMax
 	Object.defineProperty(OrbitCamera.prototype, "distance", {
@@ -172,75 +171,70 @@ const CreateOrbitCamera = ({...props}) => {
 
 	OrbitCamera.prototype.initialize = function () {
 
-		// CUSTOM - Create Camera			
+		// CUSTOM - Create Camera
 
-			// WORKING
-				// this.entity.addComponent("camera", {
-				// 	clearColorBuffer: true,
-				// 	clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
-				// 	// NEW
-				// 	// ,projection: pc.PROJECTION_ORTHOGRAPHIC
-				// 	// ,cullFaces: false
-				// 	// ,clearDepthBuffer: true
-				// });
-				// var layers = this.entity.camera.layers;
-				// for (var i = 1; i < this.layerCount+1; i++) {
-				// 	layers.push("blade"+i);
-				// };		
-				// this.entity.camera.layers = layers;
-
-			// TEST 
+			// CAMERA wt/wo layers 
 			
 				// const worldLayer = this.app.scene.layers.getLayerByName("World");
 				// const layers = [worldLayer.id];
 				
+				this.entity.addComponent("camera", {
+					clearColorBuffer: false
+					// clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+					// NEW
+					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
+					// ,cullFaces: false
+					,clearDepthBuffer: false
+					
+					// ,nearClip: 1
+					// ,farClip: 100
+					// ,fov: 55,
+					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
+				});
+
+				if ("use layers" === "no") {
+
+					const layers = this.entity.camera.layers;
+					for (var i = 1; i < this.layerCount+1; i++) {
+						layers.push("blade"+i);
+					};		
+					this.entity.camera.layers = layers;
+				
+				}
+
+			// TEST - each layer will have its own camera with the priority
+				
 				// this.entity.addComponent("camera", {
 				// 	clearColorBuffer: false
-				// 	// clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+				// 	// ,clearColor: new pc.Color(0, 0, 0, 0) // new pc.Color(0.2, 0.2, 0.2),
 				// 	// NEW
 				// 	// ,projection: pc.PROJECTION_ORTHOGRAPHIC
 				// 	// ,cullFaces: false
 				// 	,clearDepthBuffer: false
 				// });
-				// // var layers = this.entity.camera.layers;
 				// for (var i = 1; i < this.layerCount+1; i++) {
-				// 	layers.push("blade"+i);
+				// 	var entity = new pc.Entity();
+				// 	entity.addComponent('camera', {
+				// 	    // nearClip: 1,
+				// 	    // farClip: 100,
+				// 	    // fov: 55
+				// 	    //
+				// 	    // clearColorBuffer: true
+				// 		// ,clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+				// 	    // ,clearDepthBuffer: true
+					    
+				// 	    clearDepthBuffer: false
+				// 	    ,priority: i
+				// 	    // ,projection: pc.PROJECTION_ORTHOGRAPHIC
+				// 	    // ,frustumCulling: true
+				// 	    ,clearColorBuffer: false
+				// 	    // ,cullFaces: false
+					    
+				// 	});
+				// 	entity.camera.layers = ["blade"+i];				
+
+				// 	this.entity.addChild(entity);
 				// };		
-				// this.entity.camera.layers = layers;
-				
-
-			// TEST
-				
-				this.entity.addComponent("camera", {
-					clearColorBuffer: false
-					// ,clearColor: new pc.Color(0, 0, 0, 0) // new pc.Color(0.2, 0.2, 0.2),
-					// NEW
-					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
-					// ,cullFaces: false
-					,clearDepthBuffer: false
-				});
-				for (var i = 1; i < this.layerCount+1; i++) {
-					var entity = new pc.Entity();
-					entity.addComponent('camera', {
-					    // nearClip: 1,
-					    // farClip: 100,
-					    // fov: 55
-					    //
-					    // clearColorBuffer: true
-						// ,clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
-					    // ,clearDepthBuffer: true
-					    
-					    clearDepthBuffer: false
-					    ,priority: i
-					    // ,projection: pc.PROJECTION_ORTHOGRAPHIC
-					    // ,frustumCulling: true
-					    ,clearColorBuffer: false
-					    
-					});
-					entity.camera.layers = ["blade"+i];
-
-					this.entity.addChild(entity);
-				};		
 				
 			
 		// BAU
@@ -320,10 +314,15 @@ const CreateOrbitCamera = ({...props}) => {
 	        if (value) {
 	            this.focus(this.focusEntity || this.app.root);
 	        }
-	    });
+	    });	    
 
 	    this.on('destroy', function() {
 	        window.removeEventListener('resize', onWindowResize, false);
+	    });
+
+	    // CUSTOM
+	    this.on('reset', function () {
+	    	this._resetPosition();
 	    });
 	};
 
@@ -349,6 +348,18 @@ const CreateOrbitCamera = ({...props}) => {
 	    position.scale(-this._distance);
 	    position.add(this.pivotPoint);
 	    this.entity.setPosition(position);
+
+	    // console.warn("\tposition", position);
+
+	};
+
+	// CUSTOM
+	OrbitCamera.prototype._resetPosition = function () {
+		
+		this._targetPitch = 0;
+		this._targetYaw = -0;
+		this._targetDistance = this.distanceDefault;
+		
 	};
 
 

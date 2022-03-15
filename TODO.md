@@ -3,9 +3,9 @@
 ## Play Canvas
 
 ### core:
-1. blades transparency 
-2. model orbit/rotation drag
-3. global offset slider
+1. TBD: blades transparency 
+2. DONE: model orbit/rotation drag
+3. DO: global offset slider
 4. floating labels 
 5. receive and execute commands from outside
 
