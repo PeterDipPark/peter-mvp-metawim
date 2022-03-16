@@ -214,6 +214,7 @@ export default class BladeControls {
 							tabIndex: 0,
 							width: null
 						});
+						;
 						slider.link(observer,'progress');
 						morphContainer.appendChild(slider.dom);
 

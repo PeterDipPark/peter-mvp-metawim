@@ -33,6 +33,10 @@
     			background-color: transparent;
     			overflow: hidden;
 	        }
+	        iframe#pc {
+	        	clip-path: circle(250px);
+	        	/*opacity: 0.6;*/
+	        }
 	        div#ui {
 	        	height: 100%;	        	
 	        	overflow-y: scroll;
@@ -52,9 +56,8 @@
 		<script src="metawim.js" ></script>
 	</head>
 	<body>
-		<iframe id="pp" src="https://cloud.protopie.io/p/f9727aeef1?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false" title="Proto Pie"></iframe>
-		<iframe id="pc" src="pc.html" title="Play Canvas"></iframe>
-
+		<iframe scrolling="no" id="pp" src="https://cloud.protopie.io/p/f9727aeef1?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false" title="Proto Pie"></iframe>
+		<iframe scrolling="no" id="pc" src="pc.html" title="Play Canvas"></iframe>		
 
 		<script type="text/javascript">
 

@@ -403,7 +403,10 @@ export default class MetaWim {
 	    				this.ui.appendChild(this.blades[b].getControls("ui"));
 	    			}
     		
-	    		// Add to parent	    		
+	    		// Add to parent
+	    		if (window.self !== window.top) {
+	    			window.top.document.body.appendChild(this.ui);
+	    		}
     		}
 
 		}

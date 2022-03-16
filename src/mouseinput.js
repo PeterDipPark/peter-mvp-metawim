@@ -90,7 +90,7 @@ const CreateMouseInput = ({...props}) => {
 
 	MouseInput.prototype.onMouseDown = function (event) {
 		// console.log(event.event.target);
-		if (event.event.target.tagName!=="CANVAS") return;
+		//if (event.event.target.tagName!=="CANVAS") return;
 
 	    switch (event.button) {
 	        case pc.MOUSEBUTTON_LEFT: {
