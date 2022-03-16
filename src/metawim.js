@@ -30,6 +30,9 @@ export default class MetaWim {
 				const { canvas, ui, count } = props;			
 
 			// Props
+			
+				// Canvas DOM
+				this.canvas = canvas;
 
 				// Controls
 				this.ui = ui || null;
@@ -291,9 +294,62 @@ export default class MetaWim {
     						// Mutate
     						switch(this.type) {
 								case "camera":
-									// Reset
-									this.scope.scene.resetCamera();
+
+									switch(this.idx) {
+										case "reset":
+											// Reset Orbit
+											this.scope.scene.resetCamera();
+											break;
+										case "projection":
+											// Change projection											
+											this.scope.scene.setProjection(newValue);
+											break;
+									}
+
 									break;
+								case "material":
+
+									switch(this.idx) {
+										case "depth":
+											// Change material depth write
+											for (let b in this.scope.blades) {
+												this.scope.blades[b].setDepth(newValue);
+											}
+											break;
+									}
+
+									break;
+
+								case "opacity":
+
+									switch(this.idx) {
+										case "blades":
+											// Change material opacity
+											for (let b in this.scope.blades) {
+												this.scope.blades[b].setOpacity(newValue);
+											}
+											break;
+										case "canvas":
+											// Change canvas opacity
+											this.scope.canvas.style.opacity = newValue;											
+											break;
+									}
+
+									break;
+
+								case "separate":
+
+									switch(this.idx) {
+										case "blades":
+											// Change material depth write
+											for (let b in this.scope.blades) {
+												this.scope.blades[b].translateBlade(newValue);
+											}
+											break;
+									}
+
+									break;
+
     						}    						
 						}.bind({
 							scope: this

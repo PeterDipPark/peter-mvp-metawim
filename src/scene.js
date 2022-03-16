@@ -103,6 +103,9 @@ export default class Scene {
 			this.scripts.script.orbitCamera.fire('reset');
 		}
 
+		setProjection(p) {
+			this.scripts.script.orbitCamera.fire('projection', p);
+		}
 
 		/**
 		 * [getControls description]
@@ -182,7 +185,8 @@ export default class Scene {
 			this.scripts.script.create("orbitCamera", CreateOrbitCamera({
 				app: this.app
 				,count: this.count
-				,defaultZoom: 20.1
+				,defaultZoom: 20.2 //20.19
+				,defaultOrthoHeight: 8.38
 				,canZoom: false
 			}));
 			// Mouse Input

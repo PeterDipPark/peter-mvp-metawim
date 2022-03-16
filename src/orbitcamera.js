@@ -4,16 +4,17 @@ import * as pc from 'playcanvas';
 const CreateOrbitCamera = ({...props}) => {
 
 	// Props
-	const { app, count, defaultZoom, canZoom } = props;
+	const { app, count, defaultZoom, defaultOrthoHeight, canZoom } = props;
 
 	// Orbit Camera
 	var OrbitCamera = pc.createScript('orbitCamera', app);
 
 	OrbitCamera.attributes.add('layerCount', {type: 'number', default: count, title: 'Custom layers count'});
-	OrbitCamera.attributes.add('distanceDefault', {type: 'number', default: defaultZoom, title: 'Distance Default'});
+	OrbitCamera.attributes.add('distanceDefault', {type: 'number', default: defaultZoom, title: 'Distance Default'});	
 	OrbitCamera.attributes.add('distanceMax', {type: 'number', default: canZoom === true && defaultZoom !==null ? 0: defaultZoom, title: 'Distance Max', description: 'Setting this at 0 will give an infinite distance limit'});
 	OrbitCamera.attributes.add('distanceMin', {type: 'number', default: canZoom === true && defaultZoom !==null ? 0: defaultZoom, title: 'Distance Min'});
-	
+	OrbitCamera.attributes.add('heightDefault', {type: 'number', default: defaultOrthoHeight, title: 'Distance Orthographic height'});
+
 	// This will disable Y 360 rotation
 	// OrbitCamera.attributes.add('pitchAngleMax', {type: 'number', default: 90, title: 'Pitch Angle Max (degrees)'});
 	// OrbitCamera.attributes.add('pitchAngleMin', {type: 'number', default: -90, title: 'Pitch Angle Min (degrees)'});
@@ -322,8 +323,21 @@ const CreateOrbitCamera = ({...props}) => {
 
 	    // CUSTOM
 	    this.on('reset', function () {
+	    	// Reset Orbit to initial postion and pitch
 	    	this._resetPosition();
 	    });
+
+	    this.on('projection', function (value) {
+	    	switch (value) {
+				case "p":
+					this.entity.camera.projection = pc.PROJECTION_PERSPECTIVE;
+					break;
+				case "o": 
+					this.entity.camera.orthoHeight = this.heightDefault;
+					this.entity.camera.projection = pc.PROJECTION_ORTHOGRAPHIC;					
+					break;
+			}
+		});
 	};
 
 

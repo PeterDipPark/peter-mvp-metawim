@@ -8,6 +8,11 @@ import {
 			MeshInstance,
 			Entity,
 			Quat,
+			BLEND_NONE,
+			BLEND_NORMAL,
+			BLEND_PREMULTIPLIED,
+			BLEND_ADDITIVEALPHA,
+			BLEND_ADDITIVE,
 			// TEST
 			Layer,
 			SORTMODE_MANUAL,
@@ -16,7 +21,7 @@ import {
 			SORTMODE_BACK2FRONT,
 			SORTMODE_FRONT2BACK,
 			SHADER_DEPTH,
-			SHADER_FORWARDHDR,
+			SHADER_FORWARDHDR,			
 		} from 'playcanvas';
 
 
@@ -263,6 +268,38 @@ export default class Blade {
 
 		}
 
+		/**
+		 * [setDepth description]
+		 * @param {[type]} d [description]
+		 */
+		setDepth(d) {
+			this.meshInstance.material.depthTest = this.meshInstance.material.depthWrite = d==="e"?true:false;
+			// this.meshInstance.material.blendType = d==="e"?  BLEND_PREMULTIPLIED:BLEND_NONE; //BLEND_NORMAL:BLEND_NONE;
+			this.meshInstance.material.update();
+
+
+		}
+
+		/**
+		 * [setOpacity description]
+		 * @param {[type]} v [description]
+		 */
+		setOpacity(v) {
+			this.meshInstance.material.opacity = v===1?0.999:v;
+			// this.meshInstance.material.alphaFade = v===1?0.999:v; // use when opacityFadesSpecular === false;
+			this.meshInstance.material.update();
+
+		}
+
+		translateBlade(v) {
+
+			// this.entity.translate(0, 0, -fixFloat(this.index/1000)+v/1000);
+
+			var p = this.entity.getPosition();
+			const s = Math.abs(v) < 1 ? 1 : v;			
+			this.entity.setPosition(p.x, p.y, -(fixFloat(this.index/1000)*s));
+
+		}
 
 	////////////////////////
 	// METHODS

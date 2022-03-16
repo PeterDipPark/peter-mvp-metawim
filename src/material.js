@@ -6,6 +6,7 @@ import {
 			BLEND_PREMULTIPLIED,
 			BLEND_NORMAL,
 			BLEND_ADDITIVE,
+			BLEND_SCREEN,
 			FRESNEL_NONE,
 			SPECULAR_PHONG,
 			BLEND_MULTIPLICATIVE,
@@ -106,6 +107,8 @@ export default class Material {
 						this.material.depthTest = true; //true;
 						this.material.depthWrite = true; //true;
 				
+						// this.material.opacityFadesSpecular = false; // set if you want to set alphaFade instead of opacity
+						
 						// this.material.depthBias = this.depth;
 						// 
 						// this.material.useMorphPosition = true;
@@ -173,7 +176,7 @@ export default class Material {
 				// // this.material.alphaToCoverage = true; ???				
 				// this.material.slopeDepthBias = 1*this.depth;
 				// this.material.depthBias = this.depth;
-									this.material.blendType = BLEND_NORMAL;
+									this.material.blendType = BLEND_PREMULTIPLIED; //BLEND_NORMAL;
 				// this.material.alphaTest = true;
 				// this.material.alphaWrite = true;
 				// this.material.alphaToCoverage = false;
