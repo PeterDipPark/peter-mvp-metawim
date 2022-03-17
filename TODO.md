@@ -8,6 +8,8 @@
 3. DO: global offset slider
 4. floating labels 
 5. receive and execute commands from outside
+6. fade slider: 
+Now that we are able to layer PP and PC like this…is it possible to have a seamless transition between PC 3D model and PP 2D universe by dragging a slider? If so user could set a desired level of duality at any stage of the creative process. This would also replace the need the “mini viewer setup? I suggested earlier. And super great if we could even separate the PP landscape into two entities and have one slider control opacity of the circular center section/Universe…and another control opacity of the control dials surrounding it. This would allow user to fade away the PP universe/circles and still use PP controls to edit…both PPand PC would be affected but you would only see the live effect on PC. And then user could go one step further and “fade away ” the visibility of PP controls as well…and be left with a clean PC 3D model which can be orbited against a white canvas…while having floating labels providing info/metrics.
 
 ### extras:
 6. mini window/representation of the WIMstar at all times when editing in PP - The  “mini window”/heads up display of the PC WIMstar inside PP edit mode … and vice versa.. the PP universe mini window heads up inside PC WIMstar mode….continuosly updated. This is a wish for item too…not crucial, and it does require functionality described below:

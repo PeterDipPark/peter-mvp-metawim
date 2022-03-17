@@ -32,7 +32,7 @@ export default class MetaWim {
 			// Props
 			
 				// Use Layers (TRY to solve opacity issue)
-				this.useLayers = true;
+				this.useLayers = false;
 
 				// Canvas DOM
 				this.canvas = canvas;

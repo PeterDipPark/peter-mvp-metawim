@@ -56,30 +56,16 @@
 		<script src="metawim.js" ></script>
 	</head>
 	<body>
+		<!-- CLOUD (wo/ WebSocket) -->
 		<iframe scrolling="no" id="pp" src="https://cloud.protopie.io/p/f9727aeef1?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false" title="Proto Pie"></iframe>
+
+		<!-- LOCAL (wt/ WebSocket) -->
+		<!---<iframe scrolling="no" id="pp" src="http://192.168.1.13:9981/pie?pieid=33&id=0&name=uxproto32p_20220317&bg=white" title="Proto Pie"></iframe>-->
+
+		<!-- REMOTE  (wt/ WebSocket) -->
+		<!--<iframe scrolling="no" id="pp" src="http://3.71.221.93:9981/pie?pieid=1&id=0&name=uxproto32p_20220317&bg=white" title="Proto Pie"></iframe>-->
+
 		<iframe scrolling="no" id="pc" src="pc.html" title="Play Canvas"></iframe>		
 
-		<script type="text/javascript">
-
-			// var iframe = document.getElementById('pp');
-
-			// iframe.addEventListener( "load", function(e) {
-
-			    
-
-			//     console.log(iframe.contentWindow.document);
-
-			//     var style = document.createElement('style');
-			// 	style.textContent =
-			// 	  '.eaimfk {' +
-			// 	  '  background-color: red !important;' +
-			// 	  '}' 
-			// 	;
-			// 	iframe.contentDocument.head.appendChild(style);
-
-			// } );
-
-			
-		</script>
 	</body>
 </html>
