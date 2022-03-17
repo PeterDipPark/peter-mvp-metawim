@@ -31,6 +31,9 @@ export default class MetaWim {
 
 			// Props
 			
+				// Use Layers (TRY to solve opacity issue)
+				this.useLayers = true;
+
 				// Canvas DOM
 				this.canvas = canvas;
 
@@ -42,9 +45,10 @@ export default class MetaWim {
 					alpha: true
 					,antialias: true
 					,powerPreference: "high-performance"
-					// ,premultipliedAlpha: true
+					,premultipliedAlpha: true
 				});
-				// gl.alpha = false // true;
+				// console.warn("gl",gl);
+				// gl.alpha = true; // true;
 
 				// App (see options at https://developer.playcanvas.com/en/api/pc.Application.html#Application)
 				this.app = new Application(canvas, {
@@ -52,8 +56,7 @@ export default class MetaWim {
 					,touch: new TouchDevice(canvas)
 					,graphicsDeviceOptions: gl
 				});
-				this.app.root.name = "MetaWim";
-
+				this.app.root.name = "MetaWim";				
 
 				// Count of blades
 				this.count = count || 16;
@@ -67,6 +70,7 @@ export default class MetaWim {
 					app: this.app
 					,count: this.count
 					,controls: this.ui !== null
+					,useLayers: this.useLayers
 				});
 				this.app.scene.ambientLight = new Color(1, 1, 1);
 
@@ -152,6 +156,13 @@ export default class MetaWim {
 	    		this.app.start();
 
 
+	    	// Listeners
+    			// this.app.on("update", this.update, th
+	    		
+	    		
+
+	    	// Test
+	    		
 	    		// var worldLayer = this.app.scene.layers.getLayerByName('World');
     			// // worldLayer.clearDepthBuffer = true;
     			// worldLayer.enabled = false;
@@ -159,8 +170,7 @@ export default class MetaWim {
     			// var depthLayer = this.app.scene.layers.getLayerByName('Depth');	    	
     			// depthLayer.clearDepthBuffer = true;
     			// depthLayer.enabled = false;
-
-	    	// Test
+    			
 	    		// setTimeout(function () {
 	    		// 	this.blades['blade16'].updateMorphtarget(0,1, 'm_Cutout_Left');
 	    		// 	// this.app.off();
@@ -169,6 +179,11 @@ export default class MetaWim {
 				// console.log("this.app.scene.layers", this.app.scene.layers);
 				// console.log("this.app", this.app);
 
+				// CAMERA and MESHES MATERIAL
+					// console.warn(this.scene.getCamera());
+					// for (let b in this.blades) {
+					// 	console.log(this.blades[b].meshInstance.material);
+					// }
 				
 				
 		}
@@ -183,7 +198,6 @@ export default class MetaWim {
 		 * @return {[type]}    [description]
 		 */
 		update(dt) {
-
 
 		}
 
@@ -234,6 +248,7 @@ export default class MetaWim {
 					,bladeRotationStep: this.rotationStep
 					,bladeRotationOffset: this.rotationOffset
 					,bladeRotation: {x:0,y:0,z:rot}
+					,useLayers: this.useLayers
 				});
 				// Rotate
 				// rot-=this.rotationStep;

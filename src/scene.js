@@ -25,13 +25,16 @@ export default class Scene {
 		constructor({...props}) {
 
 			// Props
-			const { controls, app, count } = props;
+			const { controls, app, count, useLayers } = props;
 
 			// Count
 			this.count = count;
 
 			// App
 			this.app = app;
+
+			// User Layers
+			this.useLayers = useLayers || false;
 
 			// Create Controls
 			this.hasControls = (controls === true);
@@ -144,7 +147,7 @@ export default class Scene {
 	        // const worldLayer = this.app.scene.layers.getLayerByName("World");
 	        // var layers = [worldLayer.id];
 
-	        if ("use layers" === "no") {
+	        if (this.useLayers === true) {
 	        	
 	        	const layers = this.light.light.layers;
 		        for (var i = 1; i < this.count+1; i++) {
@@ -188,6 +191,7 @@ export default class Scene {
 				,defaultZoom: 20.2 //20.19
 				,defaultOrthoHeight: 8.38
 				,canZoom: false
+				,useLayers: this.useLayers || false
 			}));
 			// Mouse Input
 			this.scripts.script.create("mouseInput", CreateMouseInput({

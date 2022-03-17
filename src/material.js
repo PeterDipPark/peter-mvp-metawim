@@ -103,13 +103,16 @@ export default class Material {
 						
 						//this.material.opacity = 0.5; // opacity doesn't work with depthWrite/Test
 						
+						this.material.id = this.material.name = "blade"+this.depth;
 						this.material.diffuse = this.color;
 						this.material.depthTest = true; //true;
 						this.material.depthWrite = true; //true;
-				
-						// this.material.opacityFadesSpecular = false; // set if you want to set alphaFade instead of opacity
 						
-						// this.material.depthBias = this.depth;
+						// this.material.alphaToCoverage = true;
+
+						// this.material.opacityFadesSpecular = false; // set if you want to set alphaFade instead of opacity
+
+						// this.material.depthBias = 1000*this.depth;
 						// 
 						// this.material.useMorphPosition = true;
 						// this.material.useMorphNormal = true;

@@ -4,11 +4,12 @@ import * as pc from 'playcanvas';
 const CreateOrbitCamera = ({...props}) => {
 
 	// Props
-	const { app, count, defaultZoom, defaultOrthoHeight, canZoom } = props;
+	const { app, count, defaultZoom, defaultOrthoHeight, canZoom, useLayers } = props;
 
 	// Orbit Camera
 	var OrbitCamera = pc.createScript('orbitCamera', app);
 
+	OrbitCamera.attributes.add('useLayers', {type: 'boolean', default: useLayers, title: 'Add Custom layers to camera'});
 	OrbitCamera.attributes.add('layerCount', {type: 'number', default: count, title: 'Custom layers count'});
 	OrbitCamera.attributes.add('distanceDefault', {type: 'number', default: defaultZoom, title: 'Distance Default'});	
 	OrbitCamera.attributes.add('distanceMax', {type: 'number', default: canZoom === true && defaultZoom !==null ? 0: defaultZoom, title: 'Distance Max', description: 'Setting this at 0 will give an infinite distance limit'});
@@ -187,19 +188,46 @@ const CreateOrbitCamera = ({...props}) => {
 					// ,cullFaces: false
 					,clearDepthBuffer: false
 					
+					// ,flipFaces: true
+
 					// ,nearClip: 1
 					// ,farClip: 100
 					// ,fov: 55,
 					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
 				});
 
-				if ("use layers" === "no") {
+
+				if (this.useLayers  === true) {
 
 					const layers = this.entity.camera.layers;
 					for (var i = 1; i < this.layerCount+1; i++) {
 						layers.push("blade"+i);
 					};		
 					this.entity.camera.layers = layers;
+
+					// for (var i = 1; i < this.layerCount+1; i++) {
+					// 	var entity = new pc.Entity();
+					// 	entity.addComponent('camera', {
+					// 	    // nearClip: 1,
+					// 	    // farClip: 100,
+					// 	    // fov: 55
+					// 	    //
+					// 	    // clearColorBuffer: true
+					// 		// ,clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+					// 	    // ,clearDepthBuffer: true
+						    
+					// 	    clearDepthBuffer: false
+					// 	    ,priority: i
+					// 	    // ,projection: pc.PROJECTION_ORTHOGRAPHIC
+					// 	    // ,frustumCulling: true
+					// 	    ,clearColorBuffer: false
+					// 	    // ,cullFaces: false
+						    
+					// 	});
+					// 	entity.camera.layers = ["blade"+i];				
+
+					// 	this.entity.addChild(entity);
+					// };		
 				
 				}
 

@@ -55,6 +55,7 @@ export default class Blade {
 				,meshMorphsIndex
 				,bladeRotationOffset
 				,bladeRotation
+				,useLayers
 			} = props;	    	
 			this.name = name;
 			this.index = index;
@@ -62,7 +63,8 @@ export default class Blade {
 			this.graphicsDevice = graphicsDevice;
 			this.meshMorphsIndex = meshMorphsIndex;
 			this.bladeRotationOffset = bladeRotationOffset;
-			this.bladeRotation = bladeRotation
+			this.bladeRotation = bladeRotation;
+			this.useLayers = useLayers || false;
 
 			// Create Material
 			this.material = new Material({
@@ -91,8 +93,6 @@ export default class Blade {
 			// Create Controls
 			this.hasControls = (controls === true);
 			this.controls = null;
-
-
 
 			// Init
 			this.init();
@@ -273,9 +273,12 @@ export default class Blade {
 		 * @param {[type]} d [description]
 		 */
 		setDepth(d) {
-			this.meshInstance.material.depthTest = this.meshInstance.material.depthWrite = d==="e"?true:false;
-			// this.meshInstance.material.blendType = d==="e"?  BLEND_PREMULTIPLIED:BLEND_NONE; //BLEND_NORMAL:BLEND_NONE;
-			this.meshInstance.material.update();
+			// Set
+				this.meshInstance.material.depthTest = this.meshInstance.material.depthWrite = d==="e"?true:false;
+				// this.meshInstance.material.blendType = d==="e"?  BLEND_PREMULTIPLIED:BLEND_NONE; //BLEND_NORMAL:BLEND_NONE;
+			
+			// Update
+				this.meshInstance.material.update();
 
 
 		}
@@ -285,9 +288,12 @@ export default class Blade {
 		 * @param {[type]} v [description]
 		 */
 		setOpacity(v) {
-			this.meshInstance.material.opacity = v===1?0.999:v;
-			// this.meshInstance.material.alphaFade = v===1?0.999:v; // use when opacityFadesSpecular === false;
-			this.meshInstance.material.update();
+			// Set
+				this.meshInstance.material.opacity = v===1?0.999:v;
+				// this.meshInstance.material.alphaFade = v===1?0.999:v; // use when opacityFadesSpecular === false;			
+
+			// Update
+				this.meshInstance.material.update();
 
 		}
 
@@ -386,7 +392,7 @@ export default class Blade {
 		 */
 		createEntity() {
 
-			if ("use layers" === "no") {
+			if (this.useLayers === true) {
 
 				// get the world layer index
 	    		const worldLayer = this.layers.getLayerByName("World");
@@ -395,8 +401,9 @@ export default class Blade {
 				// Create Custom Layer that will holde the entity
 					this.layer = new Layer();
 					this.layer.id = this.layer.name = this.name;
-					this.layer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;				
-					// customLayer.passThrough = true;
+					// this.layer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;	
+					// this.layer.transparentSortMode = SORTMODE_MATERIALMESH;
+					// this.layer.passThrough = true;
 					// this.layer.clearDepthBuffer = true;
 					// this.layer.shaderPass = SHADER_DEPTH;
 					this.layers.insert(this.layer, idx+1);
