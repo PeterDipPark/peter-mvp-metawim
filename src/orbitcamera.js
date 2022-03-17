@@ -184,7 +184,8 @@ const CreateOrbitCamera = ({...props}) => {
 					clearColorBuffer: false
 					// clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
 					// NEW
-					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
+					,projection: pc.PROJECTION_ORTHOGRAPHIC
+					,orthoHeight: this.heightDefault
 					// ,cullFaces: false
 					,clearDepthBuffer: false
 					

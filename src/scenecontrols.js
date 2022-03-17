@@ -173,7 +173,7 @@ export default class SceneControls {
 								sceneStateContainer.appendChild(projectionLabelContainer);
 
 								// Button
-								const projectionObserver = new Observer({progress: "p"});
+								const projectionObserver = new Observer({progress: "o"});
 								// Observer Callback is set from the main class
 								// stateObserver.on('progress:set', function(value) {
 								// 	console.log("value 4", value);
@@ -184,9 +184,9 @@ export default class SceneControls {
 									icon: "E401",
 									size: "",
 									tabIndex:0,
-									value: "p",
+									value: "o",
 									width: null,
-									options: [ {v:"p",t:"Perspective"},{v:"o",t:"Orthographic"}]
+									options: [ {v:"o",t:"Orthographic"}, {v:"p",t:"Perspective"} ]
 								});
 								// Link observer
 								projectionButton.link(projectionObserver,'progress');

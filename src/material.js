@@ -109,6 +109,7 @@ export default class Material {
 						this.material.depthWrite = true; //true;
 						
 						// this.material.alphaToCoverage = true;
+						// this.material.alphaTest = false; //true;
 
 						// this.material.opacityFadesSpecular = false; // set if you want to set alphaFade instead of opacity
 
