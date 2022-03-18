@@ -52,20 +52,45 @@
 	        	div#ui input {
 	        		width: 100% !important;
 	        	}
-	    </style>	    
-		<script src="metawim.js" ></script>
+	    </style>		
+	    <script src="metawim.js" ></script>
 	</head>
 	<body>
 		<!-- CLOUD (wo/ WebSocket) -->
-		<iframe scrolling="no" id="pp" src="https://cloud.protopie.io/p/f9727aeef1?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false" title="Proto Pie"></iframe>
+			
+			<!---<iframe scrolling="no" id="pp" src="https://cloud.protopie.io/p/f9727aeef1?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false" title="Proto Pie"></iframe>-->
 
-		<!-- LOCAL (wt/ WebSocket) -->
-		<!---<iframe scrolling="no" id="pp" src="http://192.168.1.13:9981/pie?pieid=33&id=0&name=uxproto32p_20220317&bg=white" title="Proto Pie"></iframe>-->
+		<!-- wt/ WebSocket -->
 
-		<!-- REMOTE  (wt/ WebSocket) -->
-		<!--<iframe scrolling="no" id="pp" src="http://3.71.221.93:9981/pie?pieid=1&id=0&name=uxproto32p_20220317&bg=white" title="Proto Pie"></iframe>-->
+			<script src="algowim.js" ></script>	
+			<script type="text/javascript">				
 
-		<iframe scrolling="no" id="pc" src="pc.html" title="Play Canvas"></iframe>		
+			    // Server
+				    // Local
+					const server = "http://192.168.1.13:9981";
+					const pie = "pie?pieid=33&id=0&name=uxproto32p_20220317&bg=white";
+					// Remote
+					// const server = "http://3.71.221.93:9981";
+					// const pie = "pie?pieid=1&id=0&name=uxproto32p_20220317&bg=white";
+
+				// Create DOM
+					const pp = document.createElement('iframe');
+					pp.scrolling = "no"
+					pp.id = "pp";
+					pp.src = server+"/"+pie;
+					const pc = document.createElement('iframe');
+					pc.scrolling = "no"
+					pc.id = "pc";
+					pc.src = "pc.html?pp="+server;
+					document.body.appendChild(pp);
+					document.body.appendChild(pc);
+
+				// Control
+					const app = new AlgoWim({
+						pp: server
+					});
+
+			</script>
 
 	</body>
 </html>

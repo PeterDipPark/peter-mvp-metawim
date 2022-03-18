@@ -13,6 +13,7 @@ import {
 			BLEND_PREMULTIPLIED,
 			BLEND_ADDITIVEALPHA,
 			BLEND_ADDITIVE,
+			BLEND_SCREEN,
 			// TEST
 			Layer,
 			SORTMODE_MANUAL,
@@ -381,6 +382,22 @@ export default class Blade {
 			// reate the mesh instance
 			this.meshInstance = new MeshInstance(this.mesh, this.material.getMaterial());
 
+			// this.meshInstance.mask = 0;
+
+			// WORKING when useLayers === false BUT doesn't work for tilted meshes
+				this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
+					//console.log(cameraPosition, cameraForward);
+					return cameraPosition.z>cameraForward.z?this.index:-this.index;
+				}.bind(this);
+		
+			// TBD
+				
+				// this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
+				// 	//console.log(cameraPosition, cameraForward);
+				// 	this.meshInstance.drawOrder = cameraPosition.z>cameraForward.z?-this.index:this.index;
+				// 	return cameraPosition.z>cameraForward.z?this.index:-this.index;
+				// }.bind(this);
+
 			// Add morph instance
 			this.meshInstance.morphInstance = this.morphInstance; 
 
@@ -401,8 +418,8 @@ export default class Blade {
 				// Create Custom Layer that will holde the entity
 					this.layer = new Layer();
 					this.layer.id = this.layer.name = this.name;
-					// this.layer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;	
-					// this.layer.transparentSortMode = SORTMODE_MATERIALMESH;
+					this.layer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;	
+					this.layer.transparentSortMode = SORTMODE_MANUAL;
 					// this.layer.passThrough = true;
 					// this.layer.clearDepthBuffer = true;
 					// this.layer.shaderPass = SHADER_DEPTH;

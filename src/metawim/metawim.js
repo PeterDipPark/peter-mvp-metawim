@@ -10,6 +10,7 @@ import {
 } from 'playcanvas';
 
 // METAWIM
+import Router from './router';
 import Blade from './blade';
 import Scene from './scene';
 import BladeControls from './bladecontrols';
@@ -27,7 +28,7 @@ export default class MetaWim {
 		constructor({...props}) {
 			
 			// Super 
-				const { canvas, ui, count } = props;			
+				const { canvas, ui, count, pp } = props;			
 
 			// Props
 			
@@ -87,6 +88,10 @@ export default class MetaWim {
 				});
 				this.lastState = {};
 
+				// Router
+				this.router = new Router({
+					pp: pp
+				})
 
 			// Init
 				this.init();
@@ -184,6 +189,7 @@ export default class MetaWim {
 					// for (let b in this.blades) {
 					// 	console.log(this.blades[b].meshInstance.material);
 					// }
+					// console.warn(this.scene);
 				
 				
 		}

@@ -4,11 +4,11 @@ import commonjs from "@rollup/plugin-commonjs";
 import {terser} from "rollup-plugin-terser"; 
  
 export default { 
-	input: "./src/metawim.js", 
+	input: "./src/algowim/algowim.js", 
 	output: { 
-		file: "./dist/metawim.js", 
+		file: "./dist/algowim.js", 
 		format: "iife", 
-		name: "MetaWim", 
+		name: "AlgoWim",
 		sourcemap: false
 	}, 
 	plugins: [ 
@@ -29,10 +29,10 @@ export default {
 		}), 
 		replace({ 
 			preventAssignment: true,
-			"$version": "Release and Build"
+			"$version": "1.0.0-"+Math.floor((new Date()).getTime() / 1000) // Major.Minor.Patch-Build
 		}), 
 		resolve({ 
-			//moduleDirectories: ["./mvp_modules"],
+			// moduleDirectories: ["./src/algowim"],
 			browser: true 
 		}), 
 	] 

@@ -108,12 +108,61 @@ export default class Material {
 						this.material.depthTest = true; //true;
 						this.material.depthWrite = true; //true;
 						
+						// this.material.instancingCount = 1;
+						// this.material.onUpdateShader = function(options) {
+						//     options.useInstancing = true;
+						//     return options;
+						// };
+
+// this.material.onUpdateShader = function(options) {
+//         options.useInstancing = true;
+//         return options;
+//     };
+    
+//     const transformVS = `
+
+// out vec4 color;
+
+// mat4 getModelMatrix() {
+//     color = vec4(instance_line1.w, instance_line2.w, instance_line3.w, instance_line4.w);
+//     return mat4(
+//         vec4(instance_line1.xyz, 0.0), 
+//         vec4(instance_line2.xyz, 0.0), 
+//         vec4(instance_line3.xyz, 0.0), 
+//         vec4(instance_line4.xyz, 1.0)
+//     );
+// }
+
+// vec4 getPosition() {
+//     dModelMatrix = getModelMatrix();
+//     vec3 localPos = vertex_position;
+//     vec4 posW = dModelMatrix * vec4(localPos, 1.0);
+//     dPositionW = posW.xyz;
+//     vec4 screenPos = matrix_viewProjection * posW;
+//     return screenPos;
+// }
+// vec3 getWorldPosition() {
+//     return dPositionW;
+// }
+// `;
+    
+//     const emissivePS = `
+
+// in vec4 color;
+
+// vec3 getEmission() {
+//     return color.rgb;
+// }
+// `;
+//     this.material.chunks.transformVS = transformVS;
+//     this.material.chunks.emissivePS = emissivePS;
+
 						// this.material.alphaToCoverage = true;
-						// this.material.alphaTest = false; //true;
+						// this.material.alphaTest = 0; //false; //true;
 
 						// this.material.opacityFadesSpecular = false; // set if you want to set alphaFade instead of opacity
 
-						// this.material.depthBias = 1000*this.depth;
+						// this.material.depthBias = 10*this.depth;
 						// 
 						// this.material.useMorphPosition = true;
 						// this.material.useMorphNormal = true;
@@ -178,8 +227,8 @@ export default class Material {
 			// NEW - render depth
 				
 				// // this.material.alphaToCoverage = true; ???				
-				// this.material.slopeDepthBias = 1*this.depth;
-				// this.material.depthBias = this.depth;
+				// this.material.slopeDepthBias = 10*this.depth;
+				// this.material.depthBias = this.depth/10000;
 									this.material.blendType = BLEND_PREMULTIPLIED; //BLEND_NORMAL;
 				// this.material.alphaTest = true;
 				// this.material.alphaWrite = true;

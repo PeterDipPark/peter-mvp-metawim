@@ -9,13 +9,14 @@
 		"url": "git+https://peterdippark.github.io/peter-metawim-dist.git"
 	},
 	"scripts": {
-		"prepare": "npm run build",
 		"test": "tbd",
-		"build": "rollup -c rollup.config.js"
+		"build-metawim": "rollup -c rollup.metawim-config.js",
+		"build-algowim": "rollup -c rollup.algowim-config.js"
 	},
 	"dependencies": {
 		"bufferutil": "^4.0.3",
 		"playcanvas": "^1.52.1",
+		"socket.io-client": "^2.4.0",
 		"utf-8-validate": "^5.0.4"
 	},
 	"devDependencies": {
