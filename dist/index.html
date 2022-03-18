@@ -56,32 +56,30 @@
 	    <script src="metawim.js" ></script>
 	</head>
 	<body>
-		<!-- CLOUD (wo/ WebSocket) -->
-			
-			<!---<iframe scrolling="no" id="pp" src="https://cloud.protopie.io/p/f9727aeef1?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false" title="Proto Pie"></iframe>-->
-
-		<!-- wt/ WebSocket -->
 
 			<script src="algowim.js" ></script>	
 			<script type="text/javascript">				
 
 			    // Server
-				    // Local
-					const server = "http://192.168.1.13:9981";
-					const pie = "pie?pieid=33&id=0&name=uxproto32p_20220317&bg=white";
-					// Remote
-					// const server = "http://3.71.221.93:9981";
-					// const pie = "pie?pieid=1&id=0&name=uxproto32p_20220317&bg=white";
+				    // Local (wt/ PP Connect)
+						// const server = "http://192.168.1.13:9981";
+						// const pie = "pie?pieid=33&id=0&name=uxproto32p_20220318&bg=white";
+					// Remote (wt/ PP Connect)
+						// const server = "http://3.71.221.93:9981";
+						// const pie = "pie?pieid=1&id=0&name=uxproto32p_20220318&bg=white";
+					// Cloud (wo/ PP Connect)
+						const server = null;
+						const pie = "https://cloud.protopie.io/p/0c10749c98?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false";
 
 				// Create DOM
 					const pp = document.createElement('iframe');
 					pp.scrolling = "no"
 					pp.id = "pp";
-					pp.src = server+"/"+pie;
+					pp.src = (server!==null)?server+"/"+pie:pie;
 					const pc = document.createElement('iframe');
 					pc.scrolling = "no"
 					pc.id = "pc";
-					pc.src = "pc.html?pp="+server;
+					pc.src = (server!==null)?"pc.html?pp="+server:"pc.html";
 					document.body.appendChild(pp);
 					document.body.appendChild(pc);
 
