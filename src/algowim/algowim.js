@@ -1,6 +1,8 @@
 import io from 'socket.io-client';
 import {installStyles,getComputedStyle} from "./style";
 import MetaWim from './metawim';
+import Controls from './controls';
+
 
 export default class AlgoWim {
 	
@@ -31,6 +33,9 @@ export default class AlgoWim {
 			this.pp = pp || null;
 			this.bridge = bridge || null;
 			this.pie = pie || null;
+
+			// View Ready
+			this.viewReady = false;
 
 			// Socket Clients
 			this.io = {
@@ -174,9 +179,12 @@ export default class AlgoWim {
 
 		viewInit() {
 
-			// All Sockets must be ready
+			// All Sockets must be ready AND do not rebuild the view 
 			const notReady = Object.values(this.io).findIndex( t => t.ready === false && t.url !== null) !== -1;
-			if (notReady === true) return;
+			if (notReady === true || this.viewReady === true) return;
+
+			// Create  Controls			
+			this.algowimControls = new Controls({});
 
 			// Build View
 			this.viewBuild();
@@ -184,7 +192,10 @@ export default class AlgoWim {
 		}
 
 		viewBuild() {
-			console.warn("viewInit");
+			console.warn("viewBuild");
+
+			// Set View ready
+				this.viewReady = true;
 
 			// Get Container Size
 				const w = getComputedStyle(this.container, 'width');
@@ -214,6 +225,7 @@ export default class AlgoWim {
 					canvas: pcCanvas
 					,ui: this.controls
 					,pp: null // this.pp  // no need to PC socket
+					,algowimControls:this.algowimControls
 				});
 				
 				// const pcCanvasIframe = document.createElement('iframe');
@@ -245,6 +257,7 @@ export default class AlgoWim {
 				// 		this.style.pointerEvents = "auto";
 				// 	}.bind(e.target), 200)
 					
+					/*
 				console.info("ppIframe", ppIframe.contentWindow.document);
 			 	
 			 	ppIframe.contentWindow.document.domain = "http://192.168.1.13:9981";
@@ -258,11 +271,13 @@ export default class AlgoWim {
 				    var el = this.contentWindow.document.elementFromPoint(x,y);
 				    ev.initMouseEvent(
 				        "click",
-				        true /* bubble */, true /* cancelable */,
+				        true, // bubble
+				        true, // cancelable
 				        this.contentWindow, null,
-				        e.offsetX, e.offsetY, 0, 0, /* coordinates */
-				        false, false, false, false, /* modifier keys */
-				        0 /*left*/, null
+				        e.offsetX, e.offsetY, 0, 0, // coordinates
+				        false, false, false, false, // modifier keys
+				        0, /// left 
+				        null
 				    );
 				    // var ev = new MouseEvent('click', {
 				    //     'view': window,
@@ -277,6 +292,12 @@ export default class AlgoWim {
 				    // el.dispatchEvent(ev);
 				    el.dispatchEvent(ev)
 				 }.bind(ppIframe), false);
+			 		*/
+
+
+			// Create Controls
+				
+				this.viewControls();
 
 			// Test
 			// setTimeout(function() {
@@ -288,6 +309,31 @@ export default class AlgoWim {
 
 
 			// }.bind(this), 10000);
+		}
+
+		viewControls() {
+			
+
+			// Observe and Append
+				
+				// Get Observers	
+				const observers = this.algowimControls.getControls("observers");
+				// Assign callback to all observer
+				for (let id in observers) { 
+					// Observe
+						observers[id].observer.on('progress:set', function(newValue, oldValue) {
+							console.warn(this, newValue, oldValue);							
+						}.bind({
+							scope: this
+							,type: observers[id].type
+							,idx: observers[id].idx
+							,id: id
+						}));
+					// Append
+    					this.container.appendChild(observers[id].dom);
+				}
+    				
+
 		}
 
 		viewUpdate(data) {

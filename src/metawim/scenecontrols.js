@@ -91,6 +91,21 @@ export default class SceneControls {
 				// Container
 					const sceneContainer = document.createElement("DIV");
 
+				// UI Controls name
+					const uiNameContainer = document.createElement("DIV");
+					const uiLabel = new Label({
+						enabled: true,
+						height: null,
+						text: "--- DEV CONTROLS ---",
+						tabIndex:0,
+						width:null
+					});
+					uiNameContainer.appendChild(uiLabel.dom);
+					uiLabel.dom.style.color = "#2c393c";
+					uiNameContainer.style.marginTop = uiNameContainer.style.marginBottom = "15px";
+					sceneContainer.appendChild(uiNameContainer);
+
+
 				// Scene Controls name
 					const sceneNameContainer = document.createElement("DIV");
 					const sceneLabel = new Label({

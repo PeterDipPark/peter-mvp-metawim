@@ -4,7 +4,7 @@ import * as pc from 'playcanvas';
 const CreateMouseInput = ({...props}) => {
 
 	// Props
-	const { app } = props;
+	const { app, algowimControls } = props;
 
 	// Mouse Input
 	var MouseInput = pc.createScript('mouseInput', app);
@@ -23,6 +23,13 @@ const CreateMouseInput = ({...props}) => {
 	    description: 'How fast the camera moves in and out. Higher is faster'
 	});
 
+	MouseInput.attributes.add('algowimControls', {
+	    type: 'object', 
+	    default: algowimControls, 
+	    title: 'AlgoWim Controls', 
+	    description: 'Object to call to disable pointer-events for overlay DOM elements on move'
+	});
+
 	// initialize code called once per entity
 	MouseInput.prototype.initialize = function() {	    
 
@@ -35,10 +42,16 @@ const CreateMouseInput = ({...props}) => {
 	           self.onMouseOut(e);
 	        };
 
-	        this.app.mouse.on(pc.EVENT_MOUSEDOWN, this.onMouseDown, this);
-	        this.app.mouse.on(pc.EVENT_MOUSEUP, this.onMouseUp, this);
-	        this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
-	        this.app.mouse.on(pc.EVENT_MOUSEWHEEL, this.onMouseWheel, this);
+	        // CUSTOM
+	        	// this.app.mouse._target.addEventListener('pointerdown', this.onMouseDown.bind(this), false);
+	        	// this.app.mouse._target.addEventListener('pointerup', this.onMouseUp.bind(this), false);
+	        	// console.log(this.app.mouse);
+
+	        // ORIG
+	        	this.app.mouse.on(pc.EVENT_MOUSEDOWN, this.onMouseDown, this);
+	        	this.app.mouse.on(pc.EVENT_MOUSEUP, this.onMouseUp, this);	        
+	        	this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
+	        	this.app.mouse.on(pc.EVENT_MOUSEWHEEL, this.onMouseWheel, this);
 
 	        // Listen to when the mouse travels out of the window
 	        window.addEventListener('mouseout', onMouseOut, false);
@@ -90,8 +103,18 @@ const CreateMouseInput = ({...props}) => {
 
 	MouseInput.prototype.onMouseDown = function (event) {
 		// console.log(event.event.target);
-		//if (event.event.target.tagName!=="CANVAS") return;
+		
 
+		// console.log("DOWN event.pointerId", event.pointerId);
+		// this.app.mouse._target.onpointermove = this.onMouseMove.bind(this);
+		// this.app.mouse._target.setPointerCapture(event.pointerId);
+
+
+		// CUSTOM
+		if (event.event.target.tagName!=="CANVAS") return;
+		this.algowimControls.lockControls();
+
+		// BAU
 	    switch (event.button) {
 	        case pc.MOUSEBUTTON_LEFT: {
 	            this.lookButtonDown = true;
@@ -106,6 +129,17 @@ const CreateMouseInput = ({...props}) => {
 
 
 	MouseInput.prototype.onMouseUp = function (event) {
+
+		// console.log("this.algowimControls", this.algowimControls);
+		// console.log("UP event.pointerId", event.pointerId);
+		// this.app.mouse._target.onpointermove = null;
+		// this.app.mouse._target.releasePointerCapture(event.pointerId);
+		
+		// CUSTOM
+		if (event.event.target.tagName!=="CANVAS") return;		
+		this.algowimControls.unlockControls();
+
+		// BAU
 	    switch (event.button) {
 	        case pc.MOUSEBUTTON_LEFT: {
 	            this.lookButtonDown = false;
@@ -119,7 +153,10 @@ const CreateMouseInput = ({...props}) => {
 	};
 
 
-	MouseInput.prototype.onMouseMove = function (event) {    
+	MouseInput.prototype.onMouseMove = function (event) {
+
+		// console.log("MOVE event.pointerId", event);
+
 	    var mouse = pc.app.mouse;
 	    if (this.lookButtonDown) {
 	        this.orbitCamera.pitch -= event.dy * this.orbitSensitivity;
@@ -140,6 +177,12 @@ const CreateMouseInput = ({...props}) => {
 
 
 	MouseInput.prototype.onMouseOut = function (event) {
+
+		// CUSTOM
+		// if (event.target.tagName!=="CANVAS") return;
+		this.algowimControls.unlockControls();
+
+		// BAU
 	    this.lookButtonDown = false;
 	    this.panButtonDown = false;
 	};

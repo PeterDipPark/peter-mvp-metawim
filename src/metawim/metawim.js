@@ -10,7 +10,7 @@ import {
 } from 'playcanvas';
 
 // METAWIM
-import Router from './router';
+// import Router from './router';
 import Blade from './blade';
 import Scene from './scene';
 import BladeControls from './bladecontrols';
@@ -28,7 +28,7 @@ export default class MetaWim {
 		constructor({...props}) {
 			
 			// Super 
-				const { canvas, ui, count, pp } = props;			
+				const { canvas, ui, count, pp, algowimControls } = props;			
 
 			// Props
 			
@@ -53,8 +53,8 @@ export default class MetaWim {
 
 				// App (see options at https://developer.playcanvas.com/en/api/pc.Application.html#Application)
 				this.app = new Application(canvas, {
-					mouse: new Mouse(canvas)
-					,touch: new TouchDevice(canvas)
+					mouse: new Mouse(canvas.parentElement || canvas)
+					,touch: new TouchDevice(canvas.parentElement || canvas)
 					,graphicsDeviceOptions: gl
 				});
 				this.app.root.name = "MetaWim";				
@@ -72,6 +72,7 @@ export default class MetaWim {
 					,count: this.count
 					,controls: this.ui !== null
 					,useLayers: this.useLayers
+					,algowimControls: algowimControls || null
 				});
 				this.app.scene.ambientLight = new Color(1, 1, 1);
 
@@ -89,9 +90,9 @@ export default class MetaWim {
 				this.lastState = {};
 
 				// Router
-				this.router = new Router({
-					pp: pp || null
-				})
+				// this.router = new Router({
+				// 	pp: pp || null
+				// })
 
 			// Init
 				this.init();

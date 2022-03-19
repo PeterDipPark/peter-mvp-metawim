@@ -25,13 +25,16 @@ export default class Scene {
 		constructor({...props}) {
 
 			// Props
-			const { controls, app, count, useLayers } = props;
+			const { controls, app, count, useLayers, algowimControls } = props;
 
 			// Count
 			this.count = count;
 
 			// App
 			this.app = app;
+
+			// algowimControls
+			this.algowimControls = algowimControls || null;
 
 			// User Layers
 			this.useLayers = useLayers || false;
@@ -196,6 +199,7 @@ export default class Scene {
 			// Mouse Input
 			this.scripts.script.create("mouseInput", CreateMouseInput({
 				app: this.app
+				,algowimControls: this.algowimControls
 			}));
 			// Touch Input
 			this.scripts.script.create("touchInput", CreateTouchInput({

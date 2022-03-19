@@ -14,6 +14,10 @@ export default class Router {
 			// Props
 			const { pp, bridge } = props;
 
+			// View Ready
+			this.viewReady = false;
+
+			// Socket Target
 			this.io = {
 				pp : {
 					ready: false,
@@ -119,7 +123,7 @@ export default class Router {
 
 			// All Sockets must be ready
 			const notReady = Object.values(this.io).findIndex( t => t.ready === false && t.url !== null) !== -1;
-			if (notReady === true) return;
+			if (notReady === true || this.viewReady === true) return;
 
 			// Build View
 			this.viewBuild();
@@ -129,15 +133,18 @@ export default class Router {
 		viewBuild() {
 			console.warn("viewInit");
 
+			// View is ready
+				this.viewReady = true;
+				
 			// Test
-			setTimeout(function() {
-				console.log("Emit from PlayCanvas");
+				setTimeout(function() {
+					console.log("Emit from PlayCanvas");
 
-				this.io['pp'].socket.emit('ppMessage', { messageId: "ProtoPie", value: "Hi from PlayCanvas!" } );
+					this.io['pp'].socket.emit('ppMessage', { messageId: "ProtoPie", value: "Hi from PlayCanvas!" } );
 
-				this.io['pp'].socket.emit('ppMessage', { messageId: "AlgoWim", value: "Hi from PlayCanvas!" } );
+					this.io['pp'].socket.emit('ppMessage', { messageId: "AlgoWim", value: "Hi from PlayCanvas!" } );
 
-			}.bind(this), 10000);
+				}.bind(this), 10000);
 		}
 
 		viewUpdate(data) {
