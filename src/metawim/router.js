@@ -16,11 +16,13 @@ export default class Router {
 
 			this.io = {
 				pp : {
+					ready: false,
 					name: "ProtoPie Connect",
 					url: pp || null,
 					socket: null
 				},
 				bridge : {
+					ready: false,
 					name: "Bridge Server",
 					url: bridge || null,
 					socket: null
@@ -78,8 +80,8 @@ export default class Router {
 				      this.logClient('['+this.io[c].name+'] connected to', this.io[c].url);
 				      this.viewStatus(true);
 
-				      // Get Clients
-				      this.io[c].socket.emit('ppStatus', "this.protopie");
+				      // Set Target Ready
+				      this.io[c].ready = true;
 
 				      // init view
 				      this.viewInit();
@@ -114,6 +116,17 @@ export default class Router {
 		}
 
 		viewInit() {
+
+			// All Sockets must be ready
+			const notReady = Object.values(this.io).findIndex( t => t.ready === false && t.url !== null) !== -1;
+			if (notReady === true) return;
+
+			// Build View
+			this.viewBuild();
+
+		}
+
+		viewBuild() {
 			console.warn("viewInit");
 
 			// Test

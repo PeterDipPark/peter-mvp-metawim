@@ -29,17 +29,19 @@ export default class AlgoWim {
 			this.container = container;	
 			this.controls = controls || null;	
 			this.pp = pp || null;
-			this.bridge = pp || null;
+			this.bridge = bridge || null;
 			this.pie = pie || null;
 
 			// Socket Clients
 			this.io = {
 				pp : {
+					ready: false,
 					name: "ProtoPie Connect",
 					url: this.pp,
 					socket: null
 				},
 				bridge : {
+					ready: false,
 					name: "Bridge Server",
 					url: this.bridge,
 					socket: null
@@ -135,8 +137,8 @@ export default class AlgoWim {
 				      this.logClient('['+this.io[c].name+'] connected to', this.io[c].url);
 				      this.viewStatus(true);
 
-				      // Get Clients
-				      this.io[c].socket.emit('ppStatus', "this.protopie");
+				      // Set Target Ready
+				      this.io[c].ready = true;
 
 				      // init view
 				      this.viewInit();
@@ -171,6 +173,17 @@ export default class AlgoWim {
 		}
 
 		viewInit() {
+
+			// All Sockets must be ready
+			const notReady = Object.values(this.io).findIndex( t => t.ready === false && t.url !== null) !== -1;
+			if (notReady === true) return;
+
+			// Build View
+			this.viewBuild();
+
+		}
+
+		viewBuild() {
 			console.warn("viewInit");
 
 			// Get Container Size
@@ -232,8 +245,38 @@ export default class AlgoWim {
 				// 		this.style.pointerEvents = "auto";
 				// 	}.bind(e.target), 200)
 					
-			 //    }, true);
-			
+				console.info("ppIframe", ppIframe.contentWindow.document);
+			 	
+			 	ppIframe.contentWindow.document.domain = "http://192.168.1.13:9981";
+			 	//    
+			 	ppIframe.addEventListener( "click", function(e){
+			 		console.warn("click Received", e);
+			 	}, false);
+			 	pcCanvas.addEventListener( "click", function(e){
+					console.log("fake click to pp", e.pageX, e.pageY, e.offsetX, e.offsetY);
+					var ev = this.contentWindow.document.createEvent("MouseEvent");
+				    var el = this.contentWindow.document.elementFromPoint(x,y);
+				    ev.initMouseEvent(
+				        "click",
+				        true /* bubble */, true /* cancelable */,
+				        this.contentWindow, null,
+				        e.offsetX, e.offsetY, 0, 0, /* coordinates */
+				        false, false, false, false, /* modifier keys */
+				        0 /*left*/, null
+				    );
+				    // var ev = new MouseEvent('click', {
+				    //     'view': window,
+				    //     'bubbles': true,
+				    //     'cancelable': true,
+				    //     'screenX': x,
+				    //     'screenY': y
+				    // });
+
+				    // var el = document.elementFromPoint(x, y);
+				    // console.log(el); //print element to console
+				    // el.dispatchEvent(ev);
+				    el.dispatchEvent(ev)
+				 }.bind(ppIframe), false);
 
 			// Test
 			// setTimeout(function() {
