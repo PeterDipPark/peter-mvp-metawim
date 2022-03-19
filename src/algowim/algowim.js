@@ -28,7 +28,7 @@ export default class AlgoWim {
 				,pie
 
 			} = props;	
-			this.container = container;	
+			this.container = container || document.body;
 			this.controls = controls || null;	
 			this.pp = pp || null;
 			this.bridge = bridge || null;
@@ -193,7 +193,7 @@ export default class AlgoWim {
 
 		viewBuild() {
 			console.warn("viewBuild");
-
+			
 			// Set View ready
 				this.viewReady = true;
 
@@ -311,8 +311,7 @@ export default class AlgoWim {
 			// }.bind(this), 10000);
 		}
 
-		viewControls() {
-			
+		viewControls() {			
 
 			// Observe and Append
 				
