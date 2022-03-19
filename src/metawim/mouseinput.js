@@ -34,7 +34,7 @@ const CreateMouseInput = ({...props}) => {
 	        var onMouseOut = function (e) {
 	           self.onMouseOut(e);
 	        };
-	        
+
 	        this.app.mouse.on(pc.EVENT_MOUSEDOWN, this.onMouseDown, this);
 	        this.app.mouse.on(pc.EVENT_MOUSEUP, this.onMouseUp, this);
 	        this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
@@ -98,9 +98,9 @@ const CreateMouseInput = ({...props}) => {
 	        } break;
 	            
 	        case pc.MOUSEBUTTON_MIDDLE: 
-	        case pc.MOUSEBUTTON_RIGHT: {
-	            this.panButtonDown = true;
-	        } break;
+	        // case pc.MOUSEBUTTON_RIGHT: {
+	        //     this.panButtonDown = true;
+	        // } break;
 	    }
 	};
 
@@ -112,9 +112,9 @@ const CreateMouseInput = ({...props}) => {
 	        } break;
 	            
 	        case pc.MOUSEBUTTON_MIDDLE: 
-	        case pc.MOUSEBUTTON_RIGHT: {
-	            this.panButtonDown = false;            
-	        } break;
+	        // case pc.MOUSEBUTTON_RIGHT: {
+	        //     this.panButtonDown = false;            
+	        // } break;
 	    }
 	};
 

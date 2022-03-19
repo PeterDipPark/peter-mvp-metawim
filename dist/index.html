@@ -3,18 +3,15 @@
 		<meta charset="utf-8">
 	    <title>Peter MVP - MetaWim</title>
 	    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no' />
-	    <style>
+	    <style type="text/css">
 	    	* {
 	    		font-family: inconsolatamedium, Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
 			    font-weight: normal;
 			    font-size: 12px;
-
 	    	}
 	        body {
 	            margin: 0;
 	            overflow: hidden;
-	            /*display: flex;
-    			flex-wrap: nowrap;*/
     			background-color: white;
 			    text-align: center;
 			    display: flex;
@@ -22,70 +19,43 @@
 			    justify-content: center;
 			    align-items: center;
 	        }
-	        iframe {
-	        	/*height: 100vh;
-	        	width: 100vw;*/
-	        	height: 800px;
-	        	width: 1000px;
-	        	display: inline-block;
-	        	border: none;
-	        	position: absolute;
-    			background-color: transparent;
-    			overflow: hidden;
-	        }
-	        iframe#pc {
-	        	clip-path: circle(265px);
-	        	/*opacity: 0.6;*/
-	        }
-	        div#ui {
-	        	height: 100%;	        	
-	        	overflow-y: scroll;
-	        	overflow-x: hidden;
-	        	position: absolute;
-	        	background-color: black;
-
-	        	/*temp*/
-	        	width: 220px;
-	        	left: 0px;
-	        	text-align: left;
-	        }
-	        	div#ui input {
+	        #controls {
+		        	height: 100%;	        	
+		        	overflow-y: scroll;
+		        	overflow-x: hidden;
+		        	position: absolute;
+		        	background-color: black;
+		        	width: 220px;
+		        	left: 0px;
+		        	text-align: left;
+		        }
+	        	#controls input {
 	        		width: 100% !important;
 	        	}
-	    </style>		
-	    <script src="metawim.js" ></script>
+	    </style>
 	</head>
 	<body>
 
+			<div id="controls"></div>
+			<div id="container" style="height: 800px; width: 1000px"></div>
+
 			<script src="algowim.js" ></script>	
-			<script type="text/javascript">				
-
-			    // Server
-				    // Local (wt/ PP Connect)
-						// const server = "http://192.168.1.13:9981";
-						// const pie = "pie?pieid=33&id=0&name=uxproto32p_20220318&bg=white";
-					// Remote (wt/ PP Connect)
-						// const server = "http://3.71.221.93:9981";
-						// const pie = "pie?pieid=1&id=0&name=uxproto32p_20220318&bg=white";
-					// Cloud (wo/ PP Connect)
-						const server = null;
-						const pie = "https://cloud.protopie.io/p/0c10749c98?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false";
-
-				// Create DOM
-					const pp = document.createElement('iframe');
-					pp.scrolling = "no"
-					pp.id = "pp";
-					pp.src = (server!==null)?server+"/"+pie:pie;
-					const pc = document.createElement('iframe');
-					pc.scrolling = "no"
-					pc.id = "pc";
-					pc.src = (server!==null)?"pc.html?pp="+server:"pc.html";
-					document.body.appendChild(pp);
-					document.body.appendChild(pc);
+			<script type="text/javascript">
 
 				// Control
 					const app = new AlgoWim({
-						pp: server
+						// DOM
+							container: document.getElementById('container')
+							,controls: document.getElementById('controls')
+						// Local (wt/ PP Connect)
+							// ,pp: "http://192.168.1.13:9981"
+							// ,pie: "pie?pieid=33&id=0&name=uxproto32p_20220318&bg=white"
+						// Remote (wt/ PP Connect)
+							// ,pp: "http://3.71.221.93:9981"
+							// ,pie: "pie?pieid=1&id=0&name=uxproto32p_20220318&bg=white"
+						// Cloud (wo/ PP Connect)
+							,pp: null
+							,pie: "https://cloud.protopie.io/p/0c10749c98?touchHint=false&ui=false&scaleToFit=true&cursorType=arrow&mockup=true&playerAppPopup=false"
 					});
 
 			</script>

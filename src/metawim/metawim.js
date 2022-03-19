@@ -90,7 +90,7 @@ export default class MetaWim {
 
 				// Router
 				this.router = new Router({
-					pp: pp
+					pp: pp || null
 				})
 
 			// Init
@@ -481,9 +481,9 @@ export default class MetaWim {
 	    			}
     		
 	    		// Add to parent
-	    		if (window.self !== window.top) {
-	    			window.top.document.body.appendChild(this.ui);
-	    		}
+	    		// if (window.self !== window.top) {
+	    		// 	window.top.document.body.appendChild(this.ui);
+	    		// }
     		}
 
 		}

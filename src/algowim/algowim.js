@@ -1,4 +1,6 @@
 import io from 'socket.io-client';
+import {installStyles,getComputedStyle} from "./style";
+import MetaWim from './metawim';
 
 export default class AlgoWim {
 	
@@ -13,20 +15,39 @@ export default class AlgoWim {
 			this.name = "AlgoWim";
 
 			// Props
-			const { pp, bridge } = props;
+			const { 
+				// DOM
+				container
+				,controls
+				// Socket servers
+				,pp 
+				,bridge // TBD
+				// Pie
+				,pie
 
+			} = props;	
+			this.container = container;	
+			this.controls = controls || null;	
+			this.pp = pp || null;
+			this.bridge = pp || null;
+			this.pie = pie || null;
+
+			// Socket Clients
 			this.io = {
 				pp : {
 					name: "ProtoPie Connect",
-					url: pp || null,
+					url: this.pp,
 					socket: null
 				},
 				bridge : {
 					name: "Bridge Server",
-					url: bridge || null,
+					url: this.bridge,
 					socket: null
 				},
-			};
+			};			
+
+			// Has Socket
+			this.hasSocket = Object.values(this.io).findIndex( t => t.url !== null) !== -1;
 
 			// Init
 			this.init();
@@ -38,13 +59,48 @@ export default class AlgoWim {
 		
 		init() {
 
-			// Connect to Socket Servers
+			// Install Styles
+			this.viewStyles();
+
+			// Init View wo/ socket
+			if (this.hasSocket === false) {
+				this.viewInit();
+				return;
+			}
+
+			// Connect to Socket Servers and Init View
 			this.connect();
 		}
 
 	////////////////////////
 	// METHODS
 	////////////////////////
+
+		viewStyles() {
+
+			this.style = installStyles(`				
+		        iframe#pp {
+		        	display: inline-block;
+		        	border: none;
+		        	position: absolute;
+	    			background-color: transparent;
+	    			overflow: hidden;
+	    			z-index: 0;
+	    			top: 0px;
+	    			left: 0px;
+
+		        }
+		        canvas#pc {
+		        	/*clip-path: circle(265px);*/
+		        	position: absolute;
+		        	top: 0px;
+	    			left: 0px;
+		        	/*pointer-events: none;*/
+		        	z-index: 1;
+		        }		        
+			`);
+
+		}
 
 		connect() {
 
@@ -117,16 +173,78 @@ export default class AlgoWim {
 		viewInit() {
 			console.warn("viewInit");
 
+			// Get Container Size
+				const w = getComputedStyle(this.container, 'width');
+				const h = getComputedStyle(this.container, 'height');
+
+			// Create DOM
+
+				// Make Sure Container is relative
+				this.container.style.position = "relative";
+
+				// ProtoPie
+				const ppIframe = document.createElement('iframe');
+				ppIframe.scrolling = "no"
+				ppIframe.style.width = w;
+				ppIframe.style.height = h;
+				ppIframe.id = "pp";
+				ppIframe.src = (this.pp!==null)?this.pp+"/"+this.pie:this.pie;
+				this.container.appendChild(ppIframe);
+
+				// PlayCanvas				
+				const pcCanvas = document.createElement('canvas');
+				pcCanvas.style.width = w;
+				pcCanvas.style.height = h;
+				pcCanvas.id = "pc";
+				this.container.appendChild(pcCanvas);
+				const app = new MetaWim({
+					canvas: pcCanvas
+					,ui: this.controls
+					,pp: null // this.pp  // no need to PC socket
+				});
+				
+				// const pcCanvasIframe = document.createElement('iframe');
+				// pcCanvasIframe.style.width = w;
+				// pcCanvasIframe.style.height = h;
+				// pcCanvasIframe.id = "pc";
+				// const html_string = "<html><head></head><body></body></html>";
+				// pcCanvasIframe.src = "data:text/html;charset=utf-8," + escape(html_string);
+				// this.container.appendChild(pcCanvasIframe);
+
+				// const ppCanvasDocument = pcCanvasIframe.contentWindow.document;
+				// const pcCanvas = ppCanvasDocument.createElement('canvas');
+				// pcCanvas.style.width = "100%";
+				// pcCanvas.style.height = "100vw";
+				// pcCanvas.id = "pc";
+				// ppCanvasDocument.body.appendChild(pcCanvas);
+				// console.log(ppCanvasDocument.body);
+				// pcCanvasIframe.contentWindow.app = new MetaWim({
+				// 	canvas: pcCanvas
+				// 	,ui: this.controls
+				// 	,pp: null // this.pp  // no need to PC socket
+				// });
+				
+
+				// Pass Click to ProtoPie
+				// pcCanvas.addEventListener( "mousedown", function(e){
+				// 	e.target.style.pointerEvents = "none";
+				// 	setTimeout(function(){
+				// 		this.style.pointerEvents = "auto";
+				// 	}.bind(e.target), 200)
+					
+			 //    }, true);
+			
+
 			// Test
-			setTimeout(function() {
-				console.log("Emit from AlgoWim");
+			// setTimeout(function() {
+			// 	console.log("Emit from AlgoWim");
 
-				this.io['pp'].socket.emit('ppMessage', { messageId: "ProtoPie", value: "Hi from AlgoWim!" } );
+			// 	this.io['pp'].socket.emit('ppMessage', { messageId: "ProtoPie", value: "Hi from AlgoWim!" } );
 
-				this.io['pp'].socket.emit('ppMessage', { messageId: "PlayCanvas", value: "Hi from AlgoWim!" } );
+			// 	this.io['pp'].socket.emit('ppMessage', { messageId: "PlayCanvas", value: "Hi from AlgoWim!" } );
 
 
-			}.bind(this), 10000);
+			// }.bind(this), 10000);
 		}
 
 		viewUpdate(data) {
