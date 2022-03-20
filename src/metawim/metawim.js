@@ -16,7 +16,7 @@ import Scene from './scene';
 import BladeControls from './bladecontrols';
 import States from './states';
 import { meshMorphs } from './model';
-import { fixFloat, sortArrayByNumericValue, exportJson } from './utils';
+import { fixFloat, sortArrayByNumericValue, exportJson, importJson } from './utils';
 
 export default class MetaWim {
 	
@@ -38,7 +38,7 @@ export default class MetaWim {
 				// Canvas DOM
 				this.canvas = canvas;
 
-				// Controls
+				// Dev Controls
 				this.ui = ui || null;
 
 				// Canvas context (see options at https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext)
@@ -398,6 +398,10 @@ export default class MetaWim {
 									// Add current state
 									this.scope.addCurrentState()
 									break;
+								case "import":
+									// Import from file
+									this.scope.addImportState()
+									break;
 								case "state":
 									// Setup 
 									this.scope.setupStateCallback(this.idx);
@@ -556,6 +560,45 @@ export default class MetaWim {
 		}
 
 		/**
+		 * [addImportState description]
+		 */
+		async addImportState() {
+
+			// Load
+			const importState = await importJson();
+			const name = importState.name.replace(".json","");
+			const currentState = Object.values(importState.data)[0].preset;
+
+			// Append New State
+			this.states.setState(name, currentState);
+
+			// Attache Observer
+			const statesobserver = this.states.getControls("observers");
+			const id = name;
+			statesobserver[id].observer.on('tojson:set', function(newValue, oldValue) {				
+				this.scope.exportState(this.id);
+			}.bind({
+				scope: this
+				,id: id
+			}));
+			statesobserver[id].observer.on('progress:set', function(newValue, oldValue) {
+				// Mutate
+				switch(this.type) {
+					case "state":
+						// Setup
+						this.scope.setupStateCallback(this.idx);
+						break;
+				}    						
+			}.bind({
+				scope: this
+				,type: statesobserver[id].type
+				,idx: statesobserver[id].idx
+				,id: id
+			}));
+
+		}
+
+		/**
 		 * [exportState description]
 		 * @param  {[type]} id [description]
 		 * @return {[type]}    [description]
@@ -578,9 +621,10 @@ export default class MetaWim {
 			this.app.off();
 			// Get current state
 			const currentState = this.getCurrentState();
-			// Get target state
-			const state = this.states.getState(idx);
 			
+			// Get target state
+			const state = this.states.getState(idx);		
+
 			// Set New updates
 			this.app.on("update", function(dt) {
 				try {

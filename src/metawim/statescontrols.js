@@ -216,9 +216,9 @@ export default class StatesControls {
 					statesContainer.appendChild(statesExportLabelContainer);
 
 					// Button
-					const observerButton = new Observer({progress: 1});
+					const observerExportButton = new Observer({progress: 1});
 					// Observer Callback is set from the main class
-					// observerButton.on('progress:set', function(value) {
+					// observerExportButton.on('progress:set', function(value) {
 					// 	console.log("value 4", value);
 					// }.bind(this));
 					const statesExportContainer = document.createElement("DIV");
@@ -232,7 +232,7 @@ export default class StatesControls {
 						width:null
 					});
 					// Link observer
-					exportButton.link(observerButton,'progress');
+					exportButton.link(observerExportButton,'progress');
 					// Add button to state export container
 					statesExportContainer.style.marginBottom = "15px";
 					statesExportContainer.appendChild(exportButton.dom);
@@ -241,15 +241,68 @@ export default class StatesControls {
 					// Add Listener to Button
 					exportButton.on('click', function(value) {
 						// Dispatch event (toggle)
-						const oldValue = observerButton.get("progress");						
-						observerButton.set("progress", -1*oldValue);
+						const oldValue = observerExportButton.get("progress");						
+						observerExportButton.set("progress", -1*oldValue);
 					});
 
 					// Add to Observers
 					this.controls.observers["append"] = {
 						idx: 0
-						,observer: observerButton
+						,observer: observerExportButton
 						,type: "append"
+					};
+
+				// Load State Button
+					
+					// Label
+					const statesImportLabelContainer = document.createElement("DIV");
+					const statesImportLabel = new Label({
+						enabled: true,
+						height: null,
+						text: "load state:",
+						tabIndex:0,
+						width:null
+					});
+					statesImportLabelContainer.appendChild(statesImportLabel.dom);
+					statesImportLabel.dom.style.color = "#00FF00";
+					statesImportLabelContainer.style.marginTop = "15px";
+					statesContainer.appendChild(statesImportLabelContainer);
+
+					// Button
+					const observerImportButton = new Observer({progress: 1});
+					// Observer Callback is set from the main class
+					// observerImportButton.on('progress:set', function(value) {
+					// 	console.log("value 4", value);
+					// }.bind(this));
+					const statesImportContainer = document.createElement("DIV");
+					const importButton = new Button({
+						enabled: true,
+						height: null,
+						icon: "E401",
+						size: "",
+						tabIndex:0,
+						text:"Import",
+						width:null
+					});
+					// Link observer
+					importButton.link(observerImportButton,'progress');
+					// Add button to state export container
+					statesImportContainer.style.marginBottom = "15px";
+					statesImportContainer.appendChild(importButton.dom);
+					// Add Export Container to States Container
+					statesContainer.appendChild(statesImportContainer);
+					// Add Listener to Button
+					importButton.on('click', function(value) {
+						// Dispatch event (toggle)
+						const oldValue = observerImportButton.get("progress");						
+						observerImportButton.set("progress", -1*oldValue);
+					});
+
+					// Add to Observers
+					this.controls.observers["import"] = {
+						idx: 0
+						,observer: observerImportButton
+						,type: "import"
 					};
 
 				// Add Blader to UI DOM

@@ -112,7 +112,9 @@ const CreateMouseInput = ({...props}) => {
 
 		// CUSTOM
 		if (event.event.target.tagName!=="CANVAS") return;
-		this.algowimControls.lockControls();
+		if (this.algowimControls !== null) {
+			this.algowimControls.lockControls();
+		}
 
 		// BAU
 	    switch (event.button) {
@@ -137,7 +139,9 @@ const CreateMouseInput = ({...props}) => {
 		
 		// CUSTOM
 		if (event.event.target.tagName!=="CANVAS") return;		
-		this.algowimControls.unlockControls();
+		if (this.algowimControls !== null) {
+			this.algowimControls.unlockControls();
+		}
 
 		// BAU
 	    switch (event.button) {
@@ -179,8 +183,9 @@ const CreateMouseInput = ({...props}) => {
 	MouseInput.prototype.onMouseOut = function (event) {
 
 		// CUSTOM
-		// if (event.target.tagName!=="CANVAS") return;
-		this.algowimControls.unlockControls();
+		if (this.algowimControls !== null) {
+			this.algowimControls.unlockControls();
+		}
 
 		// BAU
 	    this.lookButtonDown = false;

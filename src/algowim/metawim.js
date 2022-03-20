@@ -89488,12 +89488,70 @@ const objectMap = function(obj, fn) {
   )
 };
 
+/**
+ * [exportJson description]
+ * @param  {[type]} name [description]
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
 const exportJson = function(name, data) {
     const hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
     hiddenElement.target = '_blank';
     hiddenElement.download = name+".json";
     hiddenElement.click();
+};
+
+/**
+ * [description]
+ * @return {[type]} [description]
+ */
+const importJson = async function() {
+
+    return new Promise(async function(resolve, reject) {
+        
+        let inputFile = document.createElement("input");
+        inputFile.type = "file";
+        inputFile.multiple = false;
+        inputFile.style.display = "none";
+        document.body.appendChild(inputFile);               
+    
+        // Input Change listener
+        inputFile.addEventListener("change", function(e) {
+          var file = e.currentTarget.files[0];
+    
+          // Read File
+          if (file.type && file.type !== "application/json") {
+            console.log('File is not supported.', file.type, file);
+            reject("File is not supported.");
+            return;
+          }
+    
+          const reader = new FileReader();
+          reader.addEventListener('load', (event) => {
+            const dataSource = event.target.result;
+    
+            try {
+              inputFile.parentNode.removeChild(inputFile);
+              const dataObject = JSON.parse(dataSource);               
+              resolve({
+                name: file.name
+                ,data: dataObject
+              });
+            } catch(error) {
+              console.error("Faild to parse the file.", error);
+              reject("Failed to parse the file.");
+            }
+            
+          });
+          reader.readAsText(file);      
+          
+        }); 
+        // open dialog              
+        inputFile.click(); 
+    
+    });
+
 };
 
 /**
@@ -99164,7 +99222,9 @@ const CreateMouseInput = ({...props}) => {
 
 		// CUSTOM
 		if (event.event.target.tagName!=="CANVAS") return;
-		this.algowimControls.lockControls();
+		if (this.algowimControls !== null) {
+			this.algowimControls.lockControls();
+		}
 
 		// BAU
 	    switch (event.button) {
@@ -99187,7 +99247,9 @@ const CreateMouseInput = ({...props}) => {
 		
 		// CUSTOM
 		if (event.event.target.tagName!=="CANVAS") return;		
-		this.algowimControls.unlockControls();
+		if (this.algowimControls !== null) {
+			this.algowimControls.unlockControls();
+		}
 
 		// BAU
 	    switch (event.button) {
@@ -99227,8 +99289,9 @@ const CreateMouseInput = ({...props}) => {
 	MouseInput.prototype.onMouseOut = function (event) {
 
 		// CUSTOM
-		// if (event.target.tagName!=="CANVAS") return;
-		this.algowimControls.unlockControls();
+		if (this.algowimControls !== null) {
+			this.algowimControls.unlockControls();
+		}
 
 		// BAU
 	    this.lookButtonDown = false;
@@ -99463,19 +99526,20 @@ class SceneControls {
 				// Container
 					const sceneContainer = document.createElement("DIV");
 
-				// UI Controls name
-					const uiNameContainer = document.createElement("DIV");
-					const uiLabel = new Label({
-						enabled: true,
-						height: null,
-						text: "--- DEV CONTROLS ---",
-						tabIndex:0,
-						width:null
-					});
-					uiNameContainer.appendChild(uiLabel.dom);
-					uiLabel.dom.style.color = "#2c393c";
-					uiNameContainer.style.marginTop = uiNameContainer.style.marginBottom = "15px";
-					sceneContainer.appendChild(uiNameContainer);
+				// // UI Controls name
+				// 	const uiNameContainer = document.createElement("DIV");
+				// 	const uiLabel = new Label({
+				// 		enabled: true,
+				// 		height: null,
+				// 		text: "DEV CONTROLS",
+				// 		tabIndex:0,
+				// 		width:null
+				// 	});
+				// 	uiNameContainer.appendChild(uiLabel.dom);
+				// 	uiLabel.dom.style.color = "#2c393c";
+				// 	// uiNameContainer.style.paddingLeft = "30px";
+				// 	uiNameContainer.style.marginTop = "5px";
+				// 	sceneContainer.appendChild(uiNameContainer);
 
 
 				// Scene Controls name
@@ -101385,9 +101449,9 @@ class StatesControls {
 					statesContainer.appendChild(statesExportLabelContainer);
 
 					// Button
-					const observerButton = new Observer({progress: 1});
+					const observerExportButton = new Observer({progress: 1});
 					// Observer Callback is set from the main class
-					// observerButton.on('progress:set', function(value) {
+					// observerExportButton.on('progress:set', function(value) {
 					// 	console.log("value 4", value);
 					// }.bind(this));
 					const statesExportContainer = document.createElement("DIV");
@@ -101401,7 +101465,7 @@ class StatesControls {
 						width:null
 					});
 					// Link observer
-					exportButton.link(observerButton,'progress');
+					exportButton.link(observerExportButton,'progress');
 					// Add button to state export container
 					statesExportContainer.style.marginBottom = "15px";
 					statesExportContainer.appendChild(exportButton.dom);
@@ -101410,15 +101474,68 @@ class StatesControls {
 					// Add Listener to Button
 					exportButton.on('click', function(value) {
 						// Dispatch event (toggle)
-						const oldValue = observerButton.get("progress");						
-						observerButton.set("progress", -1*oldValue);
+						const oldValue = observerExportButton.get("progress");						
+						observerExportButton.set("progress", -1*oldValue);
 					});
 
 					// Add to Observers
 					this.controls.observers["append"] = {
 						idx: 0
-						,observer: observerButton
+						,observer: observerExportButton
 						,type: "append"
+					};
+
+				// Load State Button
+					
+					// Label
+					const statesImportLabelContainer = document.createElement("DIV");
+					const statesImportLabel = new Label({
+						enabled: true,
+						height: null,
+						text: "load state:",
+						tabIndex:0,
+						width:null
+					});
+					statesImportLabelContainer.appendChild(statesImportLabel.dom);
+					statesImportLabel.dom.style.color = "#00FF00";
+					statesImportLabelContainer.style.marginTop = "15px";
+					statesContainer.appendChild(statesImportLabelContainer);
+
+					// Button
+					const observerImportButton = new Observer({progress: 1});
+					// Observer Callback is set from the main class
+					// observerImportButton.on('progress:set', function(value) {
+					// 	console.log("value 4", value);
+					// }.bind(this));
+					const statesImportContainer = document.createElement("DIV");
+					const importButton = new Button({
+						enabled: true,
+						height: null,
+						icon: "E401",
+						size: "",
+						tabIndex:0,
+						text:"Import",
+						width:null
+					});
+					// Link observer
+					importButton.link(observerImportButton,'progress');
+					// Add button to state export container
+					statesImportContainer.style.marginBottom = "15px";
+					statesImportContainer.appendChild(importButton.dom);
+					// Add Export Container to States Container
+					statesContainer.appendChild(statesImportContainer);
+					// Add Listener to Button
+					importButton.on('click', function(value) {
+						// Dispatch event (toggle)
+						const oldValue = observerImportButton.get("progress");						
+						observerImportButton.set("progress", -1*oldValue);
+					});
+
+					// Add to Observers
+					this.controls.observers["import"] = {
+						idx: 0
+						,observer: observerImportButton
+						,type: "import"
 					};
 
 				// Add Blader to UI DOM
@@ -101671,7 +101788,7 @@ class MetaWim {
 				// Canvas DOM
 				this.canvas = canvas;
 
-				// Controls
+				// Dev Controls
 				this.ui = ui || null;
 
 				// Canvas context (see options at https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext)
@@ -102029,6 +102146,10 @@ class MetaWim {
 									// Add current state
 									this.scope.addCurrentState();
 									break;
+								case "import":
+									// Import from file
+									this.scope.addImportState();
+									break;
 								case "state":
 									// Setup 
 									this.scope.setupStateCallback(this.idx);
@@ -102184,6 +102305,45 @@ class MetaWim {
 		}
 
 		/**
+		 * [addImportState description]
+		 */
+		async addImportState() {
+
+			// Load
+			const importState = await importJson();
+			const name = importState.name.replace(".json","");
+			const currentState = Object.values(importState.data)[0].preset;
+
+			// Append New State
+			this.states.setState(name, currentState);
+
+			// Attache Observer
+			const statesobserver = this.states.getControls("observers");
+			const id = name;
+			statesobserver[id].observer.on('tojson:set', function(newValue, oldValue) {				
+				this.scope.exportState(this.id);
+			}.bind({
+				scope: this
+				,id: id
+			}));
+			statesobserver[id].observer.on('progress:set', function(newValue, oldValue) {
+				// Mutate
+				switch(this.type) {
+					case "state":
+						// Setup
+						this.scope.setupStateCallback(this.idx);
+						break;
+				}    						
+			}.bind({
+				scope: this
+				,type: statesobserver[id].type
+				,idx: statesobserver[id].idx
+				,id: id
+			}));
+
+		}
+
+		/**
 		 * [exportState description]
 		 * @param  {[type]} id [description]
 		 * @return {[type]}    [description]
@@ -102206,9 +102366,10 @@ class MetaWim {
 			this.app.off();
 			// Get current state
 			const currentState = this.getCurrentState();
-			// Get target state
-			const state = this.states.getState(idx);
 			
+			// Get target state
+			const state = this.states.getState(idx);		
+
 			// Set New updates
 			this.app.on("update", function(dt) {
 				try {

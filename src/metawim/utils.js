@@ -57,12 +57,70 @@ export const objectMap = function(obj, fn) {
   )
 }
 
+/**
+ * [exportJson description]
+ * @param  {[type]} name [description]
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
 export const exportJson = function(name, data) {
     const hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
     hiddenElement.target = '_blank';
     hiddenElement.download = name+".json";
     hiddenElement.click();
+}
+
+/**
+ * [description]
+ * @return {[type]} [description]
+ */
+export const importJson = async function() {
+
+    return new Promise(async function(resolve, reject) {
+        
+        let inputFile = document.createElement("input");
+        inputFile.type = "file";
+        inputFile.multiple = false;
+        inputFile.style.display = "none";
+        document.body.appendChild(inputFile);               
+    
+        // Input Change listener
+        inputFile.addEventListener("change", function(e) {
+          var file = e.currentTarget.files[0];
+    
+          // Read File
+          if (file.type && file.type !== "application/json") {
+            console.log('File is not supported.', file.type, file);
+            reject("File is not supported.");
+            return;
+          }
+    
+          const reader = new FileReader();
+          reader.addEventListener('load', (event) => {
+            const dataSource = event.target.result;
+    
+            try {
+              inputFile.parentNode.removeChild(inputFile);
+              const dataObject = JSON.parse(dataSource);               
+              resolve({
+                name: file.name
+                ,data: dataObject
+              });
+            } catch(error) {
+              console.error("Faild to parse the file.", error);
+              reject("Failed to parse the file.");
+            }
+            
+          });
+          reader.readAsText(file);      
+          
+        }); 
+        // open dialog              
+        inputFile.click(); 
+    
+    });
+
 }
 
 /**

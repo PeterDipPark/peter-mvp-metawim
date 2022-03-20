@@ -18,9 +18,10 @@ export default class AlgoWim {
 
 			// Props
 			const { 
+				// DEV
+				dev
 				// DOM
-				container
-				,controls
+				,container
 				// Socket servers
 				,pp 
 				,bridge // TBD
@@ -29,7 +30,7 @@ export default class AlgoWim {
 
 			} = props;	
 			this.container = container || document.body;
-			this.controls = controls || null;	
+			this.dev = dev || false;	
 			this.pp = pp || null;
 			this.bridge = bridge || null;
 			this.pie = pie || null;
@@ -215,6 +216,61 @@ export default class AlgoWim {
 				ppIframe.src = (this.pp!==null)?this.pp+"/"+this.pie:this.pie;
 				this.container.appendChild(ppIframe);
 
+				// PlayCanvas Dev UI
+				const pcControls = this.dev === true ?  document.createElement('dev') : null;
+				if (pcControls !== null) {
+					pcControls.id = "pc-dev";
+					const pcControlsStyle = installStyles(`				
+				        #pc-dev {
+							height: 100%;
+							overflow-y: scroll;
+							overflow-x: hidden;
+							position: absolute;
+							background-color: black;
+							width: 220px;
+							left: -220px;
+							text-align: left;
+							z-index: 10000;
+							-webkit-transition: left 0.3s ease-out;
+							-moz-transition: left 0.3s ease-out;
+							-o-transition: left 0.3s ease-out;
+							transition: left 0.3s ease-out;
+						}
+						#pc-dev input {
+							width: 100% !important;
+						}
+						#pc-dev-toggle {
+						    background-color: white;
+							color: red;
+						    border: none;
+						    left: 6px;
+						    top: 6px;
+						    line-height: 1;
+						    position: fixed;
+						    width: 24px;
+						    height: 24px;
+						    border-radius: 12px;
+						    z-index: 10001;
+						    cursor: pointer;
+						    -webkit-transition: left 0.3s ease-out;
+							-moz-transition: left 0.3s ease-out;
+							-o-transition: left 0.3s ease-out;
+							transition: left 0.3s ease-out;
+						}		        
+					`);
+					document.body.appendChild(pcControls);
+					const pcControlsToggle = document.createElement("button");
+					pcControlsToggle.id = "pc-dev-toggle";
+					pcControlsToggle.innerHTML = "☰";
+					pcControlsToggle.addEventListener( "click", function(e){
+						const open = (this.style.left === "0px");
+						this.style.left = open === true ? "-220px" : "0px";
+						e.target.style.left = open === true ? "0px" : "226px";
+					}.bind(pcControls), false);					
+					document.body.appendChild(pcControlsToggle);
+
+				}
+
 				// PlayCanvas				
 				const pcCanvas = document.createElement('canvas');
 				pcCanvas.style.width = w;
@@ -223,7 +279,7 @@ export default class AlgoWim {
 				this.container.appendChild(pcCanvas);
 				const app = new MetaWim({
 					canvas: pcCanvas
-					,ui: this.controls
+					,ui: pcControls
 					,pp: null // this.pp  // no need to PC socket
 					,algowimControls:this.algowimControls
 				});

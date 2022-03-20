@@ -19,25 +19,10 @@
 			    justify-content: center;
 			    align-items: center;
 	        }
-	        #controls {
-		        	height: 100%;	        	
-		        	overflow-y: scroll;
-		        	overflow-x: hidden;
-		        	position: absolute;
-		        	background-color: black;
-		        	width: 220px;
-		        	left: 0px;
-		        	text-align: left;
-		        	z-index: 3;
-		        }
-	        	#controls input {
-	        		width: 100% !important;
-	        	}
 	    </style>
 	</head>
 	<body>
 
-			<div id="controls"></div>
 			<div id="container" style="height: 800px; width: 1000px"></div>
 
 			<script src="algowim.js" ></script>	
@@ -45,8 +30,10 @@
 
 				// Control
 					const app = new AlgoWim({
+						// DEV
+							dev: true
 						// DOM
-							container: document.getElementById('container')
+							,container: document.getElementById('container')
 							,controls: document.getElementById('controls')
 						// Local (wt/ PP Connect)
 							,pp: "http://192.168.1.13:9981"
