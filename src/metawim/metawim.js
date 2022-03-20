@@ -212,7 +212,16 @@ export default class MetaWim {
 	// GETTERS / SETTERS
 	////////////////////////
 	
+		callAction(action,newValue,oldValue) {
 
+			switch(action) {
+				case "pc-orbit-reset":
+					// Reset MetaWim Orbit Camera to Initial State
+					this.scene.resetCamera();
+					break;
+			}
+			
+		}
 
 	////////////////////////
 	// METHODS
@@ -320,7 +329,8 @@ export default class MetaWim {
 									switch(this.idx) {
 										case "reset":
 											// Reset Orbit
-											this.scope.scene.resetCamera();
+											// this.scope.scene.resetCamera();
+											this.scope.callAction("pc-orbit-reset");
 											break;
 										case "projection":
 											// Change projection											

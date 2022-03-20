@@ -19,11 +19,27 @@
 			    justify-content: center;
 			    align-items: center;
 	        }
+	        #temp {
+	        	height: 100%;	        	
+	        	overflow-y: auto;
+	        	overflow-x: hidden;
+	        	position: absolute;
+	        	background-color: transparent;
+	        	width: 220px;
+	        	right: 0px;
+	        	z-index: 10002;
+	        }
 	    </style>
 	</head>
 	<body>
 
-			<div id="container" style="height: 800px; width: 1000px"></div>
+			<div id="temp">
+
+				<button data-algowim="button:pc-orbit-reset:1">reset camera</button>
+				<button data-algowim="button:pc-orbit-reset-as:1">reset camera</button>
+			</div>
+
+			<div id="container" style="height: 800px; width: 1000px"></div>			
 
 			<script src="algowim.js" ></script>	
 			<script type="text/javascript">
@@ -34,7 +50,6 @@
 							dev: true
 						// DOM
 							,container: document.getElementById('container')
-							,controls: document.getElementById('controls')
 						// Local (wt/ PP Connect)
 							,pp: "http://192.168.1.13:9981"
 							,pie: "pie?pieid=33&id=0&name=uxproto32p_20220318&bg=white"

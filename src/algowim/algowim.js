@@ -57,6 +57,9 @@ export default class AlgoWim {
 			// Has Socket
 			this.hasSocket = Object.values(this.io).findIndex( t => t.url !== null) !== -1;
 
+			// MetaWim (PC)
+			this.metawim = null;
+
 			// Init
 			this.init();
 		}
@@ -198,6 +201,9 @@ export default class AlgoWim {
 			// Set View ready
 				this.viewReady = true;
 
+			// Has container
+				if (this.container === null) return;
+
 			// Get Container Size
 				const w = getComputedStyle(this.container, 'width');
 				const h = getComputedStyle(this.container, 'height');
@@ -247,7 +253,7 @@ export default class AlgoWim {
 						    top: 6px;
 						    line-height: 1;
 						    position: fixed;
-						    width: 24px;
+						    /*width: 24px;*/
 						    height: 24px;
 						    border-radius: 12px;
 						    z-index: 10001;
@@ -261,7 +267,7 @@ export default class AlgoWim {
 					document.body.appendChild(pcControls);
 					const pcControlsToggle = document.createElement("button");
 					pcControlsToggle.id = "pc-dev-toggle";
-					pcControlsToggle.innerHTML = "☰";
+					pcControlsToggle.innerHTML = "☰ DEV";
 					pcControlsToggle.addEventListener( "click", function(e){
 						const open = (this.style.left === "0px");
 						this.style.left = open === true ? "-220px" : "0px";
@@ -277,115 +283,54 @@ export default class AlgoWim {
 				pcCanvas.style.height = h;
 				pcCanvas.id = "pc";
 				this.container.appendChild(pcCanvas);
-				const app = new MetaWim({
+				this.metawim = new MetaWim({
 					canvas: pcCanvas
 					,ui: pcControls
 					,pp: null // this.pp  // no need to PC socket
 					,algowimControls:this.algowimControls
 				});
 				
-				// const pcCanvasIframe = document.createElement('iframe');
-				// pcCanvasIframe.style.width = w;
-				// pcCanvasIframe.style.height = h;
-				// pcCanvasIframe.id = "pc";
-				// const html_string = "<html><head></head><body></body></html>";
-				// pcCanvasIframe.src = "data:text/html;charset=utf-8," + escape(html_string);
-				// this.container.appendChild(pcCanvasIframe);
-
-				// const ppCanvasDocument = pcCanvasIframe.contentWindow.document;
-				// const pcCanvas = ppCanvasDocument.createElement('canvas');
-				// pcCanvas.style.width = "100%";
-				// pcCanvas.style.height = "100vw";
-				// pcCanvas.id = "pc";
-				// ppCanvasDocument.body.appendChild(pcCanvas);
-				// console.log(ppCanvasDocument.body);
-				// pcCanvasIframe.contentWindow.app = new MetaWim({
-				// 	canvas: pcCanvas
-				// 	,ui: this.controls
-				// 	,pp: null // this.pp  // no need to PC socket
-				// });
-				
-
-				// Pass Click to ProtoPie
-				// pcCanvas.addEventListener( "mousedown", function(e){
-				// 	e.target.style.pointerEvents = "none";
-				// 	setTimeout(function(){
-				// 		this.style.pointerEvents = "auto";
-				// 	}.bind(e.target), 200)
-					
-					/*
-				console.info("ppIframe", ppIframe.contentWindow.document);
-			 	
-			 	ppIframe.contentWindow.document.domain = "http://192.168.1.13:9981";
-			 	//    
-			 	ppIframe.addEventListener( "click", function(e){
-			 		console.warn("click Received", e);
-			 	}, false);
-			 	pcCanvas.addEventListener( "click", function(e){
-					console.log("fake click to pp", e.pageX, e.pageY, e.offsetX, e.offsetY);
-					var ev = this.contentWindow.document.createEvent("MouseEvent");
-				    var el = this.contentWindow.document.elementFromPoint(x,y);
-				    ev.initMouseEvent(
-				        "click",
-				        true, // bubble
-				        true, // cancelable
-				        this.contentWindow, null,
-				        e.offsetX, e.offsetY, 0, 0, // coordinates
-				        false, false, false, false, // modifier keys
-				        0, /// left 
-				        null
-				    );
-				    // var ev = new MouseEvent('click', {
-				    //     'view': window,
-				    //     'bubbles': true,
-				    //     'cancelable': true,
-				    //     'screenX': x,
-				    //     'screenY': y
-				    // });
-
-				    // var el = document.elementFromPoint(x, y);
-				    // console.log(el); //print element to console
-				    // el.dispatchEvent(ev);
-				    el.dispatchEvent(ev)
-				 }.bind(ppIframe), false);
-			 		*/
-
 
 			// Create Controls
 				
 				this.viewControls();
 
 			// Test
-			// setTimeout(function() {
-			// 	console.log("Emit from AlgoWim");
+				
+				// setTimeout(function() {
+				// 	console.log("Emit from AlgoWim");
 
-			// 	this.io['pp'].socket.emit('ppMessage', { messageId: "ProtoPie", value: "Hi from AlgoWim!" } );
+				// 	this.io['pp'].socket.emit('ppMessage', { messageId: "ProtoPie", value: "Hi from AlgoWim!" } );
 
-			// 	this.io['pp'].socket.emit('ppMessage', { messageId: "PlayCanvas", value: "Hi from AlgoWim!" } );
+				// 	this.io['pp'].socket.emit('ppMessage', { messageId: "PlayCanvas", value: "Hi from AlgoWim!" } );
 
 
-			// }.bind(this), 10000);
+				// }.bind(this), 10000);
+				
 		}
 
 		viewControls() {			
 
-			// Observe and Append
-				
+			// Observe
+			
 				// Get Observers	
 				const observers = this.algowimControls.getControls("observers");
 				// Assign callback to all observer
 				for (let id in observers) { 
-					// Observe
-						observers[id].observer.on('progress:set', function(newValue, oldValue) {
-							console.warn(this, newValue, oldValue);							
-						}.bind({
-							scope: this
-							,type: observers[id].type
-							,idx: observers[id].idx
-							,id: id
-						}));
-					// Append
-    					this.container.appendChild(observers[id].dom);
+					
+					observers[id].observer.forEach(function(action) {
+						observers[id].observer.on(action+':set', function(newValue, oldValue) {
+
+							// Select Action
+							switch(action) {
+								case "pc-orbit-reset":
+									// Reset MetaWim Orbit Camera to Initial State
+									this.metawim.callAction(action, newValue, oldValue);
+									break;
+							}
+
+						}.bind(this));
+					}.bind(this));
 				}
     				
 
