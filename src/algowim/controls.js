@@ -69,6 +69,31 @@ export default class Controls {
 		}
 
 		/**
+		 * [getControlsDom description]
+		 * @param  {[type]} action [description]
+		 * @return {[type]}        [description]
+		 */
+		getControlsDom(action) {
+
+			let dom = null;
+			olp:
+			for (let id in this.controls.observers) {
+				dlp:
+				for (var i = this.controls.observers[id].dom.length - 1; i >= 0; i--) {
+					if (this.controls.observers[id].dom[i].control_action === action) {
+						dom = this.controls.observers[id].dom[i].control_element;
+						break dlp;
+					}
+				}
+				if (dom !== null) {
+					break olp;
+				}
+			}
+			return dom;
+
+		}
+
+		/**
 		 * [lockControls description]
 		 * @return {[type]} [description]
 		 */
@@ -195,6 +220,19 @@ export default class Controls {
 						control_element.addEventListener( "click", function(e) {
 							const oldValue = this.get(control_action);
 							this.set(control_action, -1*oldValue);
+						}.bind(control_observer), false);
+					break;
+				case "range":
+						control_element.addEventListener( "input", function(e) {
+							this.set(control_action, e.target.value);
+						}.bind(control_observer), false);
+						control_element.addEventListener( "change", function(e) {
+							this.set(control_action, e.target.value);
+						}.bind(control_observer), false);
+					break;
+				case "select":
+						control_element.addEventListener( "change", function(e) {
+							this.set(control_action, e.target.value);
 						}.bind(control_observer), false);
 					break;					
 			}

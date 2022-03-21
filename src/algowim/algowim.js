@@ -54,6 +54,10 @@ export default class AlgoWim {
 				},
 			};			
 
+			// Elements
+			this.ppIframe = null;
+			this.pcCanvas = null;
+
 			// Has Socket
 			this.hasSocket = Object.values(this.io).findIndex( t => t.url !== null) !== -1;
 
@@ -214,13 +218,17 @@ export default class AlgoWim {
 				this.container.style.position = "relative";
 
 				// ProtoPie
-				const ppIframe = document.createElement('iframe');
-				ppIframe.scrolling = "no"
-				ppIframe.style.width = w;
-				ppIframe.style.height = h;
-				ppIframe.id = "pp";
-				ppIframe.src = (this.pp!==null)?this.pp+"/"+this.pie:this.pie;
-				this.container.appendChild(ppIframe);
+				this.ppIframe = document.createElement('iframe');
+				this.ppIframe.scrolling = "no"
+				this.ppIframe.style.width = w;
+				this.ppIframe.style.height = h;
+				this.ppIframe.id = "pp";
+				this.ppIframe.src = (this.pp!==null)?this.pp+"/"+this.pie:this.pie;
+				this.ppIframe.addEventListener( "load", function(e) {
+				    this.viewShow("pp");
+				}.bind(this) );
+
+				this.container.appendChild(this.ppIframe);
 
 				// PlayCanvas Dev UI
 				const pcControls = this.dev === true ?  document.createElement('dev') : null;
@@ -278,16 +286,17 @@ export default class AlgoWim {
 				}
 
 				// PlayCanvas				
-				const pcCanvas = document.createElement('canvas');
-				pcCanvas.style.width = w;
-				pcCanvas.style.height = h;
-				pcCanvas.id = "pc";
-				this.container.appendChild(pcCanvas);
+				this.pcCanvas = document.createElement('canvas');
+				this.pcCanvas.style.width = w;
+				this.pcCanvas.style.height = h;
+				this.pcCanvas.id = "pc";
+				this.container.appendChild(this.pcCanvas);
 				this.metawim = new MetaWim({
-					canvas: pcCanvas
+					canvas: this.pcCanvas
 					,ui: pcControls
 					,pp: null // this.pp  // no need to PC socket
 					,algowimControls:this.algowimControls
+					,onload: this.viewShow.bind(this)
 				});
 				
 
@@ -309,6 +318,10 @@ export default class AlgoWim {
 				
 		}
 
+		viewShow(c) {
+			console.warn("show", c);
+		}
+
 		viewControls() {			
 
 			// Observe
@@ -321,11 +334,63 @@ export default class AlgoWim {
 					observers[id].observer.forEach(function(action) {
 						observers[id].observer.on(action+':set', function(newValue, oldValue) {
 
+							// console.log(action, newValue, oldValue);
+							
 							// Select Action
-							switch(action) {
+							switch(action) {								
+
 								case "pc-orbit-reset":
 									// Reset MetaWim Orbit Camera to Initial State
 									this.metawim.callAction(action, newValue, oldValue);
+									break;
+								case "pc-orbit-lock":
+									// Lock Canvas
+									const dom = this.algowimControls.getControlsDom(action);
+									dom.innerHTML = newValue === -1 ? dom.getAttribute("data-algowim-unlocked"):dom.getAttribute("data-algowim-locked");
+									this.pcCanvas.style.pointerEvents = newValue === -1 ? "none":"auto";
+									break;
+								case "pp-opacity":
+									// Change PP element opacity
+									if (this.ppIframe !== null && this.ppIframe.style !== undefined) {
+										this.ppIframe.style.opacity = newValue;
+									}
+									break;
+								case "pc-opacity":
+									// Change PP element opacity									
+									if (this.pcCanvas !== null && this.pcCanvas.style !== undefined) {
+										this.pcCanvas.style.opacity = newValue;
+									}
+									break;
+								case "pp-pc-opacity":
+									// Change PP element opacity									
+									if (
+										this.pcCanvas !== null && this.pcCanvas.style !== undefined 
+										&& this.ppIframe !== null && this.ppIframe.style !== undefined
+									) {
+										//pp
+											this.ppIframe.style.opacity = 1-newValue;
+											const ppdom = this.algowimControls.getControlsDom("pp-opacity");
+											ppdom.value = 1-newValue;
+										//pc
+											this.pcCanvas.style.opacity = newValue;
+											const pcdom = this.algowimControls.getControlsDom("pc-opacity");
+											pcdom.value = newValue;
+									}
+									break;
+								default:
+									// Other
+									
+									if (action.indexOf("pp-") === 0) {
+										// Dom
+										const dom = this.algowimControls.getControlsDom(action);
+										// Send message to ProtoPie
+										if (dom.tagName === "SELECT") {
+											this.protopieMessage(action+"-"+newValue);
+										} else {
+											this.protopieMessage(action);
+										}
+									}
+
 									break;
 							}
 
@@ -340,6 +405,13 @@ export default class AlgoWim {
 			console.warn("viewUpdate", data);
 		}
 
+	////////////////////////
+	// ROUTER
+	////////////////////////
+
+		protopieMessage(msg) {
+			this.io['pp'].socket.emit('ppMessage', { messageId: "ProtoPie", value: msg } );
+		}
 
 	////////////////////////
 	// HELPERS

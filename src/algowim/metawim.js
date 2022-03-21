@@ -101778,10 +101778,13 @@ class MetaWim {
 		constructor({...props}) {
 			
 			// Super 
-				const { canvas, ui, count, pp, algowimControls } = props;			
+				const { canvas, ui, count, pp, algowimControls, onload } = props;			
 
 			// Props
 			
+				// Onload callback
+				this.onload = onload || null;
+
 				// Use Layers (TRY to solve opacity issue)
 				this.useLayers = false;
 
@@ -101911,7 +101914,12 @@ class MetaWim {
 	    	// Start App
 	    		this.app.start();
 
-
+	    	// Onload
+	    	
+	    		if (this.onload !== null) {
+	    			this.onload("pc");	    			
+	    		}
+	    		
 	    	// Listeners
     			// this.app.on("update", this.update, th
 	    		
@@ -101970,7 +101978,7 @@ class MetaWim {
 					this.scene.resetCamera();
 					break;
 			}
-			
+
 		}
 
 	////////////////////////
