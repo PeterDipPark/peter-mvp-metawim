@@ -3,6 +3,8 @@ import {
 			Color,
 			CULLFACE_NONE,
 			// TEST
+			Shader,
+			SEMANTIC_POSITION,
 			BLEND_PREMULTIPLIED,
 			BLEND_NORMAL,
 			BLEND_ADDITIVE,
@@ -13,7 +15,10 @@ import {
 			Texture,
 			PIXELFORMAT_R8_G8_B8_A8,
 			BLENDMODE_ONE_MINUS_SRC_ALPHA,
-			BLENDMODE_SRC_ALPHA
+			BLENDMODE_SRC_ALPHA,
+			FILTER_LINEAR_MIPMAP_LINEAR,
+			FILTER_LINEAR,
+			ADDRESS_CLAMP_TO_EDGE
 		} from 'playcanvas';
 
 import { fixFloat } from './utils';
@@ -36,7 +41,8 @@ export default class Material {
 			const { color, depth, graphicsDevice } = props;
 	    	
 			// Props
-			this.color = new Color(fixFloat(color.r/255),fixFloat(color.g/255),fixFloat(color.b/255)); // rgb values in 0.0-1.0 scale
+			this.colorsrc= color;
+			this.color = new Color((color.r/255),(color.g/255),(color.b/255), (color.a||1) ); // rgb values in 0.0-1.0 scale
 			this.depth = depth;
 			this.graphicsDevice = graphicsDevice;
 
@@ -97,6 +103,29 @@ export default class Material {
 				// this.material.emissive = this.color;
 			// NEW 
 				
+					// TEXUTRE
+						
+						this.texture = new Texture(this.graphicsDevice, {
+					        format: PIXELFORMAT_R8_G8_B8_A8,
+					        autoMipmap: true
+					        // ,mipmaps: true
+					        // ,premultiplyAlpha: true
+					    });
+					    var opacity = document.createElement("canvas");
+						var ctx = opacity.getContext("2d");
+						// ctx.fillStyle = "rgba(255,255,255,0.5);" //"+this.color.a+")";
+						ctx.fillStyle = "rgba("+this.colorsrc.r+","+this.colorsrc.g+","+this.colorsrc.b+","+(this.colorsrc.axx||0.69)+")";
+						ctx.fillRect(0, 0, opacity.width, opacity.height);
+					    
+					    this.texture.setSource(opacity);//document.getElementById("texture"));
+					    this.texture.minFilter = FILTER_LINEAR_MIPMAP_LINEAR;
+					    this.texture.magFilter = FILTER_LINEAR;
+					    this.texture.addressU = ADDRESS_CLAMP_TO_EDGE;
+					    this.texture.addressV = ADDRESS_CLAMP_TO_EDGE;
+					
+					    this.material.emissiveMap = this.texture;
+    					this.material.opacityMap = this.texture;
+    					// this.material.diffuseMap = this.texture;
 
 					// DIFFUSE COLOR and OPACITV
 					
@@ -104,7 +133,47 @@ export default class Material {
 						//this.material.opacity = 0.5; // opacity doesn't work with depthWrite/Test
 						
 						this.material.id = this.material.name = "blade"+this.depth;
-						this.material.diffuse = this.color;
+						
+						// DIFUSSE COLOR - WORKING
+							this.material.diffuse = this.color;
+							// this.material.opacity = this.color.a;
+							
+						// EMISIVE COLOR
+							// this.material.emissiveTint = true;
+							// this.material.emissive = this.color;
+							// this.material.opacityTint = true;
+
+						
+						
+
+						// SHADER
+							// var shaderDefinition = {
+							//     attributes: {
+							//         aPosition: SEMANTIC_POSITION
+							//     },
+							//     vshader: [
+							//         "attribute vec3 aPosition;",
+							//         "",
+							//         "void main(void)",
+							//         "{",
+							//         "    gl_Position = vec4(aPosition, 1.0);",
+							//         "}"
+							//     ].join("\n"),
+							//     fshader: [
+							//         "precision " + this.graphicsDevice.precision + " float;",
+							//         "",
+							//         "void main(void)",
+							//         "{",
+							//         "    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);",
+							//         "}"
+							//     ].join("\n")
+							// };
+
+							// this.shader = new Shader(this.graphicsDevice, shaderDefinition);
+
+							// this.material.setShader(this.shader);
+
+
 						this.material.depthTest = true; //true;
 						this.material.depthWrite = true; //true;
 						

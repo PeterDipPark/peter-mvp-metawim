@@ -89608,7 +89608,8 @@ class Material {
 			const { color, depth, graphicsDevice } = props;
 	    	
 			// Props
-			this.color = new Color(fixFloat(color.r/255),fixFloat(color.g/255),fixFloat(color.b/255)); // rgb values in 0.0-1.0 scale
+			this.colorsrc= color;
+			this.color = new Color((color.r/255),(color.g/255),(color.b/255), (color.a||1) ); // rgb values in 0.0-1.0 scale
 			this.depth = depth;
 			this.graphicsDevice = graphicsDevice;
 
@@ -89669,6 +89670,29 @@ class Material {
 				// this.material.emissive = this.color;
 			// NEW 
 				
+					// TEXUTRE
+						
+						this.texture = new Texture(this.graphicsDevice, {
+					        format: PIXELFORMAT_R8_G8_B8_A8,
+					        autoMipmap: true
+					        // ,mipmaps: true
+					        // ,premultiplyAlpha: true
+					    });
+					    var opacity = document.createElement("canvas");
+						var ctx = opacity.getContext("2d");
+						// ctx.fillStyle = "rgba(255,255,255,0.5);" //"+this.color.a+")";
+						ctx.fillStyle = "rgba("+this.colorsrc.r+","+this.colorsrc.g+","+this.colorsrc.b+","+(this.colorsrc.axx||0.69)+")";
+						ctx.fillRect(0, 0, opacity.width, opacity.height);
+					    
+					    this.texture.setSource(opacity);//document.getElementById("texture"));
+					    this.texture.minFilter = FILTER_LINEAR_MIPMAP_LINEAR;
+					    this.texture.magFilter = FILTER_LINEAR;
+					    this.texture.addressU = ADDRESS_CLAMP_TO_EDGE;
+					    this.texture.addressV = ADDRESS_CLAMP_TO_EDGE;
+					
+					    this.material.emissiveMap = this.texture;
+    					this.material.opacityMap = this.texture;
+    					// this.material.diffuseMap = this.texture;
 
 					// DIFFUSE COLOR and OPACITV
 					
@@ -89676,7 +89700,47 @@ class Material {
 						//this.material.opacity = 0.5; // opacity doesn't work with depthWrite/Test
 						
 						this.material.id = this.material.name = "blade"+this.depth;
-						this.material.diffuse = this.color;
+						
+						// DIFUSSE COLOR - WORKING
+							this.material.diffuse = this.color;
+							// this.material.opacity = this.color.a;
+							
+						// EMISIVE COLOR
+							// this.material.emissiveTint = true;
+							// this.material.emissive = this.color;
+							// this.material.opacityTint = true;
+
+						
+						
+
+						// SHADER
+							// var shaderDefinition = {
+							//     attributes: {
+							//         aPosition: SEMANTIC_POSITION
+							//     },
+							//     vshader: [
+							//         "attribute vec3 aPosition;",
+							//         "",
+							//         "void main(void)",
+							//         "{",
+							//         "    gl_Position = vec4(aPosition, 1.0);",
+							//         "}"
+							//     ].join("\n"),
+							//     fshader: [
+							//         "precision " + this.graphicsDevice.precision + " float;",
+							//         "",
+							//         "void main(void)",
+							//         "{",
+							//         "    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);",
+							//         "}"
+							//     ].join("\n")
+							// };
+
+							// this.shader = new Shader(this.graphicsDevice, shaderDefinition);
+
+							// this.material.setShader(this.shader);
+
+
 						this.material.depthTest = true; //true;
 						this.material.depthWrite = true; //true;
 						
@@ -89847,22 +89911,41 @@ const defaultColors = {
 
 	blank: 		{r: 255, g: 0, b: 0},
 
-	blade1: 	{r: 159, g: 132, b: 189},
-	blade2: 	{r: 235, g: 195, b: 219},
-	blade3: 	{r: 230, g: 228, b: 206},
-	blade4: 	{r: 13, g: 31, b: 45},
-	blade5: 	{r: 158, g: 163, b: 176},
-	blade6: 	{r: 228, g: 195, b: 173},
-	blade7: 	{r: 208, g: 0, b: 0},
-	blade8: 	{r: 63, g: 136, b: 197},
-	blade9: 	{r: 19, g: 111, b: 99},
-	blade10: 	{r: 214, g: 246, b: 221},
-	blade11: 	{r: 244, g: 152, b: 156},
-	blade12: 	{r: 172, g: 236, b: 247},
-	blade13: 	{r: 255, g: 164, b: 108},
-	blade14: 	{r: 105, g: 221, b: 255},
-	blade15: 	{r: 216, g: 225, b: 255},
-	blade16: 	{r: 190, g: 146, b: 162}
+	// CUSTOM
+	// blade1: 	{r: 159, g: 132, b: 189},
+	// blade2: 	{r: 235, g: 195, b: 219},
+	// blade3: 	{r: 230, g: 228, b: 206},
+	// blade4: 	{r: 13, g: 31, b: 45},
+	// blade5: 	{r: 158, g: 163, b: 176},
+	// blade6: 	{r: 228, g: 195, b: 173},
+	// blade7: 	{r: 208, g: 0, b: 0},
+	// blade8: 	{r: 63, g: 136, b: 197},
+	// blade9: 	{r: 19, g: 111, b: 99},
+	// blade10: 	{r: 214, g: 246, b: 221},
+	// blade11: 	{r: 244, g: 152, b: 156},
+	// blade12: 	{r: 172, g: 236, b: 247},
+	// blade13: 	{r: 255, g: 164, b: 108},
+	// blade14: 	{r: 105, g: 221, b: 255},
+	// blade15: 	{r: 216, g: 225, b: 255},
+	// blade16: 	{r: 190, g: 146, b: 162}
+
+	// FBX
+	blade1: 	{r: 0.061965, g: 75.735, b: 72.675, a: 0.964},
+	blade2: 	{r: 1.02, g: 65.025, b: 32.385, a: 0.976},
+	blade3: 	{r: 8.67, g: 69.87, b: 13.26, a: 0.978},
+	blade4: 	{r: 89.76, g: 125.97, b: 7.14, a: 0.945},
+	blade5: 	{r: 176.205, g: 167.79, b: 8.16, a: 0.914},
+	blade6: 	{r: 202.215, g: 120.36, b: 7.65, a: 0.919},
+	blade7: 	{r: 187.935, g: 56.1, b: 6.63, a: 0.939},
+	blade8: 	{r: 179.52, g: 23.97, b: 6.375, a: 0.949},
+	blade9: 	{r: 176.205, g: 10.2, b: 6.63, a: 0.953},
+	blade10: 	{r: 176.205, g: 10.455, b: 23.46, a: 0.949},
+	blade11: 	{r: 134.385, g: 10.2, b: 57.885, a: 0.950},
+	blade12: 	{r: 59.415, g: 6.885, b: 56.865, a: 0.970},
+	blade13: 	{r: 2.805, g: 10.455, b: 47.94, a: 0.985},
+	blade14: 	{r: 0, g: 20.91, b: 74.715, a: 0.977},
+	blade15: 	{r: 0, g: 55.08, b: 107.61, a: 0.960},
+	blade16: 	{r: 0, g: 83.13, b: 106.335, a: 0.954}
 
 };
 
@@ -98582,7 +98665,8 @@ class Blade {
 				// this.entity.translate(0, 0, (this.index/1000));
 				// this.entity.translate(0, 0, -fixFloat(this.index/1000));
 
-				this.entity.translate(0, 0, -fixFloat(this.index/1000));
+				this.entity.translate(0, 0, -fixFloat(this.index/1000));			
+		
 		}
 
 		/**
@@ -98788,14 +98872,20 @@ const CreateOrbitCamera = ({...props}) => {
 				// const layers = [worldLayer.id];
 				
 				this.entity.addComponent("camera", {
-					clearColorBuffer: false
+					
 					// clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
 					// NEW
-					,projection: PROJECTION_ORTHOGRAPHIC
+					projection: PROJECTION_ORTHOGRAPHIC
 					,orthoHeight: this.heightDefault
 					// ,cullFaces: false
-					,clearDepthBuffer: false
 					
+					,clearColorBuffer: false
+					,clearDepthBuffer: false
+					// ,clearColorBuffer: true
+					// ,clearDepthBuffer: true					
+					
+					,priority: 1
+
 					// ,flipFaces: true
 
 					// ,nearClip: 1
@@ -98804,6 +98894,7 @@ const CreateOrbitCamera = ({...props}) => {
 					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
 				});
 
+				console.log("orbit camera layers", this.entity.camera.layers);
 
 				if (this.useLayers  === true) {
 
@@ -101809,6 +101900,7 @@ class MetaWim {
 					mouse: new Mouse(canvas.parentElement || canvas)
 					,touch: new TouchDevice(canvas.parentElement || canvas)
 					,graphicsDeviceOptions: gl
+					,elementInput: new ElementInput(canvas)
 				});
 				this.app.root.name = "MetaWim";				
 
@@ -101919,7 +102011,7 @@ class MetaWim {
 	    		if (this.onload !== null) {
 	    			this.onload("pc");	    			
 	    		}
-	    		
+
 	    	// Listeners
     			// this.app.on("update", this.update, th
 	    		
@@ -101950,8 +102042,322 @@ class MetaWim {
 					// }
 					// console.warn(this.scene);
 				
+
+				// TEXT
+					console.log("----------------------------");
+					console.log("root", this.app.root);
+					console.log("layers", this.app.scene.layers);
+					console.log("----------------------------");					 
+					
+
+
+					// const scripts = new Entity();
+					// scripts.name = "fontsloader";
+					// scripts.addComponent("script");
+					// scripts.script.create("canvasFontHelper", CreateFonts({}));
+					// this.app.root.addChild(scripts);	
+
+
+					// console.warn("font asset", scripts.script.canvasFontHelper);
+
+var asset = new Asset("customfont", "font", {
+    url: "http://dc.local/~dogma/_sites/peter-playcanvas/dist/Roboto-Condensed-webfont.json"
+});
+this.app.assets.add(asset);
+
+console.log("customfont", this.app.assets.find("customfont"));
+
+var assetsToLoad = [
+    this.app.assets.find("customfont")
+];
+var count = 0;
+assetsToLoad.forEach(function (assetToLoad) {
+    assetToLoad.ready(function (asset) {
+        count++;
+        if (count === assetsToLoad.length) {
+            // done
+            console.log("customfont loaded", this.app.assets.find("customfont"));
+        }
+    }.bind(this));
+    this.app.assets.load(assetToLoad);
+}.bind(this));
+
+
+const fontsFacesAdded = [];
+var font = new FontFace("custom", 'url(http://dc.local/~dogma/_sites/peter-playcanvas/dist/Roboto-Condensed-webfont.ttf)');  // ' + fontAsset.asset.getFileUrl() + '
+font.load().then(function(loadedFace) {
+    document.fonts.add(loadedFace);    
+    fontsFacesAdded.push(loadedFace);
+    console.log(fontsFacesAdded);
+			       
+    var testfont = document.createElement("DIV");
+    testfont.innerHTML = "testing font";
+    testfont.setAttribute("style", "font-family: custom; position: absolute; top: 0px; right: 0px; color: white;");
+    document.body.appendChild(testfont);
+
+
+					const worldLayer = this.app.scene.layers.getLayerByName("World");
+					const idx = this.app.scene.layers.getTransparentIndex(worldLayer);
+					const textlayer = new Layer();
+					textlayer.id = textlayer.name = "text";
+					// textlayer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;	
+					// textlayer.transparentSortMode = SORTMODE_MANUAL;
+					// this.layer.passThrough = true;
+					// this.layer.clearDepthBuffer = true;
+					// this.layer.shaderPass = SHADER_DEPTH;
+					this.app.scene.layers.insert(textlayer, idx+1);
+
+					// Create a 2D screen
+				    // const screen = new Entity();
+				    // screen.id = screen.name = "text";
+				    // screen.addComponent("screen", {
+				    //     referenceResolution: new Vec2(1369, 1094),
+				    //     scaleBlend: 0.5,
+				    //     scaleMode: SCALEMODE_BLEND,
+				    //     screenSpace: false,
+				    // });
+				    // screen.screen.layers = [textlayer.id];
+				    // this.app.root.addChild(screen);
+
+				     // Basic Text
+					    const textBasic = new Entity();
+					    // textBasic.setLocalPosition(0, 200, 0);
+					    textBasic.addComponent("element", {
+					        // pivot: new Vec2(0.5, 0.5),
+					        // anchor: new Vec4(0.5, 0.5, 0.5, 0.5),
+					        // fontAsset: assets.font.id,
+					        // font: 'custom', //assets.font.id,
+					        fontAsset: this.app.assets.find("customfont").id,
+					        fontSize: 42,
+					        text: 'There are seven colors in the rainbow: [color="#ff0000"]red[/color], [color="#ffa500"]orange[/color], [color="#ffff00"]yellow[/color], [color="#00ff00"]green[/color], [color="#0000ff"]blue[/color], [color="#4b0082"]indigo[/color] and [color="#7f00ff"]violet[/color].',
+					        type: ELEMENTTYPE_TEXT,
+					    });				    	
+					    // screen.addChild(textBasic);
+					    textBasic.element.layers = [textlayer.id];
+				    	this.app.root.addChild(textBasic);
+
+				    // create box entity
+					    const box = new Entity("cube");
+					    box.id = box.name = "text";
+					    box.addComponent("render", {
+					        type: "box",
+					    });
+					    box.render.layers = [textlayer.id];
+				    	this.app.root.addChild(box);
+
+					const camera = new Entity();
+				    camera.addComponent("camera", {
+				        // clearColor: new Color(30 / 255, 30 / 255, 30 / 255),
+				        clearColorBuffer: false
+						,clearDepthBuffer: true //true
+						,priority:2
+				    });
+					camera.camera.layers = [textlayer.id];
+				    this.app.root.addChild(camera);		
+
+
+				    const light = new Entity();
+			        light.name = "light";
+			        light.addComponent("light", {
+			            type: "omni", //"directional",
+			            color: new Color(1, 1, 1),
+			            castShadows: false,
+			        });
+					light.light.layers = [textlayer.id];
+
+
+				    console.log("text camera layers", camera.camera.layers);
+				 
+
+				   	camera.translate(0, 0, 20);
+					camera.lookAt(Vec3.ZERO);
+
+				    
+
+				// TEST 2 - https://playcanvas.github.io/#/user-interface/world-to-screen
 				
-		}
+					// Create a 2D screen
+				    const screen = new Entity();
+				    screen.setLocalScale(0.01, 0.01, 0.01);
+				    screen.addComponent("screen", {
+				        referenceResolution: new Vec2(1280, 720),
+				        screenSpace: true,
+				    });
+
+				    this.app.root.addChild(screen);
+
+
+				    const name = new Entity();
+			        name.addComponent("element", {
+			            pivot: new Vec2(0.5, 0.5),
+			            anchor: new Vec4(0, 0.4, 1, 1),
+			            margin: new Vec4(0, 0, 0, 0),
+			            fontAsset: loadedFace, //assets.font.id,
+			            fontSize: 20,
+			            text: `Player `,
+			            useInput: true,
+			            type: ELEMENTTYPE_TEXT,
+			        });
+
+			        screen.addChild(name);
+
+//////////////
+	
+	var self = this;
+			        /**
+     * Converts a coordinate in world space into a screen's space.
+     *
+     * @param {pc.Vec3} worldPosition - the Vec3 representing the world-space coordinate.
+     * @param {pc.CameraComponent} camera - the Camera.
+     * @param {pc.ScreenComponent} screen - the Screen
+     * @returns {pc.Vec3} a Vec3 of the input worldPosition relative to the camera and screen. The Z coordinate represents the depth,
+     * and negative numbers signal that the worldPosition is behind the camera.
+     */
+    function worldToScreenSpace(worldPosition, camera, screen) {
+        const screenPos = camera.worldToScreen(worldPosition);
+
+        // take pixel ratio into account
+        const pixelRatio = self.app.graphicsDevice.maxPixelRatio;
+        screenPos.x *= pixelRatio;
+        screenPos.y *= pixelRatio;
+
+        // account for screen scaling
+        // @ts-ignore engine-tsd
+        const scale = screen.scale;
+
+        // invert the y position
+        screenPos.y = screen.resolution.y - screenPos.y;
+
+        // put that into a Vec3
+        return new Vec3(
+            screenPos.x / scale,
+            screenPos.y / scale,
+            screenPos.z / scale
+        );
+    }
+
+    function createPlayer(id, startingAngle, speed, radius) {
+        // Create a capsule entity to represent a player in the 3d world
+        const entity = new Entity();
+        entity.setLocalScale(new Vec3(0.5, 0.5, 0.5));
+        entity.addComponent("render", {
+            type: "capsule",
+        });
+
+        self.app.root.addChild(entity);
+
+        // update the player position every frame with some mock logic
+        // normally, this would be taking inputs, running physics simulation, etc
+        let angle = startingAngle;
+        const height = 0.5;
+        self.app.on("update", function (dt) {
+            angle += dt * speed;
+            if (angle > 360) {
+                angle -= 360;
+            }
+            entity.setLocalPosition(
+                radius * Math.sin(angle * math.DEG_TO_RAD),
+                height,
+                radius * Math.cos(angle * math.DEG_TO_RAD)
+            );
+            entity.setLocalEulerAngles(0, angle + 90, 0);
+        });
+
+        // Create a text element that will hover the player's head
+        const playerInfo = new Entity();
+        playerInfo.addComponent("element", {
+            pivot: new Vec2(0.5, 0),
+            anchor: new Vec4(0, 0, 0, 0),
+            width: 150,
+            height: 50,
+            opacity: 0.05,
+            type: ELEMENTTYPE_IMAGE,
+        });
+
+        screen.addChild(playerInfo);
+
+        const name = new Entity();
+        name.name = "textelement";
+        name.addComponent("element", {
+            pivot: new Vec2(0.5, 0.5),
+            anchor: new Vec4(0, 0.4, 1, 1),
+            margin: new Vec4(0, 0, 0, 0),
+            // font: 'custom', //assets.font.id,
+            fontAsset: self.app.assets.find("customfont").id,
+            fontSize: 20,
+            text: `Player ${id}`,
+            useInput: true,
+            type: ELEMENTTYPE_TEXT,
+        });
+
+        console.warn("where is the text?", name);
+
+        name.addComponent("button", {
+            imageEntity: name,
+        });
+
+        name.button.on("click", function (e) {
+            const color = new Color(
+                Math.random(),
+                Math.random(),
+                Math.random()
+            );
+            name.element.color = color;
+            entity.render.material.setParameter("material_diffuse", [
+                color.r,
+                color.g,
+                color.b,
+            ]);
+        });
+        playerInfo.addChild(name);
+
+        const healthBar = new Entity();
+        healthBar.addComponent("element", {
+            pivot: new Vec2(0.5, 0),
+            anchor: new Vec4(0, 0, 1, 0.4),
+            margin: new Vec4(0, 0, 0, 0),
+            color: new Color(0.2, 0.6, 0.2, 1),
+            opacity: 1,
+            type: ELEMENTTYPE_IMAGE,
+        });
+
+        playerInfo.addChild(healthBar);
+
+        // update the player text's position to always hover the player
+        self.app.on("update", function () {
+            // get the desired world position
+            const worldPosition = entity.getPosition();
+            worldPosition.y += 0.6; // slightly above the player's head
+
+            // convert to screen position
+            const screenPosition = worldToScreenSpace(
+                worldPosition,
+                camera.camera,
+                screen.screen
+            );
+
+            if (screenPosition.z > 0) {
+                // if world position is in front of the camera, show it
+                playerInfo.enabled = true;
+
+                // set the UI position
+                playerInfo.setLocalPosition(screenPosition);
+            } else {
+                // if world position is actually *behind* the camera, hide the UI
+                playerInfo.enabled = false;
+            }
+        });
+    }
+
+    createPlayer(1, 135, 30, 1.5);
+
+
+/////////////
+ }.bind(this)).catch(function(error) {
+    console.error(error);
+});
+							   
+				}
 
 	////////////////////////
 	// CALLBACKS

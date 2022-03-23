@@ -3,7 +3,7 @@
 ## Play Canvas
 
 ### DO:
-1. DO: floating labels (PC, PP)
+1. DO: floating labels (PC, PP), http://phone.playcanvas.com/ 
 2. DO: global offset slider
 3. DO: umbrella effect (Y folding of blades)
 4. DO: flexible size with locked aspect ratio

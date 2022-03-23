@@ -7,7 +7,20 @@ import {
 	Mouse,
 	TouchDevice,
 	Color,
+	// TEXT test
+			Entity,
+			ELEMENTTYPE_TEXT,
+			Vec2,
+			Vec3,
+			Vec4,
+			SCALEMODE_BLEND,
+			Layer,
+			SORTMODE_MANUAL,
+			ElementInput
 } from 'playcanvas';
+
+// TEMP
+import * as pc from 'playcanvas';
 
 // METAWIM
 // import Router from './router';
@@ -59,6 +72,7 @@ export default class MetaWim {
 					mouse: new Mouse(canvas.parentElement || canvas)
 					,touch: new TouchDevice(canvas.parentElement || canvas)
 					,graphicsDeviceOptions: gl
+					,elementInput: new ElementInput(canvas)
 				});
 				this.app.root.name = "MetaWim";				
 
@@ -169,7 +183,7 @@ export default class MetaWim {
 	    		if (this.onload !== null) {
 	    			this.onload("pc");	    			
 	    		}
-	    		
+
 	    	// Listeners
     			// this.app.on("update", this.update, th
 	    		
@@ -200,8 +214,324 @@ export default class MetaWim {
 					// }
 					// console.warn(this.scene);
 				
+
+				// TEXT
+					console.log("----------------------------");
+					console.log("root", this.app.root);
+					console.log("layers", this.app.scene.layers);
+					console.log("----------------------------");					 
+					
+
+
+					// const scripts = new Entity();
+					// scripts.name = "fontsloader";
+					// scripts.addComponent("script");
+					// scripts.script.create("canvasFontHelper", CreateFonts({}));
+					// this.app.root.addChild(scripts);	
+
+
+					// console.warn("font asset", scripts.script.canvasFontHelper);
+
+
+// ASETS FONTS - https://forum.playcanvas.com/t/setting-up-font-by-script/14989
+var asset = new pc.Asset("customfont", "font", {
+    url: "http://dc.local/~dogma/_sites/peter-playcanvas/dist/Roboto-Condensed-webfont.json"
+});
+this.app.assets.add(asset);
+
+console.log("customfont", this.app.assets.find("customfont"));
+
+var assetsToLoad = [
+    this.app.assets.find("customfont")
+];
+var count = 0;
+assetsToLoad.forEach(function (assetToLoad) {
+    assetToLoad.ready(function (asset) {
+        count++;
+        if (count === assetsToLoad.length) {
+            // done
+            console.log("customfont loaded", this.app.assets.find("customfont"));
+        }
+    }.bind(this));
+    this.app.assets.load(assetToLoad);
+}.bind(this));
+
+
+const fontsFacesAdded = [];
+var font = new FontFace("custom", 'url(http://dc.local/~dogma/_sites/peter-playcanvas/dist/Roboto-Condensed-webfont.ttf)');  // ' + fontAsset.asset.getFileUrl() + '
+font.load().then(function(loadedFace) {
+    document.fonts.add(loadedFace);    
+    fontsFacesAdded.push(loadedFace);
+    console.log(fontsFacesAdded);
+			       
+    var testfont = document.createElement("DIV");
+    testfont.innerHTML = "testing font";
+    testfont.setAttribute("style", "font-family: custom; position: absolute; top: 0px; right: 0px; color: white;");
+    document.body.appendChild(testfont);
+
+
+					const worldLayer = this.app.scene.layers.getLayerByName("World");
+					const idx = this.app.scene.layers.getTransparentIndex(worldLayer);
+					const textlayer = new Layer();
+					textlayer.id = textlayer.name = "text";
+					// textlayer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;	
+					// textlayer.transparentSortMode = SORTMODE_MANUAL;
+					// this.layer.passThrough = true;
+					// this.layer.clearDepthBuffer = true;
+					// this.layer.shaderPass = SHADER_DEPTH;
+					this.app.scene.layers.insert(textlayer, idx+1);
+
+					// Create a 2D screen
+				    // const screen = new Entity();
+				    // screen.id = screen.name = "text";
+				    // screen.addComponent("screen", {
+				    //     referenceResolution: new Vec2(1369, 1094),
+				    //     scaleBlend: 0.5,
+				    //     scaleMode: SCALEMODE_BLEND,
+				    //     screenSpace: false,
+				    // });
+				    // screen.screen.layers = [textlayer.id];
+				    // this.app.root.addChild(screen);
+
+				     // Basic Text
+					    const textBasic = new Entity();
+					    // textBasic.setLocalPosition(0, 200, 0);
+					    textBasic.addComponent("element", {
+					        // pivot: new Vec2(0.5, 0.5),
+					        // anchor: new Vec4(0.5, 0.5, 0.5, 0.5),
+					        // fontAsset: assets.font.id,
+					        // font: 'custom', //assets.font.id,
+					        fontAsset: this.app.assets.find("customfont").id,
+					        fontSize: 42,
+					        text: 'There are seven colors in the rainbow: [color="#ff0000"]red[/color], [color="#ffa500"]orange[/color], [color="#ffff00"]yellow[/color], [color="#00ff00"]green[/color], [color="#0000ff"]blue[/color], [color="#4b0082"]indigo[/color] and [color="#7f00ff"]violet[/color].',
+					        type: ELEMENTTYPE_TEXT,
+					    });				    	
+					    // screen.addChild(textBasic);
+					    textBasic.element.layers = [textlayer.id];
+				    	this.app.root.addChild(textBasic);
+
+				    // create box entity
+					    const box = new Entity("cube");
+					    box.id = box.name = "text";
+					    box.addComponent("render", {
+					        type: "box",
+					    });
+					    box.render.layers = [textlayer.id];
+				    	this.app.root.addChild(box);
+
+					const camera = new Entity();
+				    camera.addComponent("camera", {
+				        // clearColor: new Color(30 / 255, 30 / 255, 30 / 255),
+				        clearColorBuffer: false
+						,clearDepthBuffer: true //true
+						,priority:2
+				    });
+					camera.camera.layers = [textlayer.id];
+				    this.app.root.addChild(camera);		
+
+
+				    const light = new Entity();
+			        light.name = "light";
+			        light.addComponent("light", {
+			            type: "omni", //"directional",
+			            color: new Color(1, 1, 1),
+			            castShadows: false,
+			        });
+					light.light.layers = [textlayer.id];
+
+
+				    console.log("text camera layers", camera.camera.layers);
+				 
+
+				   	camera.translate(0, 0, 20);
+					camera.lookAt(Vec3.ZERO);
+
+				    
+
+				// TEST 2 - https://playcanvas.github.io/#/user-interface/world-to-screen
 				
-		}
+					// Create a 2D screen
+				    const screen = new Entity();
+				    screen.setLocalScale(0.01, 0.01, 0.01);
+				    screen.addComponent("screen", {
+				        referenceResolution: new Vec2(1280, 720),
+				        screenSpace: true,
+				    });
+
+				    this.app.root.addChild(screen);
+
+
+				    const name = new Entity();
+			        name.addComponent("element", {
+			            pivot: new Vec2(0.5, 0.5),
+			            anchor: new Vec4(0, 0.4, 1, 1),
+			            margin: new Vec4(0, 0, 0, 0),
+			            fontAsset: loadedFace, //assets.font.id,
+			            fontSize: 20,
+			            text: `Player `,
+			            useInput: true,
+			            type: ELEMENTTYPE_TEXT,
+			        });
+
+			        screen.addChild(name);
+
+//////////////
+	
+	var self = this;
+			        /**
+     * Converts a coordinate in world space into a screen's space.
+     *
+     * @param {pc.Vec3} worldPosition - the Vec3 representing the world-space coordinate.
+     * @param {pc.CameraComponent} camera - the Camera.
+     * @param {pc.ScreenComponent} screen - the Screen
+     * @returns {pc.Vec3} a Vec3 of the input worldPosition relative to the camera and screen. The Z coordinate represents the depth,
+     * and negative numbers signal that the worldPosition is behind the camera.
+     */
+    function worldToScreenSpace(worldPosition, camera, screen) {
+        const screenPos = camera.worldToScreen(worldPosition);
+
+        // take pixel ratio into account
+        const pixelRatio = self.app.graphicsDevice.maxPixelRatio;
+        screenPos.x *= pixelRatio;
+        screenPos.y *= pixelRatio;
+
+        // account for screen scaling
+        // @ts-ignore engine-tsd
+        const scale = screen.scale;
+
+        // invert the y position
+        screenPos.y = screen.resolution.y - screenPos.y;
+
+        // put that into a Vec3
+        return new pc.Vec3(
+            screenPos.x / scale,
+            screenPos.y / scale,
+            screenPos.z / scale
+        );
+    }
+
+    function createPlayer(id, startingAngle, speed, radius) {
+        // Create a capsule entity to represent a player in the 3d world
+        const entity = new pc.Entity();
+        entity.setLocalScale(new pc.Vec3(0.5, 0.5, 0.5));
+        entity.addComponent("render", {
+            type: "capsule",
+        });
+
+        self.app.root.addChild(entity);
+
+        // update the player position every frame with some mock logic
+        // normally, this would be taking inputs, running physics simulation, etc
+        let angle = startingAngle;
+        const height = 0.5;
+        self.app.on("update", function (dt) {
+            angle += dt * speed;
+            if (angle > 360) {
+                angle -= 360;
+            }
+            entity.setLocalPosition(
+                radius * Math.sin(angle * pc.math.DEG_TO_RAD),
+                height,
+                radius * Math.cos(angle * pc.math.DEG_TO_RAD)
+            );
+            entity.setLocalEulerAngles(0, angle + 90, 0);
+        });
+
+        // Create a text element that will hover the player's head
+        const playerInfo = new pc.Entity();
+        playerInfo.addComponent("element", {
+            pivot: new pc.Vec2(0.5, 0),
+            anchor: new pc.Vec4(0, 0, 0, 0),
+            width: 150,
+            height: 50,
+            opacity: 0.05,
+            type: pc.ELEMENTTYPE_IMAGE,
+        });
+
+        screen.addChild(playerInfo);
+
+        const name = new pc.Entity();
+        name.name = "textelement";
+        name.addComponent("element", {
+            pivot: new pc.Vec2(0.5, 0.5),
+            anchor: new pc.Vec4(0, 0.4, 1, 1),
+            margin: new pc.Vec4(0, 0, 0, 0),
+            // font: 'custom', //assets.font.id,
+            fontAsset: self.app.assets.find("customfont").id,
+            fontSize: 20,
+            text: `Player ${id}`,
+            useInput: true,
+            type: pc.ELEMENTTYPE_TEXT,
+        });
+
+        console.warn("where is the text?", name);
+
+        name.addComponent("button", {
+            imageEntity: name,
+        });
+
+        name.button.on("click", function (e) {
+            const color = new pc.Color(
+                Math.random(),
+                Math.random(),
+                Math.random()
+            );
+            name.element.color = color;
+            entity.render.material.setParameter("material_diffuse", [
+                color.r,
+                color.g,
+                color.b,
+            ]);
+        });
+        playerInfo.addChild(name);
+
+        const healthBar = new pc.Entity();
+        healthBar.addComponent("element", {
+            pivot: new pc.Vec2(0.5, 0),
+            anchor: new pc.Vec4(0, 0, 1, 0.4),
+            margin: new pc.Vec4(0, 0, 0, 0),
+            color: new pc.Color(0.2, 0.6, 0.2, 1),
+            opacity: 1,
+            type: pc.ELEMENTTYPE_IMAGE,
+        });
+
+        playerInfo.addChild(healthBar);
+
+        // update the player text's position to always hover the player
+        self.app.on("update", function () {
+            // get the desired world position
+            const worldPosition = entity.getPosition();
+            worldPosition.y += 0.6; // slightly above the player's head
+
+            // convert to screen position
+            const screenPosition = worldToScreenSpace(
+                worldPosition,
+                camera.camera,
+                screen.screen
+            );
+
+            if (screenPosition.z > 0) {
+                // if world position is in front of the camera, show it
+                playerInfo.enabled = true;
+
+                // set the UI position
+                playerInfo.setLocalPosition(screenPosition);
+            } else {
+                // if world position is actually *behind* the camera, hide the UI
+                playerInfo.enabled = false;
+            }
+        });
+    }
+
+    createPlayer(1, 135, 30, 1.5);
+
+
+/////////////
+ }.bind(this)).catch(function(error) {
+    console.error(error);
+});
+							   
+				}
 
 	////////////////////////
 	// CALLBACKS

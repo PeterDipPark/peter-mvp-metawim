@@ -22,7 +22,7 @@ import {
 			SORTMODE_BACK2FRONT,
 			SORTMODE_FRONT2BACK,
 			SHADER_DEPTH,
-			SHADER_FORWARDHDR,			
+			SHADER_FORWARDHDR,						
 		} from 'playcanvas';
 
 
@@ -450,7 +450,8 @@ export default class Blade {
 				// this.entity.translate(0, 0, (this.index/1000));
 				// this.entity.translate(0, 0, -fixFloat(this.index/1000));
 
-				this.entity.translate(0, 0, -fixFloat(this.index/1000));
+				this.entity.translate(0, 0, -fixFloat(this.index/1000));			
+		
 		}
 
 		/**

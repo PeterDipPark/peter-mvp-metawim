@@ -181,14 +181,20 @@ const CreateOrbitCamera = ({...props}) => {
 				// const layers = [worldLayer.id];
 				
 				this.entity.addComponent("camera", {
-					clearColorBuffer: false
+					
 					// clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
 					// NEW
-					,projection: pc.PROJECTION_ORTHOGRAPHIC
+					projection: pc.PROJECTION_ORTHOGRAPHIC
 					,orthoHeight: this.heightDefault
 					// ,cullFaces: false
-					,clearDepthBuffer: false
 					
+					,clearColorBuffer: false
+					,clearDepthBuffer: false
+					// ,clearColorBuffer: true
+					// ,clearDepthBuffer: true					
+					
+					,priority: 1
+
 					// ,flipFaces: true
 
 					// ,nearClip: 1
@@ -197,6 +203,7 @@ const CreateOrbitCamera = ({...props}) => {
 					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
 				});
 
+				console.log("orbit camera layers", this.entity.camera.layers);
 
 				if (this.useLayers  === true) {
 
