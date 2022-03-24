@@ -254,6 +254,7 @@ export default class MetaWim {
 					})
 					// const b1 = this.blades['blade1'].getEntity();
 					this.app.root.addChild(lbl.getScreen());
+					// this.app.root.addChild(lbl.getReferenceCamera());
 
 					lbl.createLabel("test", "MetaWim label");
 
@@ -341,6 +342,21 @@ export default class MetaWim {
 					    // });
 					    // box.render.layers = [textlayer.id];
 				    	// this.app.root.addChild(box);
+				    	
+
+				    	
+
+
+
+				    	// const sphere = new Entity("sphere");
+					    // sphere.id = sphere.name = "sphere";
+					    // sphere.addComponent("render", {
+					    //     type: "sphere",
+					    // });
+					    // sphere.render.layers = [textlayer.id];
+				    	// this.app.root.addChild(sphere);
+				    	// console.log("sphere", sphere);
+				    	// sphere.render.material.opacity = 0.4;
 
 					const camera = new Entity();
 				    camera.addComponent("camera", {
@@ -559,7 +575,7 @@ export default class MetaWim {
 
     }
 
-    createPlayer(1, 135, 30, 1.5);
+    // createPlayer(1, 135, 30, 1.5);
 
 
     // update the player text's position to always hover the player
@@ -590,32 +606,86 @@ export default class MetaWim {
 			        //     }
 			        // });
 	
-	const b1label = lbl.getLabel('test').frame;
-	const b1 = self.blades['blade1'].getEntity();
 	
-	// account for screen scaling
-    // @ts-ignore engine-tsd
-	const sc = lbl.getScreen().screen;
-	
-	const oc = self.scene.getCamera().camera
-	console.log("sc", sc.scale, screen)
-	// self.app.on("update", function () {
-	// 	console.log(oc.worldToScreen(b1.getPosition()));
-	// });
 
-	const sreenpos = oc.worldToScreen(b1.getPosition());
-		const pixelRatio = self.app.graphicsDevice.maxPixelRatio;
-        sreenpos.x *= pixelRatio;
-        sreenpos.y *= pixelRatio;
+
+	
+	const b1label = lbl.getLabel('test').frame; // entity to reposition
+	const b1 = self.blades['blade1'].getEntity(); // anchor entity		
+	const sc = lbl.getScreen();	// screen component
+	const oc = self.scene.getCamera().camera; //lbl.getReferenceCamera().camera; // self.scene.getCamera().camera // camera component
+
+	console.log("b1label",b1label);
+
+	function newpos(position, direction, camera, gd, screen) {
+        const screenPos = camera.worldToScreen(position, screen);
+
+        // take pixel ratio into account
+        const pixelRatio = gd.maxPixelRatio;
+        screenPos.x *= pixelRatio;
+        screenPos.y *= pixelRatio;
+
         // account for screen scaling
         // @ts-ignore engine-tsd
-        const scale = sc.scale;
+        const scale = screen.screen.scale;
+
         // invert the y position
-        sreenpos.y = sc.resolution.y - sreenpos.y;
+        screenPos.y = screen.screen.resolution.y - screenPos.y;
 
-	b1label.setLocalPosition(sreenpos);
+        // put that into a Vec3
+        // if (position.z < 0) {
+        // 	console.log("hide", direction);
+        // }
+        // console.log(direction);
+        lbl.setOpacity("test", direction, position.z);
+        // if (direction === true && position.z < -1 || direction === false && position.z > -1) {
+        // 	console.log("hide", direction);	
+        // 	lbl.setOpacity("test", 0);
+        // } else {
+        // 	lbl.setOpacity("test", 0.8);
+        // }
 
-	console.warn(sreenpos);
+        return new Vec3(
+            screenPos.x / scale,
+           	screenPos.y / scale,
+            screenPos.z / scale
+        );
+    }
+
+
+    
+
+    self.app.on("update", function () {
+	    	    
+	    // const newposforlabel = newpos(b1.getPosition(), oc, self.app.graphicsDevice, sc); // get new position from blade
+	    // const newposforlabel = newpos(self.blades['blade1'].getCameraPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera
+	    const newposforlabel = newpos(self.blades['blade1'].getLabelPostion(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera
+		
+	    // if (newposforlabel.z > 0) {
+     //        // if world position is in front of the camera, show it
+     //        // playerInfo.enabled = true;
+     //    } else {
+     //    	console.warn("hide");
+     //    }
+
+		b1label.setLocalPosition(newposforlabel); // set entity new position
+		
+	});
+
+    // console.log("b1 position", b1.getPosition());
+    // console.log("b1 screen position", newpos(b1.getPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc));
+    // console.log("b1 camera position", self.blades['blade1'].getCameraPosition());
+    // console.log("b1 camera screen position", newpos(self.blades['blade1'].getCameraPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc));
+
+    // for (let b in this.blades) {
+    // 	console.warn(b, this.blades[b].meshInstance);
+    // 	console.warn("\t", b, this.blades[b].entity.getPosition()); 
+    // 	console.warn("\t", b, this.blades[b].rotation);
+
+    // 	// const wt = this.blades[b].entity.getWorldTransform();
+    // }
+
+	//console.warn(newposforlabel);
 
 /////////////
 

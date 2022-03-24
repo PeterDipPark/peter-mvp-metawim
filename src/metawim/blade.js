@@ -14,6 +14,9 @@ import {
 			BLEND_ADDITIVEALPHA,
 			BLEND_ADDITIVE,
 			BLEND_SCREEN,
+			Vec3,
+			BoundingSphere,
+			Ray,
 			// TEST
 			Layer,
 			SORTMODE_MANUAL,
@@ -74,6 +77,11 @@ export default class Blade {
 				,graphicsDevice: this.graphicsDevice
 			});
 
+
+			// Camera Postion for this blade
+			this.cameraPosition = Vec3.ZERO;
+			this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
+			this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
 
 			// Morphing
 			this.morphing = this.meshMorphsIndex.reduce((acc,curr)=> (acc[curr.id]=0,acc),{}); // default is 0
@@ -308,6 +316,44 @@ export default class Blade {
 
 		}
 
+		setCamarePosition(p) {
+			// Revert camera Y
+			p.y *=-1;		
+			this.cameraPosition = p;
+		}
+		getCameraPosition() {
+			return this.cameraPosition;
+		}
+		setCameraDirection(b) {
+			this.cameraDirection = b;			
+		}
+		getCameraDirection() {
+
+			return this.cameraDirection;
+
+			const ray = new Ray(new Vec3(0,0,0), this.getLabelPostion());
+			let point = new Vec3(0,0,0);
+			const interects = this.intersectOpacitySphere.intersectsRay(ray, point);
+			//console.log(interects, point);
+
+			return point;
+
+			// return this.cameraDirection;
+		}
+
+		getExtent() {
+			return this.meshInstance.aabb.halfExtents;
+		}
+		getLabelPostion() {		
+			
+			const ray = new Ray(new Vec3(0,0,0), this.meshInstance.aabb.center);
+			let point = new Vec3(0,0,0);
+			const interects = this.intersectSphere.intersectsRay(ray, point);
+			//console.log(interects, point);
+
+			return point;
+		}
+
 	////////////////////////
 	// METHODS
 	////////////////////////
@@ -386,7 +432,9 @@ export default class Blade {
 
 			// WORKING when useLayers === false BUT doesn't work for tilted meshes
 				this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
-					//console.log(cameraPosition, cameraForward);
+					// console.log(cameraPosition, cameraForward);
+					this.setCamarePosition(cameraForward);
+					this.setCameraDirection(cameraPosition.z);
 					return cameraPosition.z>cameraForward.z?this.index:-this.index;
 				}.bind(this);
 		
@@ -397,6 +445,7 @@ export default class Blade {
 				// 	this.meshInstance.drawOrder = cameraPosition.z>cameraForward.z?-this.index:this.index;
 				// 	return cameraPosition.z>cameraForward.z?this.index:-this.index;
 				// }.bind(this);
+				
 
 			// Add morph instance
 			this.meshInstance.morphInstance = this.morphInstance; 

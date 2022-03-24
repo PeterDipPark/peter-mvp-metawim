@@ -98291,6 +98291,11 @@ class Blade {
 			});
 
 
+			// Camera Postion for this blade
+			this.cameraPosition = Vec3.ZERO;
+			this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
+			this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
+
 			// Morphing
 			this.morphing = this.meshMorphsIndex.reduce((acc,curr)=> (acc[curr.id]=0,acc),{}); // default is 0
 
@@ -98523,6 +98528,37 @@ class Blade {
 
 		}
 
+		setCamarePosition(p) {
+			// Revert camera Y
+			p.y *=-1;		
+			this.cameraPosition = p;
+		}
+		getCameraPosition() {
+			return this.cameraPosition;
+		}
+		setCameraDirection(b) {
+			this.cameraDirection = b;			
+		}
+		getCameraDirection() {
+
+			return this.cameraDirection;
+
+			// return this.cameraDirection;
+		}
+
+		getExtent() {
+			return this.meshInstance.aabb.halfExtents;
+		}
+		getLabelPostion() {		
+			
+			const ray = new Ray(new Vec3(0,0,0), this.meshInstance.aabb.center);
+			let point = new Vec3(0,0,0);
+			this.intersectSphere.intersectsRay(ray, point);
+			//console.log(interects, point);
+
+			return point;
+		}
+
 	////////////////////////
 	// METHODS
 	////////////////////////
@@ -98601,7 +98637,9 @@ class Blade {
 
 			// WORKING when useLayers === false BUT doesn't work for tilted meshes
 				this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
-					//console.log(cameraPosition, cameraForward);
+					// console.log(cameraPosition, cameraForward);
+					this.setCamarePosition(cameraForward);
+					this.setCameraDirection(cameraPosition.z);
 					return cameraPosition.z>cameraForward.z?this.index:-this.index;
 				}.bind(this);
 		
@@ -98612,6 +98650,7 @@ class Blade {
 				// 	this.meshInstance.drawOrder = cameraPosition.z>cameraForward.z?-this.index:this.index;
 				// 	return cameraPosition.z>cameraForward.z?this.index:-this.index;
 				// }.bind(this);
+				
 
 			// Add morph instance
 			this.meshInstance.morphInstance = this.morphInstance; 
@@ -101898,6 +101937,9 @@ class CanvasLabels {
 		 */
 		init() {
 
+			// Create Reference Camera so we can worldToSpace coords
+			this.createReferenceCamera();
+
 			// Create Screen
 			this.createScreen();
 
@@ -101907,6 +101949,10 @@ class CanvasLabels {
 	// GETTERS / SETTERS
 	////////////////////////
 	
+		getReferenceCamera() {
+			return this.referenceCamera;
+		}
+
 		getScreen() {
 			return this.screen;
 		}
@@ -101916,9 +101962,39 @@ class CanvasLabels {
 			return this.lables[id];
 		}
 
+		setOpacity(id, d, p) {
+
+			//console.log(d,p);
+
+			// const v = 
+			// if (direction === true && position.z < -1 || direction === false && position.z > -1) {
+			// 	console.log("hide", direction);	
+			// 	lbl.setOpacity("test", 0);
+			// } else {
+			// 	lbl.setOpacity("test", 0.8);
+			// }
+
+			// this.getLabel(id).frame.element.opacity = v;
+		}
+
 	////////////////////////
 	// METHODS
 	////////////////////////
+	
+		createReferenceCamera() {
+
+			this.referenceCamera = new Entity();
+			this.referenceCamera.addComponent("camera", {
+		        clearColorBuffer: false
+				,clearDepthBuffer: true
+				,priority:2
+		    });
+		    this.referenceCamera.camera.layers = [];
+		    this.referenceCamera.translate(0, 0, 20.2);
+			// this.referenceCamera.lookAt(Vec3.ZERO);
+			
+
+		}
 	
 		createScreen() {
 
@@ -101928,6 +102004,7 @@ class CanvasLabels {
 				referenceResolution: new Vec2(2000, 2500),
 				screenSpace: true,
 			});			
+
 
 		}
 
@@ -101943,7 +102020,7 @@ class CanvasLabels {
 		            opacity: 0.8,
 		            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
 		            type: ELEMENTTYPE_IMAGE,
-		        });	        
+		        });
 	        	this.screen.addChild(frame);
 
 	        // Text
@@ -102197,6 +102274,7 @@ class MetaWim {
 					});
 					// const b1 = this.blades['blade1'].getEntity();
 					this.app.root.addChild(lbl.getScreen());
+					// this.app.root.addChild(lbl.getReferenceCamera());
 
 					lbl.createLabel("test", "MetaWim label");
 
@@ -102284,6 +102362,21 @@ class MetaWim {
 					    // });
 					    // box.render.layers = [textlayer.id];
 				    	// this.app.root.addChild(box);
+				    	
+
+				    	
+
+
+
+				    	// const sphere = new Entity("sphere");
+					    // sphere.id = sphere.name = "sphere";
+					    // sphere.addComponent("render", {
+					    //     type: "sphere",
+					    // });
+					    // sphere.render.layers = [textlayer.id];
+				    	// this.app.root.addChild(sphere);
+				    	// console.log("sphere", sphere);
+				    	// sphere.render.material.opacity = 0.4;
 
 					const camera = new Entity();
 				    camera.addComponent("camera", {
@@ -102344,165 +102437,8 @@ class MetaWim {
 //////////////
 	
 	var self = this;
-			        /**
-     * Converts a coordinate in world space into a screen's space.
-     *
-     * @param {pc.Vec3} worldPosition - the Vec3 representing the world-space coordinate.
-     * @param {pc.CameraComponent} camera - the Camera.
-     * @param {pc.ScreenComponent} screen - the Screen
-     * @returns {pc.Vec3} a Vec3 of the input worldPosition relative to the camera and screen. The Z coordinate represents the depth,
-     * and negative numbers signal that the worldPosition is behind the camera.
-     */
-    function worldToScreenSpace(worldPosition, camera, screen) {
-        const screenPos = camera.worldToScreen(worldPosition);
 
-        // take pixel ratio into account
-        const pixelRatio = self.app.graphicsDevice.maxPixelRatio;
-        screenPos.x *= pixelRatio;
-        screenPos.y *= pixelRatio;
-
-        // account for screen scaling
-        // @ts-ignore engine-tsd
-        const scale = screen.scale;
-
-       	// console.warn("screen wt/ esolution", screen);
-
-        // invert the y position
-        screenPos.y = screen.resolution.y - screenPos.y;
-
-        // put that into a Vec3
-        return new Vec3(
-            screenPos.x / scale,
-            screenPos.y / scale,
-            screenPos.z / scale
-        );
-    }
-
-    function createPlayer(id, startingAngle, speed, radius) {
-        // Create a capsule entity to represent a player in the 3d world
-        const entity = new Entity();
-        entity.setLocalScale(new Vec3(0.5, 0.5, 0.5));
-        entity.addComponent("render", {
-            type: "capsule",
-        });
-
-        self.app.root.addChild(entity);
-
-        // update the player position every frame with some mock logic
-        // normally, this would be taking inputs, running physics simulation, etc
-        let angle = startingAngle;
-        const height = 0.5;
-        self.app.on("update", function (dt) {
-            angle += dt * speed;
-            if (angle > 360) {
-                angle -= 360;
-            }
-            entity.setLocalPosition(
-                radius * Math.sin(angle * math.DEG_TO_RAD),
-                height,
-                radius * Math.cos(angle * math.DEG_TO_RAD)
-            );
-            entity.setLocalEulerAngles(0, angle + 90, 0);
-        });
-
-        // Create a text element that will hover the player's head
-        const playerInfo = new Entity();
-        playerInfo.addComponent("element", {
-            pivot: new Vec2(0.5, 0),
-            anchor: new Vec4(0, 0, 0, 0),
-            width: 70,
-            height: 20,
-            opacity: 0.8,
-            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
-            type: ELEMENTTYPE_IMAGE,
-        });
-
-        screen.addChild(playerInfo);
-
-        const name = new Entity();
-        name.name = "textelement";
-        name.addComponent("element", {
-            pivot: new Vec2(0.5, 0.5),
-            anchor: new Vec4(0, 0.4, 1, 0.55),
-            margin: new Vec4(0, 0, 0, 0),
-            // font: 'custom', //assets.font.id,
-            fontAsset: self.app.assets.find("customfont").id,
-            fontSize: 14,
-            text: `Blade ${id}`,
-            useInput: true,
-            type: ELEMENTTYPE_TEXT,
-        });
-
-        playerInfo.addChild(name);
-
-        /*
-        name.addComponent("button", {
-            imageEntity: name,
-        });
-
-        name.button.on("click", function (e) {
-            const color = new pc.Color(
-                Math.random(),
-                Math.random(),
-                Math.random()
-            );
-            name.element.color = color;
-            entity.render.material.setParameter("material_diffuse", [
-                color.r,
-                color.g,
-                color.b,
-            ]);
-        });
-        playerInfo.addChild(name);
-
-        const healthBar = new pc.Entity();
-        healthBar.addComponent("element", {
-            pivot: new pc.Vec2(0.5, 0),
-            anchor: new pc.Vec4(0, 0, 1, 0.4),
-            margin: new pc.Vec4(0, 0, 0, 0),
-            color: new pc.Color(0.2, 0.6, 0.2, 1),
-            opacity: 1,
-            type: pc.ELEMENTTYPE_IMAGE,
-        });
-
-        playerInfo.addChild(healthBar);
-
-        */
-       
-        // console.log("blade1 entity",self.blades['blade1']);
-        self.blades['blade1'].getEntity();
-        lbl.getLabel('test').frame;
-       
-        // update the player text's position to always hover the player
-        self.app.on("update", function () {
-            // get the desired world position
-            const worldPosition = entity.getPosition(); // b1.getPosition(); // entity.getPosition(); // 
-            worldPosition.y += 0.6; // slightly above the player's head
-
-            // convert to screen position
-            const screenPosition = worldToScreenSpace(
-                worldPosition,
-                camera.camera, //self.scene.getCamera().camera, // camera.camera, //
-                screen.screen // lbl.getScreen() // screen.screen //
-            );
-
-            if (screenPosition.z > 0) {
-                // if world position is in front of the camera, show it
-                playerInfo.enabled = true;
-
-                // set the UI position
-                playerInfo.setLocalPosition(screenPosition);
-
-            } else {
-                // if world position is actually *behind* the camera, hide the UI
-                playerInfo.enabled = false;
-            }
-        });
-
-
-    }
-
-    createPlayer(1, 135, 30, 1.5);
+    // createPlayer(1, 135, 30, 1.5);
 
 
     // update the player text's position to always hover the player
@@ -102533,32 +102469,86 @@ class MetaWim {
 			        //     }
 			        // });
 	
-	const b1label = lbl.getLabel('test').frame;
-	const b1 = self.blades['blade1'].getEntity();
 	
-	// account for screen scaling
-    // @ts-ignore engine-tsd
-	const sc = lbl.getScreen().screen;
-	
-	const oc = self.scene.getCamera().camera;
-	console.log("sc", sc.scale, screen);
-	// self.app.on("update", function () {
-	// 	console.log(oc.worldToScreen(b1.getPosition()));
-	// });
 
-	const sreenpos = oc.worldToScreen(b1.getPosition());
-		const pixelRatio = self.app.graphicsDevice.maxPixelRatio;
-        sreenpos.x *= pixelRatio;
-        sreenpos.y *= pixelRatio;
+
+	
+	const b1label = lbl.getLabel('test').frame; // entity to reposition
+	self.blades['blade1'].getEntity(); // anchor entity		
+	const sc = lbl.getScreen();	// screen component
+	const oc = self.scene.getCamera().camera; //lbl.getReferenceCamera().camera; // self.scene.getCamera().camera // camera component
+
+	console.log("b1label",b1label);
+
+	function newpos(position, direction, camera, gd, screen) {
+        const screenPos = camera.worldToScreen(position, screen);
+
+        // take pixel ratio into account
+        const pixelRatio = gd.maxPixelRatio;
+        screenPos.x *= pixelRatio;
+        screenPos.y *= pixelRatio;
+
         // account for screen scaling
         // @ts-ignore engine-tsd
-        sc.scale;
+        const scale = screen.screen.scale;
+
         // invert the y position
-        sreenpos.y = sc.resolution.y - sreenpos.y;
+        screenPos.y = screen.screen.resolution.y - screenPos.y;
 
-	b1label.setLocalPosition(sreenpos);
+        // put that into a Vec3
+        // if (position.z < 0) {
+        // 	console.log("hide", direction);
+        // }
+        // console.log(direction);
+        lbl.setOpacity("test", direction, position.z);
+        // if (direction === true && position.z < -1 || direction === false && position.z > -1) {
+        // 	console.log("hide", direction);	
+        // 	lbl.setOpacity("test", 0);
+        // } else {
+        // 	lbl.setOpacity("test", 0.8);
+        // }
 
-	console.warn(sreenpos);
+        return new Vec3(
+            screenPos.x / scale,
+           	screenPos.y / scale,
+            screenPos.z / scale
+        );
+    }
+
+
+    
+
+    self.app.on("update", function () {
+	    	    
+	    // const newposforlabel = newpos(b1.getPosition(), oc, self.app.graphicsDevice, sc); // get new position from blade
+	    // const newposforlabel = newpos(self.blades['blade1'].getCameraPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera
+	    const newposforlabel = newpos(self.blades['blade1'].getLabelPostion(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera
+		
+	    // if (newposforlabel.z > 0) {
+     //        // if world position is in front of the camera, show it
+     //        // playerInfo.enabled = true;
+     //    } else {
+     //    	console.warn("hide");
+     //    }
+
+		b1label.setLocalPosition(newposforlabel); // set entity new position
+		
+	});
+
+    // console.log("b1 position", b1.getPosition());
+    // console.log("b1 screen position", newpos(b1.getPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc));
+    // console.log("b1 camera position", self.blades['blade1'].getCameraPosition());
+    // console.log("b1 camera screen position", newpos(self.blades['blade1'].getCameraPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc));
+
+    // for (let b in this.blades) {
+    // 	console.warn(b, this.blades[b].meshInstance);
+    // 	console.warn("\t", b, this.blades[b].entity.getPosition()); 
+    // 	console.warn("\t", b, this.blades[b].rotation);
+
+    // 	// const wt = this.blades[b].entity.getWorldTransform();
+    // }
+
+	//console.warn(newposforlabel);
 
 /////////////
 

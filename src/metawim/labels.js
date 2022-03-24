@@ -52,6 +52,9 @@ export default class CanvasLabels {
 		 */
 		init() {
 
+			// Create Reference Camera so we can worldToSpace coords
+			this.createReferenceCamera();
+
 			// Create Screen
 			this.createScreen();
 
@@ -61,6 +64,10 @@ export default class CanvasLabels {
 	// GETTERS / SETTERS
 	////////////////////////
 	
+		getReferenceCamera() {
+			return this.referenceCamera;
+		}
+
 		getScreen() {
 			return this.screen;
 		}
@@ -70,9 +77,39 @@ export default class CanvasLabels {
 			return this.lables[id];
 		}
 
+		setOpacity(id, d, p) {
+
+			//console.log(d,p);
+
+			// const v = 
+			// if (direction === true && position.z < -1 || direction === false && position.z > -1) {
+			// 	console.log("hide", direction);	
+			// 	lbl.setOpacity("test", 0);
+			// } else {
+			// 	lbl.setOpacity("test", 0.8);
+			// }
+
+			// this.getLabel(id).frame.element.opacity = v;
+		}
+
 	////////////////////////
 	// METHODS
 	////////////////////////
+	
+		createReferenceCamera() {
+
+			this.referenceCamera = new Entity();
+			this.referenceCamera.addComponent("camera", {
+		        clearColorBuffer: false
+				,clearDepthBuffer: true
+				,priority:2
+		    });
+		    this.referenceCamera.camera.layers = [];
+		    this.referenceCamera.translate(0, 0, 20.2);
+			// this.referenceCamera.lookAt(Vec3.ZERO);
+			
+
+		}
 	
 		createScreen() {
 
@@ -82,6 +119,7 @@ export default class CanvasLabels {
 				referenceResolution: new Vec2(2000, 2500),
 				screenSpace: true,
 			});			
+
 
 		}
 
@@ -97,7 +135,7 @@ export default class CanvasLabels {
 		            opacity: 0.8,
 		            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
 		            type: ELEMENTTYPE_IMAGE,
-		        });	        
+		        });
 	        	this.screen.addChild(frame);
 
 	        // Text
