@@ -7,7 +7,7 @@
 2. DO: global offset slider
 3. DO: umbrella effect (Y folding of blades)
 4. DO: flexible size with locked aspect ratio
-5. DO: blades transparency and blending
+5. DO: blades transparency and blending (feel: https://www.youtube.com/watch?v=2N66nmEZiH8)
 
 ### DONE:
 1. DONE: model orbit/rotation drag
