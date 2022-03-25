@@ -102957,11 +102957,6 @@ class MetaWim {
 			// Start updates
 			this.labels.start();
 
-			setTimeout(function() {
-				for (let b in this.blades) {
-					this.blades[b].setLabelText(b+" update");
-				}
-			}.bind(this), 5000);
 		}
 
 		/**
