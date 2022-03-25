@@ -378,6 +378,7 @@ const CreateOrbitCamera = ({...props}) => {
 
 
 	OrbitCamera.prototype.setLabelsCallback = function(action, scope) {
+		// lables update callback and scope
 		this.labelsCallback = {
 			action: action,
 			scope: scope
@@ -385,7 +386,7 @@ const CreateOrbitCamera = ({...props}) => {
 	}
 
 	OrbitCamera.prototype.updateLabels = function() {
-	// Update Labels
+		// Update Labels
 	    if (this.labelsCallback !== undefined) {
 	    	this.labelsCallback.action.call(this.labelsCallback.scope);
 	    }
@@ -398,7 +399,7 @@ const CreateOrbitCamera = ({...props}) => {
 	    this._distance = pc.math.lerp(this._distance, this._targetDistance, t);
 	    this._yaw = pc.math.lerp(this._yaw, this._targetYaw, t);
 	    this._pitch = pc.math.lerp(this._pitch, this._targetPitch, t);
-
+	    // Update Position(s)
 	    this._updatePosition();
 	};
 
@@ -407,30 +408,22 @@ const CreateOrbitCamera = ({...props}) => {
 	    // Work out the camera position based on the pivot point, pitch, yaw and distance
 	    this.entity.setLocalPosition(0,0,0);
 	    this.entity.setLocalEulerAngles(this._pitch, this._yaw, 0);
-
 	    var position = this.entity.getPosition();
 	    position.copy(this.entity.forward);
 	    position.scale(-this._distance);
 	    position.add(this.pivotPoint);
 	    this.entity.setPosition(position);
-
-	    // console.warn("\tposition", position);
 	    
+	    // Update labels on Camera update (app.on)
 	    this.updateLabels();
 
-	    // console.log("labelsCallback", this.labelsCallback) ;	    
 
 	};
 
-
-
-	// CUSTOM
-	OrbitCamera.prototype._resetPosition = function () {
-		
+	OrbitCamera.prototype._resetPosition = function () {		
 		this._targetPitch = 0;
 		this._targetYaw = -0;
-		this._targetDistance = this.distanceDefault;
-		
+		this._targetDistance = this.distanceDefault;		
 	};
 
 

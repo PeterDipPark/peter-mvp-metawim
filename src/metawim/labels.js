@@ -32,18 +32,17 @@ export default class CanvasLabels {
 				assets 
 				,pixelRatio
 				,camera
-				,blades
 			} = props;
 			this.assets = assets;
 			this.pixelRatio = pixelRatio;
 			this.cameraInstance = camera;
-			this.camera = camera.entity.camera;
-			this.blades = blades;
+			this.camera = null;
 
-
-			// Objects
+			// Screen
 			this.screen = null;
-			this.lables = {}
+
+			// Labels
+			this.labels = {}
 			
 			// Init
 			this.init();
@@ -61,7 +60,7 @@ export default class CanvasLabels {
 		 */
 		init() {
 
-			// Create Reference Camera so we can worldToSpace coords
+			// Create Reference Camera so we can worldToSpace coords - DO WE NEED THIS
 			this.createReferenceCamera();
 
 			// Create Screen
@@ -70,20 +69,31 @@ export default class CanvasLabels {
 		}
 
 	////////////////////////
+	// START (updates)
+	////////////////////////
+
+		
+		/**
+		 * [start description]
+		 * @return {[type]} [description]
+		 */
+		start() {
+			// Must go after pc.app.start()
+
+			// Set Camera component
+			this.camera = this.cameraInstance.entity.camera || null;			
+
+			// Hook Camera			
+			this.hookCamera();
+			
+
+		}
+	////////////////////////
 	// GETTERS / SETTERS
 	////////////////////////
 	
 		getReferenceCamera() {
 			return this.referenceCamera;
-		}
-
-		getScreen() {
-			return this.screen;
-		}
-
-		getLabel(id) {
-
-			return this.lables[id];
 		}
 
 		setOpacity(id, d, p) {
@@ -102,49 +112,114 @@ export default class CanvasLabels {
 			// this.getLabel(id).frame.element.opacity = v;
 		}
 
-		setPositions() {
-			this.setPosition(Object.values(this.blades));
+		/**
+		 * [getScreen description]
+		 * @return {[type]} [description]
+		 */
+		getScreen() {
+			return this.screen;
 		}
 
-		setPosition(objects) {
+		/**
+		 * [getLabel description]
+		 * @param  {[type]} id [description]
+		 * @return {[type]}    [description]
+		 */
+		getLabel(id) {
 
-			for (let i = objects.length - 1; i >= 0; i--) {
-				
-				// Get Vec3 screen position
-				const screenPos = this.camera.worldToScreen(objects[i].getLabelPostion(), this.screen.screen);
+			return this.labels[id];
+		}		
 
-				// Take pixel ration into account
-				screenPos.x *= this.pixelRatio;
-	        	screenPos.y *= this.pixelRatio;
+		/**
+		 * [updateCallback description]
+		 */
+		updateCallback() {
+	    	this.updateLabels();
+	    }
 
-	        	// account for screen scaling
-	        	const scale = this.screen.screen.scale;
+	    /**
+	     * [updateLabel description]
+	     * @param  {[type]} objects [description]
+	     * @return {[type]}         [description]
+	     */
+		updateLabels() {
 
-	        	// invert the y position
-	        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
+			try {
+				for (let id in this.labels)	{
 
-	        	// New Postion
-	        	const entityPos = new Vec3(
-		            screenPos.x / scale,
-		           	screenPos.y / scale,
-		            screenPos.z / scale
-		        );
+					// Get Label Postions
+					const labelPos = this.labels[id].object.getLabelPostion();
 
-		        // Move
-		        this.getLabel(objects[i].name).frame.setLocalPosition(entityPos);
+					// No intersection
+					if (labelPos === null) return;
 
+					// Get Vec3 screen position
+					const screenPos = this.camera.worldToScreen(this.labels[id].object.getLabelPostion(), this.screen.screen);
+
+					// Take pixel ration into account
+					screenPos.x *= this.pixelRatio;
+		        	screenPos.y *= this.pixelRatio;
+
+		        	// account for screen scaling
+		        	const scale = this.screen.screen.scale;
+
+		        	// invert the y position
+		        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
+
+		        	// New Postion
+		        	const entityPos = new Vec3(
+			            screenPos.x / scale,
+			           	screenPos.y / scale,
+			            screenPos.z / scale
+			        );
+
+			        // Update Postion
+			        this.updateLabelPosition(id, entityPos);
+
+			        // Update Text
+			        this.updateLabelText(id);
+
+				}
+			} catch(error) {
+				console.error("updateLabels failed", error);
 			}
 
 	    }
 
-	    setPositionCallback() {
-	    	this.setPositions();
+	    /**
+	     * [updateLabelPosition description]
+	     * @param  {[type]} id       [description]
+	     * @param  {[type]} position [description]
+	     * @return {[type]}          [description]
+	     */
+	    updateLabelPosition(id, position) {
+	    	const label = this.getLabel(id);
+	    	label.frame.setLocalPosition(position);
 	    }
 
+	    /**
+	     * [updateLabelText description]
+	     * @param  {[type]} id [description]
+	     * @return {[type]}    [description]
+	     */
+	    updateLabelText(id) {
+	    	
+	    	const label = this.getLabel(id);
+	    	const labelText = label.object.getLabelText();
+		    if (labelText!==label.text.element.text) {
+		        // Set new text
+		        label.text.element.text = labelText;
+		        // Resize frame to match text width
+		    	label.frame.element.width = label.text.element.textWidth + 10;
+		    }	    	
+	    }
+
+	    
 	////////////////////////
 	// METHODS
 	////////////////////////
 	
+		// ??? - do we need front facing reference camera
 		createReferenceCamera() {
 
 			this.referenceCamera = new Entity();
@@ -159,7 +234,22 @@ export default class CanvasLabels {
 			
 
 		}
+
+		/**
+		 * [hookCamera description]
+		 * @return {[type]} [description]
+		 */
+		hookCamera() {
+
+			// Set Camera Callback (call on camera update)
+			this.cameraInstance.setLabelsCallback(this.updateCallback, this);
+
+		}
 	
+		/**
+		 * [createScreen description]
+		 * @return {[type]} [description]
+		 */
 		createScreen() {
 
 			this.screen = new Entity();
@@ -172,19 +262,43 @@ export default class CanvasLabels {
 
 		}
 
-		createLabels() {
-			// Lables
-			for (let b in this.blades) {
-				this.createLabel(this.blades[b], this.blades[b].name);
+		/**
+		 * [createLabels description]
+		 * @return {[type]} [description]
+		 */
+		createLabels(objects) {
+
+			try {
+				// Convert Object to Array
+				let arrayOfNewObjects = objects;
+				if (Array.isArray(arrayOfNewObjects) === false) {
+					arrayOfNewObjects = Object.values(arrayOfNewObjects);
+				}
+
+				// Create labels
+				for (let i = arrayOfNewObjects.length - 1; i >= 0; i--) {
+					this.createLabel(arrayOfNewObjects[i]);
+				}
+
+			} catch(error) {
+				console.error("Failed to createLabels");
 			}
-			// Set Camera Callback
-			this.cameraInstance.setLabelsCallback(this.setPositionCallback, this)
+			
 		}
 
-		createLabel(object, string) {
+		/**
+		 * [createLabel description]
+		 * @param  {[type]} object [description]
+		 * @param  {[type]} string [description]
+		 * @return {[type]}        [description]
+		 */
+		createLabel(object) {
 
 			// ID
 				const id = object.name;
+
+			// Text
+				const string = object.getLabelText();
 
 			// Background
 				const frame = new Entity();
@@ -219,9 +333,10 @@ export default class CanvasLabels {
 		        frame.element.width = text.element.textWidth + 10;
 
         	// Add to object
-		        this.lables[id] = {
+		        this.labels[id] = {
 		        	frame: frame,
-		        	text: text
+		        	text: text,
+		        	object: object
 		        }
 		}
 

@@ -98283,6 +98283,10 @@ class Blade {
 			this.bladeRotation = bladeRotation;
 			this.useLayers = useLayers || false;
 
+
+			// Label Text
+			this.bladeLabel = this.name;
+
 			// Create Material
 			this.material = new Material({
 				color:defaultColors[this.name] || defaultColors['blank']
@@ -98292,9 +98296,11 @@ class Blade {
 
 
 			// Camera Postion for this blade
-			this.cameraPosition = Vec3.ZERO;
-			this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
-			this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
+				// this.cameraPosition = Vec3.ZERO;
+
+			// Label Postion - Ray intersection Spehere
+				this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
+				// this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
 
 
 			// Morphing
@@ -98497,7 +98503,6 @@ class Blade {
 		setDepth(d) {
 			// Set
 				this.meshInstance.material.depthTest = this.meshInstance.material.depthWrite = d==="e"?true:false;
-				// this.meshInstance.material.blendType = d==="e"?  BLEND_PREMULTIPLIED:BLEND_NONE; //BLEND_NORMAL:BLEND_NONE;
 			
 			// Update
 				this.meshInstance.material.update();
@@ -98519,57 +98524,85 @@ class Blade {
 
 		}
 
+		/**
+		 * [translateBlade description]
+		 * @param  {[type]} v [description]
+		 * @return {[type]}   [description]
+		 */
 		translateBlade(v) {
 
-			// this.entity.translate(0, 0, -fixFloat(this.index/1000)+v/1000);
-
-			var p = this.entity.getPosition();
-			const s = Math.abs(v) < 1 ? 1 : v;			
+			const p = this.entity.getPosition();
+			const s = Math.abs(v) < 1 ? Math.ceil(v) : v;			
 			this.entity.setPosition(p.x, p.y, -(fixFloat(this.index/1000)*s));
 
 		}
 
-
-		setCamarePosition(p) {
-			// Revert camera Y
-			p.y *=-1;		
-			this.cameraPosition = p;
-		}
-		getCameraPosition() {
-			return this.cameraPosition;
-		}
-		setCameraDirection(b) {
-			this.cameraDirection = b;			
-		}
-		getCameraDirection() {
-
-			// return this.cameraDirection;
-
-			const origin = this.getLabelPostion();
-			const ray = new Ray(origin, new Vec3(origin.x,origin.y,-20));
-			let point = new Vec3(0,0,0);
-			const interects = this.intersectOpacitySphere.intersectsRay(ray, point);
-			// 
-			// if (interects === true) {
-			// 	console.log(point);
-			// }
-			return interects;
-
-			// return this.cameraDirection;
-		}
-
-		getExtent() {
-			return this.meshInstance.aabb.halfExtents;
-		}
+		/**
+		 * [getLabelPostion description]
+		 * @return {[type]} [description]
+		 */
 		getLabelPostion() {		
 			
+			// Ray from ZERO through meshInstance Center
 			const ray = new Ray(new Vec3(0,0,0), this.meshInstance.aabb.center);
+			// Point to receive intersection
 			let point = new Vec3(0,0,0);
-			this.intersectSphere.intersectsRay(ray, point);
-			//console.log(interects, point);
+			// Sphere to intersect
+			const interects = this.intersectSphere.intersectsRay(ray, point);
+			// Return
+			return (interects===true)?point:null;
 
-			return point;
 		}
+
+
+		/**
+		 * [setLabelText description]
+		 * @param {[type]} s [description]
+		 */
+		setLabelText(s) {
+			this.bladeLabel = s;
+		}
+
+		/**
+		 * [getLabelText description]
+		 * @return {[type]} [description]
+		 */
+		getLabelText() {
+			return this.bladeLabel;
+		}
+
+
+		// setCamarePosition(p) {
+		// 	// Revert camera Y
+		// 	p.y *=-1;		
+		// 	this.cameraPosition = p;
+		// }
+		// getCameraPosition() {
+		// 	return this.cameraPosition;
+		// }
+		// setCameraDirection(b) {
+		// 	this.cameraDirection = b;			
+		// }
+		// getCameraDirection() {
+
+		// 	// return this.cameraDirection;
+
+		// 	const origin = this.getLabelPostion();
+		// 	const ray = new Ray(origin, new Vec3(origin.x,origin.y,-20));
+		// 	let point = new Vec3(0,0,0);
+		// 	const interects = this.intersectOpacitySphere.intersectsRay(ray, point);
+		// 	// 
+		// 	// if (interects === true) {
+		// 	// 	console.log(point);
+		// 	// }
+		// 	return interects;
+
+		// 	return point;
+
+		// 	// return this.cameraDirection;
+		// }
+
+		
 
 	////////////////////////
 	// METHODS
@@ -98650,8 +98683,8 @@ class Blade {
 			// WORKING when useLayers === false BUT doesn't work for tilted meshes
 				this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
 					// console.log(cameraPosition, cameraForward);
-					this.setCamarePosition(cameraForward);
-					this.setCameraDirection(cameraPosition.z);
+					// this.setCamarePosition(cameraForward);
+					// this.setCameraDirection(cameraPosition.z);
 					return cameraPosition.z>cameraForward.z?this.index:-this.index;
 				}.bind(this);
 		
@@ -98684,7 +98717,7 @@ class Blade {
 				// Create Custom Layer that will holde the entity
 					this.layer = new Layer();
 					this.layer.id = this.layer.name = this.name;
-					this.layer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;	
+					this.layer.opaqueSortMode = SORTMODE_MANUAL;
 					this.layer.transparentSortMode = SORTMODE_MANUAL;
 					// this.layer.passThrough = true;
 					// this.layer.clearDepthBuffer = true;
@@ -99119,6 +99152,7 @@ const CreateOrbitCamera = ({...props}) => {
 
 
 	OrbitCamera.prototype.setLabelsCallback = function(action, scope) {
+		// lables update callback and scope
 		this.labelsCallback = {
 			action: action,
 			scope: scope
@@ -99126,7 +99160,7 @@ const CreateOrbitCamera = ({...props}) => {
 	};
 
 	OrbitCamera.prototype.updateLabels = function() {
-	// Update Labels
+		// Update Labels
 	    if (this.labelsCallback !== undefined) {
 	    	this.labelsCallback.action.call(this.labelsCallback.scope);
 	    }
@@ -99139,7 +99173,7 @@ const CreateOrbitCamera = ({...props}) => {
 	    this._distance = math.lerp(this._distance, this._targetDistance, t);
 	    this._yaw = math.lerp(this._yaw, this._targetYaw, t);
 	    this._pitch = math.lerp(this._pitch, this._targetPitch, t);
-
+	    // Update Position(s)
 	    this._updatePosition();
 	};
 
@@ -99148,30 +99182,22 @@ const CreateOrbitCamera = ({...props}) => {
 	    // Work out the camera position based on the pivot point, pitch, yaw and distance
 	    this.entity.setLocalPosition(0,0,0);
 	    this.entity.setLocalEulerAngles(this._pitch, this._yaw, 0);
-
 	    var position = this.entity.getPosition();
 	    position.copy(this.entity.forward);
 	    position.scale(-this._distance);
 	    position.add(this.pivotPoint);
 	    this.entity.setPosition(position);
-
-	    // console.warn("\tposition", position);
 	    
+	    // Update labels on Camera update (app.on)
 	    this.updateLabels();
 
-	    // console.log("labelsCallback", this.labelsCallback) ;	    
 
 	};
 
-
-
-	// CUSTOM
-	OrbitCamera.prototype._resetPosition = function () {
-		
+	OrbitCamera.prototype._resetPosition = function () {		
 		this._targetPitch = 0;
 		this._targetYaw = -0;
-		this._targetDistance = this.distanceDefault;
-		
+		this._targetDistance = this.distanceDefault;		
 	};
 
 
@@ -101960,18 +101986,17 @@ class CanvasLabels {
 				assets 
 				,pixelRatio
 				,camera
-				,blades
 			} = props;
 			this.assets = assets;
 			this.pixelRatio = pixelRatio;
 			this.cameraInstance = camera;
-			this.camera = camera.entity.camera;
-			this.blades = blades;
+			this.camera = null;
 
-
-			// Objects
+			// Screen
 			this.screen = null;
-			this.lables = {};
+
+			// Labels
+			this.labels = {};
 			
 			// Init
 			this.init();
@@ -101989,7 +102014,7 @@ class CanvasLabels {
 		 */
 		init() {
 
-			// Create Reference Camera so we can worldToSpace coords
+			// Create Reference Camera so we can worldToSpace coords - DO WE NEED THIS
 			this.createReferenceCamera();
 
 			// Create Screen
@@ -101998,20 +102023,31 @@ class CanvasLabels {
 		}
 
 	////////////////////////
+	// START (updates)
+	////////////////////////
+
+		
+		/**
+		 * [start description]
+		 * @return {[type]} [description]
+		 */
+		start() {
+			// Must go after pc.app.start()
+
+			// Set Camera component
+			this.camera = this.cameraInstance.entity.camera || null;			
+
+			// Hook Camera			
+			this.hookCamera();
+			
+
+		}
+	////////////////////////
 	// GETTERS / SETTERS
 	////////////////////////
 	
 		getReferenceCamera() {
 			return this.referenceCamera;
-		}
-
-		getScreen() {
-			return this.screen;
-		}
-
-		getLabel(id) {
-
-			return this.lables[id];
 		}
 
 		setOpacity(id, d, p) {
@@ -102030,49 +102066,114 @@ class CanvasLabels {
 			// this.getLabel(id).frame.element.opacity = v;
 		}
 
-		setPositions() {
-			this.setPosition(Object.values(this.blades));
+		/**
+		 * [getScreen description]
+		 * @return {[type]} [description]
+		 */
+		getScreen() {
+			return this.screen;
 		}
 
-		setPosition(objects) {
+		/**
+		 * [getLabel description]
+		 * @param  {[type]} id [description]
+		 * @return {[type]}    [description]
+		 */
+		getLabel(id) {
 
-			for (let i = objects.length - 1; i >= 0; i--) {
-				
-				// Get Vec3 screen position
-				const screenPos = this.camera.worldToScreen(objects[i].getLabelPostion(), this.screen.screen);
+			return this.labels[id];
+		}		
 
-				// Take pixel ration into account
-				screenPos.x *= this.pixelRatio;
-	        	screenPos.y *= this.pixelRatio;
+		/**
+		 * [updateCallback description]
+		 */
+		updateCallback() {
+	    	this.updateLabels();
+	    }
 
-	        	// account for screen scaling
-	        	const scale = this.screen.screen.scale;
+	    /**
+	     * [updateLabel description]
+	     * @param  {[type]} objects [description]
+	     * @return {[type]}         [description]
+	     */
+		updateLabels() {
 
-	        	// invert the y position
-	        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
+			try {
+				for (let id in this.labels)	{
 
-	        	// New Postion
-	        	const entityPos = new Vec3(
-		            screenPos.x / scale,
-		           	screenPos.y / scale,
-		            screenPos.z / scale
-		        );
+					// Get Label Postions
+					const labelPos = this.labels[id].object.getLabelPostion();
 
-		        // Move
-		        this.getLabel(objects[i].name).frame.setLocalPosition(entityPos);
+					// No intersection
+					if (labelPos === null) return;
 
+					// Get Vec3 screen position
+					const screenPos = this.camera.worldToScreen(this.labels[id].object.getLabelPostion(), this.screen.screen);
+
+					// Take pixel ration into account
+					screenPos.x *= this.pixelRatio;
+		        	screenPos.y *= this.pixelRatio;
+
+		        	// account for screen scaling
+		        	const scale = this.screen.screen.scale;
+
+		        	// invert the y position
+		        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
+
+		        	// New Postion
+		        	const entityPos = new Vec3(
+			            screenPos.x / scale,
+			           	screenPos.y / scale,
+			            screenPos.z / scale
+			        );
+
+			        // Update Postion
+			        this.updateLabelPosition(id, entityPos);
+
+			        // Update Text
+			        this.updateLabelText(id);
+
+				}
+			} catch(error) {
+				console.error("updateLabels failed", error);
 			}
 
 	    }
 
-	    setPositionCallback() {
-	    	this.setPositions();
+	    /**
+	     * [updateLabelPosition description]
+	     * @param  {[type]} id       [description]
+	     * @param  {[type]} position [description]
+	     * @return {[type]}          [description]
+	     */
+	    updateLabelPosition(id, position) {
+	    	const label = this.getLabel(id);
+	    	label.frame.setLocalPosition(position);
 	    }
 
+	    /**
+	     * [updateLabelText description]
+	     * @param  {[type]} id [description]
+	     * @return {[type]}    [description]
+	     */
+	    updateLabelText(id) {
+	    	
+	    	const label = this.getLabel(id);
+	    	const labelText = label.object.getLabelText();
+		    if (labelText!==label.text.element.text) {
+		        // Set new text
+		        label.text.element.text = labelText;
+		        // Resize frame to match text width
+		    	label.frame.element.width = label.text.element.textWidth + 10;
+		    }	    	
+	    }
+
+	    
 	////////////////////////
 	// METHODS
 	////////////////////////
 	
+		// ??? - do we need front facing reference camera
 		createReferenceCamera() {
 
 			this.referenceCamera = new Entity();
@@ -102087,7 +102188,22 @@ class CanvasLabels {
 			
 
 		}
+
+		/**
+		 * [hookCamera description]
+		 * @return {[type]} [description]
+		 */
+		hookCamera() {
+
+			// Set Camera Callback (call on camera update)
+			this.cameraInstance.setLabelsCallback(this.updateCallback, this);
+
+		}
 	
+		/**
+		 * [createScreen description]
+		 * @return {[type]} [description]
+		 */
 		createScreen() {
 
 			this.screen = new Entity();
@@ -102100,19 +102216,43 @@ class CanvasLabels {
 
 		}
 
-		createLabels() {
-			// Lables
-			for (let b in this.blades) {
-				this.createLabel(this.blades[b], this.blades[b].name);
+		/**
+		 * [createLabels description]
+		 * @return {[type]} [description]
+		 */
+		createLabels(objects) {
+
+			try {
+				// Convert Object to Array
+				let arrayOfNewObjects = objects;
+				if (Array.isArray(arrayOfNewObjects) === false) {
+					arrayOfNewObjects = Object.values(arrayOfNewObjects);
+				}
+
+				// Create labels
+				for (let i = arrayOfNewObjects.length - 1; i >= 0; i--) {
+					this.createLabel(arrayOfNewObjects[i]);
+				}
+
+			} catch(error) {
+				console.error("Failed to createLabels");
 			}
-			// Set Camera Callback
-			this.cameraInstance.setLabelsCallback(this.setPositionCallback, this);
+			
 		}
 
-		createLabel(object, string) {
+		/**
+		 * [createLabel description]
+		 * @param  {[type]} object [description]
+		 * @param  {[type]} string [description]
+		 * @return {[type]}        [description]
+		 */
+		createLabel(object) {
 
 			// ID
 				const id = object.name;
+
+			// Text
+				const string = object.getLabelText();
 
 			// Background
 				const frame = new Entity();
@@ -102147,9 +102287,10 @@ class CanvasLabels {
 		        frame.element.width = text.element.textWidth + 10;
 
         	// Add to object
-		        this.lables[id] = {
+		        this.labels[id] = {
 		        	frame: frame,
-		        	text: text
+		        	text: text,
+		        	object: object
 		        };
 		}
 
@@ -102173,7 +102314,7 @@ class MetaWim {
 
 			// Props
 			
-				// Onload callback
+				// Onload callback (for algowimControls)
 				this.onload = onload || null;
 
 				// Use Layers (TRY to solve opacity issue)
@@ -102224,6 +102365,13 @@ class MetaWim {
 				// Blades			
 				this.blades = {};
 				
+				// Labels
+				this.labels = new CanvasLabels({
+					assets: this.app.assets
+					,pixelRatio: this.app.graphicsDevice.maxPixelRatio
+					,camera: this.scene.getCameraInstance()
+				});
+
 				// All (Blades) Controls
 				this.meshMorphsIndex = meshMorphs;
 				this.allcontrols = null;
@@ -102234,7 +102382,7 @@ class MetaWim {
 				});
 				this.lastState = {};
 
-				// Router
+				// Router - WebScoket - not needed (we are trigger states via algowimControls)
 				// this.router = new Router({
 				// 	pp: pp || null
 				// })
@@ -102285,6 +102433,9 @@ class MetaWim {
 	    	// Create Blades
 			this.createBlades();
 
+			// Create Labels
+			this.createLabels();
+
 			// Create All Controls
 			this.createAllControls();
 
@@ -102321,18 +102472,29 @@ class MetaWim {
 
 	    	// Add Blades
 	    		this.addBlades();
-	    
+
 	    	// Add Controls
 	    		this.addControls();
 	    
 	    	// Start App
 	    		this.app.start();
 
-	    	// Onload
+	    	// Append Lables (must go after app.start)
+	    		this.appendLabels();
+
+	    	// Onload (for algowimControls)
 	    	
 	    		if (this.onload !== null) {
 	    			this.onload("pc");	    			
 	    		}
+
+	    }
+
+	////////////////////////
+	// DEV TEST
+	////////////////////////
+
+		devTest() {
 
 	    	// Listeners
     			// this.app.on("update", this.update, th
@@ -102370,15 +102532,15 @@ class MetaWim {
 					// console.log("root", this.app.root);
 					// console.log("layers", this.app.scene.layers);
 					// console.log("----------------------------");					 
-					
+/*					
 
 					const lbl = new CanvasLabels({
 						assets: this.app.assets
 						,pixelRatio: this.app.graphicsDevice.maxPixelRatio
 						,camera: this.scene.getCameraInstance()
-						,blades: this.blades
+						// ,blades: this.blades
 
-					});
+					})
 					// const b1 = this.blades['blade1'].getEntity();
 					this.app.root.addChild(lbl.getScreen());
 					// this.app.root.addChild(lbl.getReferenceCamera());
@@ -102386,9 +102548,9 @@ class MetaWim {
 					// for (let b in this.blades) {
 					// 	lbl.createLabel(this.blades[b], this.blades[b].name+" label");
 					// }
-					lbl.createLabels();
+					lbl.createLabels(this.blades);
 
-
+*/
 					// const scripts = new Entity();
 					// scripts.name = "fontsloader";
 					// scripts.addComponent("script");
@@ -102656,8 +102818,9 @@ class MetaWim {
 
 /////////////
 
-							   
-				}
+
+		}
+
 
 	////////////////////////
 	// CALLBACKS
@@ -102739,6 +102902,16 @@ class MetaWim {
 			}
 		}
 
+
+		/**
+		 * [createLabels description]
+		 * @return {[type]} [description]
+		 */
+		createLabels() {
+			
+		}
+
+
 		/**
 		 * [createControls description]
 		 * @return {[type]} [description]
@@ -102769,6 +102942,26 @@ class MetaWim {
     			this.app.root.addChild(this.blades[b].getEntity());
     		}
 
+		}
+
+		/**
+		 * [appendLabels description]
+		 */
+		appendLabels() {
+
+			// Add Labels Screen
+			this.app.root.addChild(this.labels.getScreen());
+
+			this.labels.createLabels(this.blades);
+			
+			// Start updates
+			this.labels.start();
+
+			setTimeout(function() {
+				for (let b in this.blades) {
+					this.blades[b].setLabelText(b+" update");
+				}
+			}.bind(this), 5000);
 		}
 
 		/**

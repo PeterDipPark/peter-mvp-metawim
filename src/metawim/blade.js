@@ -7,25 +7,25 @@ import {
 			MorphInstance,
 			MeshInstance,
 			Entity,
-			Quat,
-			BLEND_NONE,
-			BLEND_NORMAL,
-			BLEND_PREMULTIPLIED,
-			BLEND_ADDITIVEALPHA,
-			BLEND_ADDITIVE,
-			BLEND_SCREEN,
+			Quat,			
+			Layer,
+			SORTMODE_MANUAL,
 			Vec3,
 			BoundingSphere,
 			Ray,
 			// TEST
-			Layer,
-			SORTMODE_MANUAL,
-			SORTMODE_NONE,
-			SORTMODE_MATERIALMESH,
-			SORTMODE_BACK2FRONT,
-			SORTMODE_FRONT2BACK,
-			SHADER_DEPTH,
-			SHADER_FORWARDHDR,						
+				// BLEND_NONE,
+				// BLEND_NORMAL,
+				// BLEND_PREMULTIPLIED,
+				// BLEND_ADDITIVEALPHA,
+				// BLEND_ADDITIVE,
+				// BLEND_SCREEN,
+				// SORTMODE_NONE,
+				// SORTMODE_MATERIALMESH,
+				// SORTMODE_BACK2FRONT,
+				// SORTMODE_FRONT2BACK,
+				// SHADER_DEPTH,
+				// SHADER_FORWARDHDR,						
 		} from 'playcanvas';
 
 
@@ -70,6 +70,10 @@ export default class Blade {
 			this.bladeRotation = bladeRotation;
 			this.useLayers = useLayers || false;
 
+
+			// Label Text
+			this.bladeLabel = this.name;
+
 			// Create Material
 			this.material = new Material({
 				color:defaultColors[this.name] || defaultColors['blank']
@@ -79,9 +83,11 @@ export default class Blade {
 
 
 			// Camera Postion for this blade
-			this.cameraPosition = Vec3.ZERO;
-			this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
-			this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
+				// this.cameraPosition = Vec3.ZERO;
+
+			// Label Postion - Ray intersection Spehere
+				this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
+				// this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
 
 
 			// Morphing
@@ -285,7 +291,6 @@ export default class Blade {
 		setDepth(d) {
 			// Set
 				this.meshInstance.material.depthTest = this.meshInstance.material.depthWrite = d==="e"?true:false;
-				// this.meshInstance.material.blendType = d==="e"?  BLEND_PREMULTIPLIED:BLEND_NONE; //BLEND_NORMAL:BLEND_NONE;
 			
 			// Update
 				this.meshInstance.material.update();
@@ -307,59 +312,85 @@ export default class Blade {
 
 		}
 
+		/**
+		 * [translateBlade description]
+		 * @param  {[type]} v [description]
+		 * @return {[type]}   [description]
+		 */
 		translateBlade(v) {
 
-			// this.entity.translate(0, 0, -fixFloat(this.index/1000)+v/1000);
-
-			var p = this.entity.getPosition();
-			const s = Math.abs(v) < 1 ? 1 : v;			
+			const p = this.entity.getPosition();
+			const s = Math.abs(v) < 1 ? Math.ceil(v) : v;			
 			this.entity.setPosition(p.x, p.y, -(fixFloat(this.index/1000)*s));
 
 		}
 
-
-		setCamarePosition(p) {
-			// Revert camera Y
-			p.y *=-1;		
-			this.cameraPosition = p;
-		}
-		getCameraPosition() {
-			return this.cameraPosition;
-		}
-		setCameraDirection(b) {
-			this.cameraDirection = b;			
-		}
-		getCameraDirection() {
-
-			// return this.cameraDirection;
-
-			const origin = this.getLabelPostion();
-			const ray = new Ray(origin, new Vec3(origin.x,origin.y,-20));
-			let point = new Vec3(0,0,0);
-			const interects = this.intersectOpacitySphere.intersectsRay(ray, point);
-			// 
-			// if (interects === true) {
-			// 	console.log(point);
-			// }
-			return interects;
-
-			return point;
-
-			// return this.cameraDirection;
-		}
-
-		getExtent() {
-			return this.meshInstance.aabb.halfExtents;
-		}
+		/**
+		 * [getLabelPostion description]
+		 * @return {[type]} [description]
+		 */
 		getLabelPostion() {		
 			
+			// Ray from ZERO through meshInstance Center
 			const ray = new Ray(new Vec3(0,0,0), this.meshInstance.aabb.center);
+			// Point to receive intersection
 			let point = new Vec3(0,0,0);
+			// Sphere to intersect
 			const interects = this.intersectSphere.intersectsRay(ray, point);
-			//console.log(interects, point);
+			// Return
+			return (interects===true)?point:null;
 
-			return point;
 		}
+
+
+		/**
+		 * [setLabelText description]
+		 * @param {[type]} s [description]
+		 */
+		setLabelText(s) {
+			this.bladeLabel = s;
+		}
+
+		/**
+		 * [getLabelText description]
+		 * @return {[type]} [description]
+		 */
+		getLabelText() {
+			return this.bladeLabel;
+		}
+
+
+		// setCamarePosition(p) {
+		// 	// Revert camera Y
+		// 	p.y *=-1;		
+		// 	this.cameraPosition = p;
+		// }
+		// getCameraPosition() {
+		// 	return this.cameraPosition;
+		// }
+		// setCameraDirection(b) {
+		// 	this.cameraDirection = b;			
+		// }
+		// getCameraDirection() {
+
+		// 	// return this.cameraDirection;
+
+		// 	const origin = this.getLabelPostion();
+		// 	const ray = new Ray(origin, new Vec3(origin.x,origin.y,-20));
+		// 	let point = new Vec3(0,0,0);
+		// 	const interects = this.intersectOpacitySphere.intersectsRay(ray, point);
+		// 	// 
+		// 	// if (interects === true) {
+		// 	// 	console.log(point);
+		// 	// }
+		// 	return interects;
+
+		// 	return point;
+
+		// 	// return this.cameraDirection;
+		// }
+
+		
 
 	////////////////////////
 	// METHODS
@@ -440,8 +471,8 @@ export default class Blade {
 			// WORKING when useLayers === false BUT doesn't work for tilted meshes
 				this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
 					// console.log(cameraPosition, cameraForward);
-					this.setCamarePosition(cameraForward);
-					this.setCameraDirection(cameraPosition.z);
+					// this.setCamarePosition(cameraForward);
+					// this.setCameraDirection(cameraPosition.z);
 					return cameraPosition.z>cameraForward.z?this.index:-this.index;
 				}.bind(this);
 		
@@ -474,7 +505,7 @@ export default class Blade {
 				// Create Custom Layer that will holde the entity
 					this.layer = new Layer();
 					this.layer.id = this.layer.name = this.name;
-					this.layer.opaqueSortMode = SORTMODE_MANUAL; //SORTMODE_MATERIALMESH; //SORTMODE_MANUAL;	
+					this.layer.opaqueSortMode = SORTMODE_MANUAL;
 					this.layer.transparentSortMode = SORTMODE_MANUAL;
 					// this.layer.passThrough = true;
 					// this.layer.clearDepthBuffer = true;

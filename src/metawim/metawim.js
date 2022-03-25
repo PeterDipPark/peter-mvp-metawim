@@ -50,7 +50,7 @@ export default class MetaWim {
 
 			// Props
 			
-				// Onload callback
+				// Onload callback (for algowimControls)
 				this.onload = onload || null;
 
 				// Use Layers (TRY to solve opacity issue)
@@ -101,6 +101,13 @@ export default class MetaWim {
 				// Blades			
 				this.blades = {};
 				
+				// Labels
+				this.labels = new CanvasLabels({
+					assets: this.app.assets
+					,pixelRatio: this.app.graphicsDevice.maxPixelRatio
+					,camera: this.scene.getCameraInstance()
+				});
+
 				// All (Blades) Controls
 				this.meshMorphsIndex = meshMorphs;
 				this.allcontrols = null;
@@ -111,7 +118,7 @@ export default class MetaWim {
 				});
 				this.lastState = {};
 
-				// Router
+				// Router - WebScoket - not needed (we are trigger states via algowimControls)
 				// this.router = new Router({
 				// 	pp: pp || null
 				// })
@@ -162,6 +169,9 @@ export default class MetaWim {
 	    	// Create Blades
 			this.createBlades();
 
+			// Create Labels
+			this.createLabels();
+
 			// Create All Controls
 			this.createAllControls();
 
@@ -198,18 +208,29 @@ export default class MetaWim {
 
 	    	// Add Blades
 	    		this.addBlades();
-	    
+
 	    	// Add Controls
 	    		this.addControls();
 	    
 	    	// Start App
 	    		this.app.start();
 
-	    	// Onload
+	    	// Append Lables (must go after app.start)
+	    		this.appendLabels();
+
+	    	// Onload (for algowimControls)
 	    	
 	    		if (this.onload !== null) {
 	    			this.onload("pc");	    			
 	    		}
+
+	    }
+
+	////////////////////////
+	// DEV TEST
+	////////////////////////
+
+		devTest() {
 
 	    	// Listeners
     			// this.app.on("update", this.update, th
@@ -247,13 +268,13 @@ export default class MetaWim {
 					// console.log("root", this.app.root);
 					// console.log("layers", this.app.scene.layers);
 					// console.log("----------------------------");					 
-					
+/*					
 
 					const lbl = new CanvasLabels({
 						assets: this.app.assets
 						,pixelRatio: this.app.graphicsDevice.maxPixelRatio
 						,camera: this.scene.getCameraInstance()
-						,blades: this.blades
+						// ,blades: this.blades
 
 					})
 					// const b1 = this.blades['blade1'].getEntity();
@@ -263,9 +284,9 @@ export default class MetaWim {
 					// for (let b in this.blades) {
 					// 	lbl.createLabel(this.blades[b], this.blades[b].name+" label");
 					// }
-					lbl.createLabels();
+					lbl.createLabels(this.blades);
 
-
+*/
 					// const scripts = new Entity();
 					// scripts.name = "fontsloader";
 					// scripts.addComponent("script");
@@ -690,8 +711,9 @@ export default class MetaWim {
 
 /////////////
 
-							   
-				}
+
+		}
+
 
 	////////////////////////
 	// CALLBACKS
@@ -774,6 +796,16 @@ export default class MetaWim {
 
 		}
 
+
+		/**
+		 * [createLabels description]
+		 * @return {[type]} [description]
+		 */
+		createLabels() {
+			
+		}
+
+
 		/**
 		 * [createControls description]
 		 * @return {[type]} [description]
@@ -803,6 +835,21 @@ export default class MetaWim {
     			// Blade Entity
     			this.app.root.addChild(this.blades[b].getEntity());
     		}
+
+		}
+
+		/**
+		 * [appendLabels description]
+		 */
+		appendLabels() {
+
+			// Add Labels Screen
+			this.app.root.addChild(this.labels.getScreen());
+
+			this.labels.createLabels(this.blades);
+			
+			// Start updates
+			this.labels.start();
 
 		}
 
