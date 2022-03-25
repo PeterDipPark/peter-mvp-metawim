@@ -243,20 +243,27 @@ export default class MetaWim {
 				
 
 				// TEXT
-					console.log("----------------------------");
-					console.log("root", this.app.root);
-					console.log("layers", this.app.scene.layers);
-					console.log("----------------------------");					 
+					// console.log("----------------------------");
+					// console.log("root", this.app.root);
+					// console.log("layers", this.app.scene.layers);
+					// console.log("----------------------------");					 
 					
 
 					const lbl = new CanvasLabels({
 						assets: this.app.assets
+						,pixelRatio: this.app.graphicsDevice.maxPixelRatio
+						,camera: this.scene.getCameraInstance()
+						,blades: this.blades
+
 					})
 					// const b1 = this.blades['blade1'].getEntity();
 					this.app.root.addChild(lbl.getScreen());
 					// this.app.root.addChild(lbl.getReferenceCamera());
 
-					lbl.createLabel("test", "MetaWim label");
+					// for (let b in this.blades) {
+					// 	lbl.createLabel(this.blades[b], this.blades[b].name+" label");
+					// }
+					lbl.createLabels();
 
 
 					// const scripts = new Entity();
@@ -379,7 +386,7 @@ export default class MetaWim {
 					light.light.layers = [textlayer.id];
 
 
-				    console.log("text camera layers", camera.camera.layers);
+				    // console.log("text camera layers", camera.camera.layers);
 				 
 
 				   	camera.translate(0, 0, 20);
@@ -610,67 +617,61 @@ export default class MetaWim {
 
 
 	
-	const b1label = lbl.getLabel('test').frame; // entity to reposition
-	const b1 = self.blades['blade1'].getEntity(); // anchor entity		
-	const sc = lbl.getScreen();	// screen component
-	const oc = self.scene.getCamera().camera; //lbl.getReferenceCamera().camera; // self.scene.getCamera().camera // camera component
+	// const b1label = lbl.getLabel('test').frame; // entity to reposition
+	// const b1 = self.blades['blade1'].getEntity(); // anchor entity		
+	// const sc = lbl.getScreen();	// screen component
+	// const oc = self.scene.getCamera().camera; //lbl.getReferenceCamera().camera; // self.scene.getCamera().camera // camera component
 
-	console.log("b1label",b1label);
+	// console.log("b1label",b1label);
 
-	function newpos(position, direction, camera, gd, screen) {
-        const screenPos = camera.worldToScreen(position, screen);
+	// function newpos(position, direction, camera, gd, screen) {
+ //        const screenPos = camera.worldToScreen(position, screen);
 
-        // take pixel ratio into account
-        const pixelRatio = gd.maxPixelRatio;
-        screenPos.x *= pixelRatio;
-        screenPos.y *= pixelRatio;
+ //        // take pixel ratio into account
+ //        const pixelRatio = gd.maxPixelRatio;
+ //        screenPos.x *= pixelRatio;
+ //        screenPos.y *= pixelRatio;
 
-        // account for screen scaling
-        // @ts-ignore engine-tsd
-        const scale = screen.screen.scale;
+ //        // account for screen scaling
+ //        // @ts-ignore engine-tsd
+ //        const scale = screen.screen.scale;
 
-        // invert the y position
-        screenPos.y = screen.screen.resolution.y - screenPos.y;
+ //        // invert the y position
+ //        screenPos.y = screen.screen.resolution.y - screenPos.y;
 
-        // put that into a Vec3
-        // if (position.z < 0) {
-        // 	console.log("hide", direction);
-        // }
-        // console.log(direction);
-        lbl.setOpacity("test", direction, position.z);
-        // if (direction === true && position.z < -1 || direction === false && position.z > -1) {
-        // 	console.log("hide", direction);	
-        // 	lbl.setOpacity("test", 0);
-        // } else {
-        // 	lbl.setOpacity("test", 0.8);
-        // }
+ //        // put that into a Vec3
+ //        // if (position.z < 0) {
+ //        // 	console.log("hide", direction);
+ //        // }
+ //        // console.log(direction);
+ //        lbl.setOpacity("test", direction, position.z);
+ //        // if (direction === true && position.z < -1 || direction === false && position.z > -1) {
+ //        // 	console.log("hide", direction);	
+ //        // 	lbl.setOpacity("test", 0);
+ //        // } else {
+ //        // 	lbl.setOpacity("test", 0.8);
+ //        // }
 
-        return new Vec3(
-            screenPos.x / scale,
-           	screenPos.y / scale,
-            screenPos.z / scale
-        );
-    }
+ //        return new Vec3(
+ //            screenPos.x / scale,
+ //           	screenPos.y / scale,
+ //            screenPos.z / scale
+ //        );
+ //    }
 
 
     
 
     self.app.on("update", function () {
-	    	    
-	    // const newposforlabel = newpos(b1.getPosition(), oc, self.app.graphicsDevice, sc); // get new position from blade
-	    // const newposforlabel = newpos(self.blades['blade1'].getCameraPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera
-	    const newposforlabel = newpos(self.blades['blade1'].getLabelPostion(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera
+	    
+		// const newposforlabel = newpos(self.blades['blade1'].getLabelPostion(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera		
+		// b1label.setLocalPosition(newposforlabel); // set entity new position
 		
-	    // if (newposforlabel.z > 0) {
-     //        // if world position is in front of the camera, show it
-     //        // playerInfo.enabled = true;
-     //    } else {
-     //    	console.warn("hide");
-     //    }
-
-		b1label.setLocalPosition(newposforlabel); // set entity new position
+		// lbl.setPosition([self.blades['blade1']]);
+		// lbl.setPositions();
 		
 	});
+	// self.app.off();
 
     // console.log("b1 position", b1.getPosition());
     // console.log("b1 screen position", newpos(b1.getPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc));
@@ -1125,7 +1126,7 @@ export default class MetaWim {
 		setupStateCallback(idx) {
 
 			// Stop Other updates
-			this.app.off();
+			this.app.off("update");
 			// Get current state
 			const currentState = this.getCurrentState();
 			
@@ -1197,11 +1198,11 @@ export default class MetaWim {
 					}											
 					// Stop
 					if (this.time>=this.state.duration) {
-						this.scope.app.off();
+						this.scope.app.off("update");
 					}
 				} catch(error) {
 					console.warn("state timer error", error);
-					this.scope.app.off();	
+					this.scope.app.off("update");	
 				}
 			}, {
 				scope: this

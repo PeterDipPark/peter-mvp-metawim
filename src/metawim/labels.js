@@ -28,8 +28,17 @@ export default class CanvasLabels {
 		constructor({...props}) {
 
 			// Props			
-			const { assets } = props;
+			const { 
+				assets 
+				,pixelRatio
+				,camera
+				,blades
+			} = props;
 			this.assets = assets;
+			this.pixelRatio = pixelRatio;
+			this.cameraInstance = camera;
+			this.camera = camera.entity.camera;
+			this.blades = blades;
 
 
 			// Objects
@@ -80,6 +89,7 @@ export default class CanvasLabels {
 		setOpacity(id, d, p) {
 
 			//console.log(d,p);
+			this.getLabel(id).frame.element.opacity = d===true?0:1;
 
 			// const v = 
 			// if (direction === true && position.z < -1 || direction === false && position.z > -1) {
@@ -91,6 +101,45 @@ export default class CanvasLabels {
 
 			// this.getLabel(id).frame.element.opacity = v;
 		}
+
+		setPositions() {
+			this.setPosition(Object.values(this.blades));
+		}
+
+		setPosition(objects) {
+
+			for (let i = objects.length - 1; i >= 0; i--) {
+				
+				// Get Vec3 screen position
+				const screenPos = this.camera.worldToScreen(objects[i].getLabelPostion(), this.screen.screen);
+
+				// Take pixel ration into account
+				screenPos.x *= this.pixelRatio;
+	        	screenPos.y *= this.pixelRatio;
+
+	        	// account for screen scaling
+	        	const scale = this.screen.screen.scale;
+
+	        	// invert the y position
+	        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
+
+	        	// New Postion
+	        	const entityPos = new Vec3(
+		            screenPos.x / scale,
+		           	screenPos.y / scale,
+		            screenPos.z / scale
+		        );
+
+		        // Move
+		        this.getLabel(objects[i].name).frame.setLocalPosition(entityPos);
+
+			}
+
+	    }
+
+	    setPositionCallback() {
+	    	this.setPositions();
+	    }
 
 	////////////////////////
 	// METHODS
@@ -123,7 +172,19 @@ export default class CanvasLabels {
 
 		}
 
-		createLabel(id, string) {
+		createLabels() {
+			// Lables
+			for (let b in this.blades) {
+				this.createLabel(this.blades[b], this.blades[b].name);
+			}
+			// Set Camera Callback
+			this.cameraInstance.setLabelsCallback(this.setPositionCallback, this)
+		}
+
+		createLabel(object, string) {
+
+			// ID
+				const id = object.name;
 
 			// Background
 				const frame = new Entity();
@@ -162,7 +223,6 @@ export default class CanvasLabels {
 		        	frame: frame,
 		        	text: text
 		        }
-
 		}
 
 	

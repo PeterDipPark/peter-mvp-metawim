@@ -98296,6 +98296,7 @@ class Blade {
 			this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
 			this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
 
+
 			// Morphing
 			this.morphing = this.meshMorphsIndex.reduce((acc,curr)=> (acc[curr.id]=0,acc),{}); // default is 0
 
@@ -98528,6 +98529,7 @@ class Blade {
 
 		}
 
+
 		setCamarePosition(p) {
 			// Revert camera Y
 			p.y *=-1;		
@@ -98541,7 +98543,17 @@ class Blade {
 		}
 		getCameraDirection() {
 
-			return this.cameraDirection;
+			// return this.cameraDirection;
+
+			const origin = this.getLabelPostion();
+			const ray = new Ray(origin, new Vec3(origin.x,origin.y,-20));
+			let point = new Vec3(0,0,0);
+			const interects = this.intersectOpacitySphere.intersectsRay(ray, point);
+			// 
+			// if (interects === true) {
+			// 	console.log(point);
+			// }
+			return interects;
 
 			// return this.cameraDirection;
 		}
@@ -98933,7 +98945,7 @@ const CreateOrbitCamera = ({...props}) => {
 					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
 				});
 
-				console.log("orbit camera layers", this.entity.camera.layers);
+				// console.log("orbit camera layers", this.entity.camera.layers);
 
 				if (this.useLayers  === true) {
 
@@ -99106,6 +99118,21 @@ const CreateOrbitCamera = ({...props}) => {
 	};
 
 
+	OrbitCamera.prototype.setLabelsCallback = function(action, scope) {
+		this.labelsCallback = {
+			action: action,
+			scope: scope
+		};
+	};
+
+	OrbitCamera.prototype.updateLabels = function() {
+	// Update Labels
+	    if (this.labelsCallback !== undefined) {
+	    	this.labelsCallback.action.call(this.labelsCallback.scope);
+	    }
+	};
+
+
 	OrbitCamera.prototype.update = function(dt) {
 	    // Add inertia, if any
 	    var t = this.inertiaFactor === 0 ? 1 : Math.min(dt / this.inertiaFactor, 1);
@@ -99129,8 +99156,14 @@ const CreateOrbitCamera = ({...props}) => {
 	    this.entity.setPosition(position);
 
 	    // console.warn("\tposition", position);
+	    
+	    this.updateLabels();
+
+	    // console.log("labelsCallback", this.labelsCallback) ;	    
 
 	};
+
+
 
 	// CUSTOM
 	OrbitCamera.prototype._resetPosition = function () {
@@ -99401,12 +99434,14 @@ const CreateMouseInput = ({...props}) => {
 	    if (this.lookButtonDown) {
 	        this.orbitCamera.pitch -= event.dy * this.orbitSensitivity;
 	        this.orbitCamera.yaw -= event.dx * this.orbitSensitivity;
-	        
 	    } else if (this.panButtonDown) {
 	        this.pan(event);   
 	    }
 	    
 	    this.lastPoint.set(event.x, event.y);
+
+	    
+
 	};
 
 
@@ -99569,6 +99604,7 @@ const CreateTouchInput = ({...props}) => {
 	        this.pan(pinchMidPoint);
 	        this.lastPinchMidPoint.copy(pinchMidPoint);
 	    }
+
 	};
 
 
@@ -100066,6 +100102,13 @@ class Scene {
 				// return this.camera;
 			// SCRIPT camera
 				return this.scripts.script.orbitCamera.entity;
+		}
+
+		getCameraInstance() {
+			// DEPRECATED (use script oribitCamera)
+				// return this.camera;
+			// SCRIPT camera
+				return this.scripts.script.orbitCamera;
 		}
 
 		getLight() {
@@ -101913,8 +101956,17 @@ class CanvasLabels {
 		constructor({...props}) {
 
 			// Props			
-			const { assets } = props;
+			const { 
+				assets 
+				,pixelRatio
+				,camera
+				,blades
+			} = props;
 			this.assets = assets;
+			this.pixelRatio = pixelRatio;
+			this.cameraInstance = camera;
+			this.camera = camera.entity.camera;
+			this.blades = blades;
 
 
 			// Objects
@@ -101965,6 +102017,7 @@ class CanvasLabels {
 		setOpacity(id, d, p) {
 
 			//console.log(d,p);
+			this.getLabel(id).frame.element.opacity = d===true?0:1;
 
 			// const v = 
 			// if (direction === true && position.z < -1 || direction === false && position.z > -1) {
@@ -101976,6 +102029,45 @@ class CanvasLabels {
 
 			// this.getLabel(id).frame.element.opacity = v;
 		}
+
+		setPositions() {
+			this.setPosition(Object.values(this.blades));
+		}
+
+		setPosition(objects) {
+
+			for (let i = objects.length - 1; i >= 0; i--) {
+				
+				// Get Vec3 screen position
+				const screenPos = this.camera.worldToScreen(objects[i].getLabelPostion(), this.screen.screen);
+
+				// Take pixel ration into account
+				screenPos.x *= this.pixelRatio;
+	        	screenPos.y *= this.pixelRatio;
+
+	        	// account for screen scaling
+	        	const scale = this.screen.screen.scale;
+
+	        	// invert the y position
+	        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
+
+	        	// New Postion
+	        	const entityPos = new Vec3(
+		            screenPos.x / scale,
+		           	screenPos.y / scale,
+		            screenPos.z / scale
+		        );
+
+		        // Move
+		        this.getLabel(objects[i].name).frame.setLocalPosition(entityPos);
+
+			}
+
+	    }
+
+	    setPositionCallback() {
+	    	this.setPositions();
+	    }
 
 	////////////////////////
 	// METHODS
@@ -102008,7 +102100,19 @@ class CanvasLabels {
 
 		}
 
-		createLabel(id, string) {
+		createLabels() {
+			// Lables
+			for (let b in this.blades) {
+				this.createLabel(this.blades[b], this.blades[b].name);
+			}
+			// Set Camera Callback
+			this.cameraInstance.setLabelsCallback(this.setPositionCallback, this);
+		}
+
+		createLabel(object, string) {
+
+			// ID
+				const id = object.name;
 
 			// Background
 				const frame = new Entity();
@@ -102047,7 +102151,6 @@ class CanvasLabels {
 		        	frame: frame,
 		        	text: text
 		        };
-
 		}
 
 	
@@ -102263,20 +102366,27 @@ class MetaWim {
 				
 
 				// TEXT
-					console.log("----------------------------");
-					console.log("root", this.app.root);
-					console.log("layers", this.app.scene.layers);
-					console.log("----------------------------");					 
+					// console.log("----------------------------");
+					// console.log("root", this.app.root);
+					// console.log("layers", this.app.scene.layers);
+					// console.log("----------------------------");					 
 					
 
 					const lbl = new CanvasLabels({
 						assets: this.app.assets
+						,pixelRatio: this.app.graphicsDevice.maxPixelRatio
+						,camera: this.scene.getCameraInstance()
+						,blades: this.blades
+
 					});
 					// const b1 = this.blades['blade1'].getEntity();
 					this.app.root.addChild(lbl.getScreen());
 					// this.app.root.addChild(lbl.getReferenceCamera());
 
-					lbl.createLabel("test", "MetaWim label");
+					// for (let b in this.blades) {
+					// 	lbl.createLabel(this.blades[b], this.blades[b].name+" label");
+					// }
+					lbl.createLabels();
 
 
 					// const scripts = new Entity();
@@ -102399,7 +102509,7 @@ class MetaWim {
 					light.light.layers = [textlayer.id];
 
 
-				    console.log("text camera layers", camera.camera.layers);
+				    // console.log("text camera layers", camera.camera.layers);
 				 
 
 				   	camera.translate(0, 0, 20);
@@ -102473,67 +102583,61 @@ class MetaWim {
 
 
 	
-	const b1label = lbl.getLabel('test').frame; // entity to reposition
-	self.blades['blade1'].getEntity(); // anchor entity		
-	const sc = lbl.getScreen();	// screen component
-	const oc = self.scene.getCamera().camera; //lbl.getReferenceCamera().camera; // self.scene.getCamera().camera // camera component
+	// const b1label = lbl.getLabel('test').frame; // entity to reposition
+	// const b1 = self.blades['blade1'].getEntity(); // anchor entity		
+	// const sc = lbl.getScreen();	// screen component
+	// const oc = self.scene.getCamera().camera; //lbl.getReferenceCamera().camera; // self.scene.getCamera().camera // camera component
 
-	console.log("b1label",b1label);
+	// console.log("b1label",b1label);
 
-	function newpos(position, direction, camera, gd, screen) {
-        const screenPos = camera.worldToScreen(position, screen);
+	// function newpos(position, direction, camera, gd, screen) {
+ //        const screenPos = camera.worldToScreen(position, screen);
 
-        // take pixel ratio into account
-        const pixelRatio = gd.maxPixelRatio;
-        screenPos.x *= pixelRatio;
-        screenPos.y *= pixelRatio;
+ //        // take pixel ratio into account
+ //        const pixelRatio = gd.maxPixelRatio;
+ //        screenPos.x *= pixelRatio;
+ //        screenPos.y *= pixelRatio;
 
-        // account for screen scaling
-        // @ts-ignore engine-tsd
-        const scale = screen.screen.scale;
+ //        // account for screen scaling
+ //        // @ts-ignore engine-tsd
+ //        const scale = screen.screen.scale;
 
-        // invert the y position
-        screenPos.y = screen.screen.resolution.y - screenPos.y;
+ //        // invert the y position
+ //        screenPos.y = screen.screen.resolution.y - screenPos.y;
 
-        // put that into a Vec3
-        // if (position.z < 0) {
-        // 	console.log("hide", direction);
-        // }
-        // console.log(direction);
-        lbl.setOpacity("test", direction, position.z);
-        // if (direction === true && position.z < -1 || direction === false && position.z > -1) {
-        // 	console.log("hide", direction);	
-        // 	lbl.setOpacity("test", 0);
-        // } else {
-        // 	lbl.setOpacity("test", 0.8);
-        // }
+ //        // put that into a Vec3
+ //        // if (position.z < 0) {
+ //        // 	console.log("hide", direction);
+ //        // }
+ //        // console.log(direction);
+ //        lbl.setOpacity("test", direction, position.z);
+ //        // if (direction === true && position.z < -1 || direction === false && position.z > -1) {
+ //        // 	console.log("hide", direction);	
+ //        // 	lbl.setOpacity("test", 0);
+ //        // } else {
+ //        // 	lbl.setOpacity("test", 0.8);
+ //        // }
 
-        return new Vec3(
-            screenPos.x / scale,
-           	screenPos.y / scale,
-            screenPos.z / scale
-        );
-    }
+ //        return new Vec3(
+ //            screenPos.x / scale,
+ //           	screenPos.y / scale,
+ //            screenPos.z / scale
+ //        );
+ //    }
 
 
     
 
     self.app.on("update", function () {
-	    	    
-	    // const newposforlabel = newpos(b1.getPosition(), oc, self.app.graphicsDevice, sc); // get new position from blade
-	    // const newposforlabel = newpos(self.blades['blade1'].getCameraPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera
-	    const newposforlabel = newpos(self.blades['blade1'].getLabelPostion(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera
+	    
+		// const newposforlabel = newpos(self.blades['blade1'].getLabelPostion(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc); // get new position from blade camera		
+		// b1label.setLocalPosition(newposforlabel); // set entity new position
 		
-	    // if (newposforlabel.z > 0) {
-     //        // if world position is in front of the camera, show it
-     //        // playerInfo.enabled = true;
-     //    } else {
-     //    	console.warn("hide");
-     //    }
-
-		b1label.setLocalPosition(newposforlabel); // set entity new position
+		// lbl.setPosition([self.blades['blade1']]);
+		// lbl.setPositions();
 		
 	});
+	// self.app.off();
 
     // console.log("b1 position", b1.getPosition());
     // console.log("b1 screen position", newpos(b1.getPosition(), self.blades['blade1'].getCameraDirection(), oc, self.app.graphicsDevice, sc));
@@ -102983,7 +103087,7 @@ class MetaWim {
 		setupStateCallback(idx) {
 
 			// Stop Other updates
-			this.app.off();
+			this.app.off("update");
 			// Get current state
 			const currentState = this.getCurrentState();
 			
@@ -103055,11 +103159,11 @@ class MetaWim {
 					}											
 					// Stop
 					if (this.time>=this.state.duration) {
-						this.scope.app.off();
+						this.scope.app.off("update");
 					}
 				} catch(error) {
 					console.warn("state timer error", error);
-					this.scope.app.off();	
+					this.scope.app.off("update");	
 				}
 			}, {
 				scope: this

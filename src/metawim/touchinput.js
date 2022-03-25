@@ -137,6 +137,7 @@ const CreateTouchInput = ({...props}) => {
 	        this.pan(pinchMidPoint);
 	        this.lastPinchMidPoint.copy(pinchMidPoint);
 	    }
+
 	};
 
 

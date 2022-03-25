@@ -203,7 +203,7 @@ const CreateOrbitCamera = ({...props}) => {
 					// ,projection: pc.PROJECTION_ORTHOGRAPHIC
 				});
 
-				console.log("orbit camera layers", this.entity.camera.layers);
+				// console.log("orbit camera layers", this.entity.camera.layers);
 
 				if (this.useLayers  === true) {
 
@@ -377,6 +377,21 @@ const CreateOrbitCamera = ({...props}) => {
 	};
 
 
+	OrbitCamera.prototype.setLabelsCallback = function(action, scope) {
+		this.labelsCallback = {
+			action: action,
+			scope: scope
+		};
+	}
+
+	OrbitCamera.prototype.updateLabels = function() {
+	// Update Labels
+	    if (this.labelsCallback !== undefined) {
+	    	this.labelsCallback.action.call(this.labelsCallback.scope);
+	    }
+	}
+
+
 	OrbitCamera.prototype.update = function(dt) {
 	    // Add inertia, if any
 	    var t = this.inertiaFactor === 0 ? 1 : Math.min(dt / this.inertiaFactor, 1);
@@ -400,8 +415,14 @@ const CreateOrbitCamera = ({...props}) => {
 	    this.entity.setPosition(position);
 
 	    // console.warn("\tposition", position);
+	    
+	    this.updateLabels();
+
+	    // console.log("labelsCallback", this.labelsCallback) ;	    
 
 	};
+
+
 
 	// CUSTOM
 	OrbitCamera.prototype._resetPosition = function () {

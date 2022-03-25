@@ -97,6 +97,13 @@ export default class Scene {
 				return this.scripts.script.orbitCamera.entity;
 		}
 
+		getCameraInstance() {
+			// DEPRECATED (use script oribitCamera)
+				// return this.camera;
+			// SCRIPT camera
+				return this.scripts.script.orbitCamera;
+		}
+
 		getLight() {
 			return this.light
 		}

@@ -83,6 +83,7 @@ export default class Blade {
 			this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
 			this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
 
+
 			// Morphing
 			this.morphing = this.meshMorphsIndex.reduce((acc,curr)=> (acc[curr.id]=0,acc),{}); // default is 0
 
@@ -316,6 +317,7 @@ export default class Blade {
 
 		}
 
+
 		setCamarePosition(p) {
 			// Revert camera Y
 			p.y *=-1;		
@@ -329,12 +331,17 @@ export default class Blade {
 		}
 		getCameraDirection() {
 
-			return this.cameraDirection;
+			// return this.cameraDirection;
 
-			const ray = new Ray(new Vec3(0,0,0), this.getLabelPostion());
+			const origin = this.getLabelPostion();
+			const ray = new Ray(origin, new Vec3(origin.x,origin.y,-20));
 			let point = new Vec3(0,0,0);
 			const interects = this.intersectOpacitySphere.intersectsRay(ray, point);
-			//console.log(interects, point);
+			// 
+			// if (interects === true) {
+			// 	console.log(point);
+			// }
+			return interects;
 
 			return point;
 

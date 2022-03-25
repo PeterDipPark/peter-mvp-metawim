@@ -165,12 +165,14 @@ const CreateMouseInput = ({...props}) => {
 	    if (this.lookButtonDown) {
 	        this.orbitCamera.pitch -= event.dy * this.orbitSensitivity;
 	        this.orbitCamera.yaw -= event.dx * this.orbitSensitivity;
-	        
 	    } else if (this.panButtonDown) {
 	        this.pan(event);   
 	    }
 	    
 	    this.lastPoint.set(event.x, event.y);
+
+	    
+
 	};
 
 
