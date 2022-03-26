@@ -3,6 +3,18 @@
 ## Play Canvas
 
 ### DO:
+* TEST: pc - blades opacity: test lookAt and reverseLooktAt to solve transparency depth issue
+```
+// https://playcanvas.com/editor/scene/904869
+// https://playcanvas.com/editor/code/678321?tabs=29887007,29886994
+this.entity.lookAtReverse(this.targetEntity.getPosition());
+pc.GraphNode.prototype.lookAtReverse = function () {
+    return function (tx, ty, tz, ux, uy, uz) {
+        this.lookAt(tx, ty, tz, ux, uy, uz);
+        this.rotateLocal(0, 180, 0);
+    };
+}();
+```
 * DO: pc - canvas double click to reset camera orbit
 * DO: pc - global offset slider
 * DO: pc - umbrella effect (Y folding of blades)
