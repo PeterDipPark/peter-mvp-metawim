@@ -3,12 +3,12 @@
 ## Play Canvas
 
 ### DO:
-* DO: pc/page canvas - double click to reset camera orbit
+* DO: pc - canvas double click to reset camera orbit
+* DO: pc - global offset slider
+* DO: pc - umbrella effect (Y folding of blades)
 * DO: pc - floating labels (PC, PP), http://phone.playcanvas.com/ 
 * DO: pc - static transparency sphere to indicate global world and picking blades reflection (transpSphere.png). See https://www.dropbox.com/s/zoh4i24aa4m4rny/transpSphere.png?dl=0
 * DO: pc - blades' axis with label: 3 axises xyz as super thin hardly noticeable hairlines see attached , these should be permanently linked to the blades meaning they orbit with the global blade structure, they are not linked to a static xyz space. These axises will help indicate which blade is what. These axises would have a (dynamic) floating label attached to each end of axis.
-* DO: pc - global offset slider
-* DO: pc - umbrella effect (Y folding of blades)
 * DO: page - flexible size with locked aspect ratio
 * DO: page - Having a series of predefined global states selected via a list/dropdown(the iPhone stuff etc)
 * DO: pp blades transparency and blending (feel: https://www.youtube.com/watch?v=2N66nmEZiH8)
