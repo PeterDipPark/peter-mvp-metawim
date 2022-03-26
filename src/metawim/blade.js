@@ -320,7 +320,7 @@ export default class Blade {
 		translateBlade(v) {
 
 			const p = this.entity.getPosition();
-			const s = Math.abs(v) < 1 ? Math.ceil(v) : v;			
+			const s = Math.abs(v) < 1 ? (v<0?-1:1) : v;			
 			this.entity.setPosition(p.x, p.y, -(fixFloat(this.index/1000)*s));
 
 		}
@@ -466,23 +466,23 @@ export default class Blade {
 			// reate the mesh instance
 			this.meshInstance = new MeshInstance(this.mesh, this.material.getMaterial());
 
-			// this.meshInstance.mask = 0;
-
-			// WORKING when useLayers === false BUT doesn't work for tilted meshes
-				this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
-					// console.log(cameraPosition, cameraForward);
-					// this.setCamarePosition(cameraForward);
-					// this.setCameraDirection(cameraPosition.z);
-					return cameraPosition.z>cameraForward.z?this.index:-this.index;
-				}.bind(this);
-		
-			// TBD
+			// TRANSPARENCY DEPTH PATCH
 				
-				// this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
-				// 	//console.log(cameraPosition, cameraForward);
-				// 	this.meshInstance.drawOrder = cameraPosition.z>cameraForward.z?-this.index:this.index;
-				// 	return cameraPosition.z>cameraForward.z?this.index:-this.index;
-				// }.bind(this);
+				//  WORKING when useLayers === false BUT doesn't work for tilted meshes
+					this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
+						// console.log(cameraPosition, cameraForward);
+						// this.setCamarePosition(cameraForward);
+						// this.setCameraDirection(cameraPosition.z);
+						const z = this.entity.getPosition().z < 0 ? 1:-1;
+						return cameraPosition.z>cameraForward.z? z*this.index:z*-this.index;
+					}.bind(this);
+		
+				// TBD				
+					// this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
+					// 	//console.log(cameraPosition, cameraForward);
+					// 	this.meshInstance.drawOrder = cameraPosition.z>cameraForward.z?-this.index:this.index;
+					// 	return cameraPosition.z>cameraForward.z?this.index:-this.index;
+					// }.bind(this);
 				
 
 			// Add morph instance

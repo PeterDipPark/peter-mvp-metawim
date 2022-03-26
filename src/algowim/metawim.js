@@ -98532,7 +98532,7 @@ class Blade {
 		translateBlade(v) {
 
 			const p = this.entity.getPosition();
-			const s = Math.abs(v) < 1 ? Math.ceil(v) : v;			
+			const s = Math.abs(v) < 1 ? (v<0?-1:1) : v;			
 			this.entity.setPosition(p.x, p.y, -(fixFloat(this.index/1000)*s));
 
 		}
@@ -98685,7 +98685,8 @@ class Blade {
 					// console.log(cameraPosition, cameraForward);
 					// this.setCamarePosition(cameraForward);
 					// this.setCameraDirection(cameraPosition.z);
-					return cameraPosition.z>cameraForward.z?this.index:-this.index;
+					const z = this.entity.getPosition().z < 0 ? 1:-1;
+					return cameraPosition.z>cameraForward.z? z*this.index:z*-this.index;
 				}.bind(this);
 		
 			// TBD
