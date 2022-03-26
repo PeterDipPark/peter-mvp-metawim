@@ -15,7 +15,6 @@ pc.GraphNode.prototype.lookAtReverse = function () {
     };
 }();
 ```
-* DO: pc - canvas double click to reset camera orbit
 * DO: pc - global offset slider (see: https://www.dropbox.com/s/12nkuhkpl11jhu3/globe.mp4?dl=0 at 0:22)
 * DO: pc - umbrella effect (Y folding of blades)
 * DO: pc - floating labels (PC, PP), http://phone.playcanvas.com/ 

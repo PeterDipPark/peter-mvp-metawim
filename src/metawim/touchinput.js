@@ -81,6 +81,13 @@ const CreateTouchInput = ({...props}) => {
 	        this.lastPinchDistance = this.getPinchDistance(touches[0], touches[1]);
 	        this.calcMidPoint(touches[0], touches[1], this.lastPinchMidPoint);
 	    }
+
+	    // Double Touch (Do we need this for touch devices? onMouseUp might work as well. Test! )
+	    // if (event.event.type === "touchstart") {
+	    // 	this.orbitCamera.clickPressed = true;
+	    // }
+
+
 	};
 
 

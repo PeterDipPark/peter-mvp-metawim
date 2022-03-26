@@ -98678,24 +98678,23 @@ class Blade {
 			// reate the mesh instance
 			this.meshInstance = new MeshInstance(this.mesh, this.material.getMaterial());
 
-			// this.meshInstance.mask = 0;
-
-			// WORKING when useLayers === false BUT doesn't work for tilted meshes
-				this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
-					// console.log(cameraPosition, cameraForward);
-					// this.setCamarePosition(cameraForward);
-					// this.setCameraDirection(cameraPosition.z);
-					const z = this.entity.getPosition().z < 0 ? 1:-1;
-					return cameraPosition.z>cameraForward.z? z*this.index:z*-this.index;
-				}.bind(this);
-		
-			// TBD
+			// TRANSPARENCY DEPTH PATCH
 				
-				// this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
-				// 	//console.log(cameraPosition, cameraForward);
-				// 	this.meshInstance.drawOrder = cameraPosition.z>cameraForward.z?-this.index:this.index;
-				// 	return cameraPosition.z>cameraForward.z?this.index:-this.index;
-				// }.bind(this);
+				//  WORKING when useLayers === false BUT doesn't work for tilted meshes
+					this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
+						// console.log(cameraPosition, cameraForward);
+						// this.setCamarePosition(cameraForward);
+						// this.setCameraDirection(cameraPosition.z);
+						const z = this.entity.getPosition().z < 0 ? 1:-1;
+						return cameraPosition.z>cameraForward.z? z*this.index:z*-this.index;
+					}.bind(this);
+		
+				// TBD				
+					// this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
+					// 	//console.log(cameraPosition, cameraForward);
+					// 	this.meshInstance.drawOrder = cameraPosition.z>cameraForward.z?-this.index:this.index;
+					// 	return cameraPosition.z>cameraForward.z?this.index:-this.index;
+					// }.bind(this);
 				
 
 			// Add morph instance
@@ -98795,6 +98794,10 @@ const CreateOrbitCamera = ({...props}) => {
 	// This will disable Y 360 rotation
 	// OrbitCamera.attributes.add('pitchAngleMax', {type: 'number', default: 90, title: 'Pitch Angle Max (degrees)'});
 	// OrbitCamera.attributes.add('pitchAngleMin', {type: 'number', default: -90, title: 'Pitch Angle Min (degrees)'});
+	
+	OrbitCamera.attributes.add("doubleClickSpeed", {type: "number", default: 0.2, title: "Double Click Speed", description: "The maximum time (secs) allowed between clicks to register as a double click"});
+	OrbitCamera.attributes.add("clickPressed", {type: "boolean", default: false, title: "Click Pressed", description: "Click or Touch input pressed."});
+	
 
 	OrbitCamera.attributes.add('inertiaFactor', {
 	    type: 'number',
@@ -98949,7 +98952,13 @@ const CreateOrbitCamera = ({...props}) => {
 
 	OrbitCamera.prototype.initialize = function () {
 
-		// CUSTOM - Create Camera
+		// CUSTOM
+
+			// DOUBLE CLICK
+				
+				// Set the timeSinceLastClick to be outside the time window for a double click so the user's first click
+    			// in the app won't be registered as double click
+    			this.timeSinceLastClick = this.doubleClickSpeed;  
 
 			// CAMERA wt/wo layers 
 			
@@ -99174,8 +99183,35 @@ const CreateOrbitCamera = ({...props}) => {
 	    this._distance = math.lerp(this._distance, this._targetDistance, t);
 	    this._yaw = math.lerp(this._yaw, this._targetYaw, t);
 	    this._pitch = math.lerp(this._pitch, this._targetPitch, t);
+	    
 	    // Update Position(s)
 	    this._updatePosition();
+
+	    // Double Click
+	    this.timeSinceLastClick += dt;
+    
+	    if (this.clickPressed === true) {
+	        // Check if user has previously clicked within the time window to be registered as a double click
+	        if (this.timeSinceLastClick < this.doubleClickSpeed) {	        	
+
+	            // User has double clicked so let's perform an action
+	            this._onDoubleClick();
+	            
+	            // We should also set the timeSinceLastClick to be outside the time window so their third click
+	            // won't accidently be registered as a double click
+	            
+	            this.timeSinceLastClick = this.doubleClickSpeed;  
+	        }
+	        else {
+	            // Reset timeSinceLastClick if the click was done after the time allowed for a double
+	            // click to register
+	            this.timeSinceLastClick = 0;
+	        }
+	    }
+
+	    // Reset
+	    this.clickPressed = false;
+
 	};
 
 
@@ -99190,9 +99226,13 @@ const CreateOrbitCamera = ({...props}) => {
 	    this.entity.setPosition(position);
 	    
 	    // Update labels on Camera update (app.on)
-	    this.updateLabels();
+	    this.updateLabels();	    
 
+	};
 
+	OrbitCamera.prototype._onDoubleClick = function () {
+		// console.log("double click");
+		this._resetPosition();		
 	};
 
 	OrbitCamera.prototype._resetPosition = function () {		
@@ -99346,6 +99386,8 @@ const CreateMouseInput = ({...props}) => {
 	        	// this.app.mouse._target.addEventListener('pointerdown', this.onMouseDown.bind(this), false);
 	        	// this.app.mouse._target.addEventListener('pointerup', this.onMouseUp.bind(this), false);
 	        	// console.log(this.app.mouse);
+	        	
+	        	// this.app.mouse.wasPressed(MOUSEBUTTON_LEFT, this.onMousePressed, this);
 
 	        // ORIG
 	        	this.app.mouse.on(EVENT_MOUSEDOWN, this.onMouseDown, this);
@@ -99362,6 +99404,8 @@ const CreateMouseInput = ({...props}) => {
 	            this.app.mouse.off(EVENT_MOUSEUP, this.onMouseUp, this);
 	            this.app.mouse.off(EVENT_MOUSEMOVE, this.onMouseMove, this);
 	            this.app.mouse.off(EVENT_MOUSEWHEEL, this.onMouseWheel, this);
+
+	            // this.app.mouse.wasPressed(MOUSEBUTTON_LEFT, this.onMousePressed, this);
 
 	            window.removeEventListener('mouseout', onMouseOut, false);
 	        });
@@ -99401,6 +99445,12 @@ const CreateMouseInput = ({...props}) => {
 	};
 
 
+	// MouseInput.prototype.onMousePressed = function (event) {
+
+	// 	console.log("mouse pressed", event);
+	// }
+
+
 	MouseInput.prototype.onMouseDown = function (event) {
 		// console.log(event.event.target);
 		
@@ -99420,6 +99470,10 @@ const CreateMouseInput = ({...props}) => {
 	    switch (event.button) {
 	        case MOUSEBUTTON_LEFT: {
 	            this.lookButtonDown = true;
+
+	            // Double Click 
+				this.orbitCamera.clickPressed = true;
+				
 	        } break;
 	        // case pc.MOUSEBUTTON_RIGHT: {
 	        //     this.panButtonDown = true;
@@ -99438,13 +99492,14 @@ const CreateMouseInput = ({...props}) => {
 		// CUSTOM
 		if (event.event.target.tagName!=="CANVAS") return;		
 		if (this.algowimControls !== null) {
-			this.algowimControls.unlockControls();
+			this.algowimControls.unlockControls();			
 		}
 
 		// BAU
 	    switch (event.button) {
 	        case MOUSEBUTTON_LEFT: {
-	            this.lookButtonDown = false;
+	            this.lookButtonDown = false;	            
+
 	        } break;
 	        // case pc.MOUSEBUTTON_RIGHT: {
 	        //     this.panButtonDown = false;            
@@ -99575,6 +99630,13 @@ const CreateTouchInput = ({...props}) => {
 	        this.lastPinchDistance = this.getPinchDistance(touches[0], touches[1]);
 	        this.calcMidPoint(touches[0], touches[1], this.lastPinchMidPoint);
 	    }
+
+	    // Double Touch (Do we need this for touch devices? onMouseUp might work as well. Test! )
+	    // if (event.event.type === "touchstart") {
+	    // 	this.orbitCamera.clickPressed = true;
+	    // }
+
+
 	};
 
 

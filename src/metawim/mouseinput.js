@@ -46,6 +46,8 @@ const CreateMouseInput = ({...props}) => {
 	        	// this.app.mouse._target.addEventListener('pointerdown', this.onMouseDown.bind(this), false);
 	        	// this.app.mouse._target.addEventListener('pointerup', this.onMouseUp.bind(this), false);
 	        	// console.log(this.app.mouse);
+	        	
+	        	// this.app.mouse.wasPressed(MOUSEBUTTON_LEFT, this.onMousePressed, this);
 
 	        // ORIG
 	        	this.app.mouse.on(pc.EVENT_MOUSEDOWN, this.onMouseDown, this);
@@ -62,6 +64,8 @@ const CreateMouseInput = ({...props}) => {
 	            this.app.mouse.off(pc.EVENT_MOUSEUP, this.onMouseUp, this);
 	            this.app.mouse.off(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
 	            this.app.mouse.off(pc.EVENT_MOUSEWHEEL, this.onMouseWheel, this);
+
+	            // this.app.mouse.wasPressed(MOUSEBUTTON_LEFT, this.onMousePressed, this);
 
 	            window.removeEventListener('mouseout', onMouseOut, false);
 	        });
@@ -101,6 +105,12 @@ const CreateMouseInput = ({...props}) => {
 	};
 
 
+	// MouseInput.prototype.onMousePressed = function (event) {
+
+	// 	console.log("mouse pressed", event);
+	// }
+
+
 	MouseInput.prototype.onMouseDown = function (event) {
 		// console.log(event.event.target);
 		
@@ -120,6 +130,10 @@ const CreateMouseInput = ({...props}) => {
 	    switch (event.button) {
 	        case pc.MOUSEBUTTON_LEFT: {
 	            this.lookButtonDown = true;
+
+	            // Double Click 
+				this.orbitCamera.clickPressed = true;
+				
 	        } break;
 	            
 	        case pc.MOUSEBUTTON_MIDDLE: 
@@ -140,13 +154,14 @@ const CreateMouseInput = ({...props}) => {
 		// CUSTOM
 		if (event.event.target.tagName!=="CANVAS") return;		
 		if (this.algowimControls !== null) {
-			this.algowimControls.unlockControls();
+			this.algowimControls.unlockControls();			
 		}
 
 		// BAU
 	    switch (event.button) {
 	        case pc.MOUSEBUTTON_LEFT: {
-	            this.lookButtonDown = false;
+	            this.lookButtonDown = false;	            
+
 	        } break;
 	            
 	        case pc.MOUSEBUTTON_MIDDLE: 

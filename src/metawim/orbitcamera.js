@@ -19,6 +19,10 @@ const CreateOrbitCamera = ({...props}) => {
 	// This will disable Y 360 rotation
 	// OrbitCamera.attributes.add('pitchAngleMax', {type: 'number', default: 90, title: 'Pitch Angle Max (degrees)'});
 	// OrbitCamera.attributes.add('pitchAngleMin', {type: 'number', default: -90, title: 'Pitch Angle Min (degrees)'});
+	
+	OrbitCamera.attributes.add("doubleClickSpeed", {type: "number", default: 0.2, title: "Double Click Speed", description: "The maximum time (secs) allowed between clicks to register as a double click"});
+	OrbitCamera.attributes.add("clickPressed", {type: "boolean", default: false, title: "Click Pressed", description: "Click or Touch input pressed."});
+	
 
 	OrbitCamera.attributes.add('inertiaFactor', {
 	    type: 'number',
@@ -173,7 +177,13 @@ const CreateOrbitCamera = ({...props}) => {
 
 	OrbitCamera.prototype.initialize = function () {
 
-		// CUSTOM - Create Camera
+		// CUSTOM
+
+			// DOUBLE CLICK
+				
+				// Set the timeSinceLastClick to be outside the time window for a double click so the user's first click
+    			// in the app won't be registered as double click
+    			this.timeSinceLastClick = this.doubleClickSpeed;  
 
 			// CAMERA wt/wo layers 
 			
@@ -399,8 +409,35 @@ const CreateOrbitCamera = ({...props}) => {
 	    this._distance = pc.math.lerp(this._distance, this._targetDistance, t);
 	    this._yaw = pc.math.lerp(this._yaw, this._targetYaw, t);
 	    this._pitch = pc.math.lerp(this._pitch, this._targetPitch, t);
+	    
 	    // Update Position(s)
 	    this._updatePosition();
+
+	    // Double Click
+	    this.timeSinceLastClick += dt;
+    
+	    if (this.clickPressed === true) {
+	        // Check if user has previously clicked within the time window to be registered as a double click
+	        if (this.timeSinceLastClick < this.doubleClickSpeed) {	        	
+
+	            // User has double clicked so let's perform an action
+	            this._onDoubleClick();
+	            
+	            // We should also set the timeSinceLastClick to be outside the time window so their third click
+	            // won't accidently be registered as a double click
+	            
+	            this.timeSinceLastClick = this.doubleClickSpeed;  
+	        }
+	        else {
+	            // Reset timeSinceLastClick if the click was done after the time allowed for a double
+	            // click to register
+	            this.timeSinceLastClick = 0;
+	        }
+	    }
+
+	    // Reset
+	    this.clickPressed = false;
+
 	};
 
 
@@ -415,9 +452,13 @@ const CreateOrbitCamera = ({...props}) => {
 	    this.entity.setPosition(position);
 	    
 	    // Update labels on Camera update (app.on)
-	    this.updateLabels();
+	    this.updateLabels();	    
 
+	};
 
+	OrbitCamera.prototype._onDoubleClick = function () {
+		// console.log("double click");
+		this._resetPosition();		
 	};
 
 	OrbitCamera.prototype._resetPosition = function () {		
