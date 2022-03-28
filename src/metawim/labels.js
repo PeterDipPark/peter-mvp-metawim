@@ -300,6 +300,9 @@ export default class CanvasLabels {
 			// Text
 				const string = object.getLabelText();
 
+			// Group - TBD
+				// See: https://playcanvas.github.io/#/user-interface/layout-group
+			
 			// Background
 				const frame = new Entity();
 		        frame.addComponent("element", {

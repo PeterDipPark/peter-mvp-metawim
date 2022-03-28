@@ -457,11 +457,11 @@ const CreateOrbitCamera = ({...props}) => {
 	};
 
 	OrbitCamera.prototype._onDoubleClick = function () {
-		// console.log("double click");
 		this._resetPosition();		
 	};
 
-	OrbitCamera.prototype._resetPosition = function () {		
+	OrbitCamera.prototype._resetPosition = function () {
+
 		this._targetPitch = 0;
 		this._targetYaw = -0;
 		this._targetDistance = this.distanceDefault;		

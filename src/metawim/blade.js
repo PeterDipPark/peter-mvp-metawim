@@ -29,7 +29,7 @@ import {
 		} from 'playcanvas';
 
 
-import {meshPositions, meshIndices, meshUvs, meshMorphPositions } from './model';
+import {meshPositions, meshIndices, meshUvs, meshMorphPositions } from './modelblade';
 import Material from './material';
 import { defaultColors } from './colors';
 import BladeControls from './bladecontrols';

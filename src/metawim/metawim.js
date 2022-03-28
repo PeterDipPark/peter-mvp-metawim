@@ -1,12 +1,13 @@
 // PC
-import {
+import {	
 	Application,
+	Asset,
 	FILLMODE_NONE,
 	FILLMODE_FILL_WINDOW,
 	RESOLUTION_AUTO,
 	Mouse,
 	TouchDevice,
-	Color,
+	Color,	
 	// TEXT test
 			Entity,
 			ELEMENTTYPE_TEXT,
@@ -20,15 +21,16 @@ import {
 } from 'playcanvas';
 
 // TEMP
-import * as pc from 'playcanvas';
+// import * as pc from 'playcanvas';
 
 // METAWIM
 // import Router from './router';
+import Globe from './globe';
 import Blade from './blade';
 import Scene from './scene';
 import BladeControls from './bladecontrols';
 import States from './states';
-import { meshMorphs } from './model';
+import { meshMorphs } from './modelblade';
 import { fixFloat, sortArrayByNumericValue, exportJson, importJson } from './utils';
 
 
@@ -77,7 +79,7 @@ export default class MetaWim {
 					mouse: new Mouse(canvas.parentElement || canvas)
 					,touch: new TouchDevice(canvas.parentElement || canvas)
 					,graphicsDeviceOptions: gl
-					,elementInput: new ElementInput(canvas)
+					// ,elementInput: new ElementInput(canvas)
 				});
 				this.app.root.name = "MetaWim";				
 
@@ -97,6 +99,9 @@ export default class MetaWim {
 					,algowimControls: algowimControls || null
 				});
 				this.app.scene.ambientLight = new Color(1, 1, 1);
+
+				// Globe
+				this.globe = null;
 
 				// Blades			
 				this.blades = {};
@@ -126,7 +131,7 @@ export default class MetaWim {
 			// Load Assets AND init app
 			
 				// Add to registry
-					const assets_font = new pc.Asset("customfont", "font", {
+					const assets_font = new Asset("customfont", "font", {
 					    url: "./assets/Roboto-Condensed-webfont.json"
 					});
 					this.app.assets.add(assets_font);
@@ -164,13 +169,13 @@ export default class MetaWim {
 		init() {			
 			
 			// Setup Canvas
-			this.setupCanvas();
+			this.setupCanvas();			
 
 	    	// Create Blades
 			this.createBlades();
 
-			// Create Labels
-			this.createLabels();
+			// Create Globe
+			this.createGlobe();
 
 			// Create All Controls
 			this.createAllControls();
@@ -211,6 +216,9 @@ export default class MetaWim {
 
 	    	// Add Controls
 	    		this.addControls();
+
+	    	// Add Globe
+	    		this.addGlobe();
 	    
 	    	// Start App
 	    		this.app.start();
@@ -224,6 +232,11 @@ export default class MetaWim {
 	    			this.onload("pc");	    			
 	    		}
 
+
+	    	// DEV Test
+	    		
+	    		//this.devTest();
+
 	    }
 
 	////////////////////////
@@ -231,6 +244,55 @@ export default class MetaWim {
 	////////////////////////
 
 		devTest() {
+
+			// Add blade inside spehre
+			
+				// red material is semi-transparent
+			 //    const red = new pc.StandardMaterial();
+			 //    red.diffuse.set(1, 0, 0);
+			 //    red.blendType = pc.BLEND_PREMULTIPLIED;
+			 //    red.opacity = 0.5;
+			 //    red.depthTest = true; //true;
+				// red.depthWrite = true; //true;	
+			 //    red.update();
+
+			 //    // red box is rendered first in World layer
+			 //    const redBox = new pc.Entity();
+			 //    redBox.addComponent("model", {
+			 //        type: "box",
+			 //    });
+
+			 //    redBox.model.material = red;
+			 //    redBox.setLocalScale(5, 5, 5);
+			 //    this.app.root.addChild(redBox);
+
+
+			 //    return;
+
+			// Scale Blades
+			
+
+				// for (let b in this.blades) {
+
+				// 	// Get Entity
+				// 	const entity = this.blades[b].getEntity();
+				// 	console.warn(b, entity);
+
+				// 	// Get Entity scale
+				// 	const scale = entity.getLocalScale();
+				// 	console.info("\t", scale);
+
+
+				// 	// Change scale
+				// 	if (b==="blade1") {
+				// 		entity.setLocalScale(new Vec3(2,2,scale.z));
+				// 	}
+
+				// }
+
+
+				// return;
+
 
 	    	// Listeners
     			// this.app.on("update", this.update, th
@@ -372,19 +434,34 @@ export default class MetaWim {
 				    	// this.app.root.addChild(box);
 				    	
 
-				    	
+				    	   const red = new pc.StandardMaterial();
+						    red.diffuse.set(1, 0, 0);
+						    red.blendType = pc.BLEND_PREMULTIPLIED;
+						    red.opacity = 0.5;
+						    red.depthTest = true; //true;
+							red.depthWrite = true; //true;	
+						    red.update();
 
 
 
-				    	// const sphere = new Entity("sphere");
-					    // sphere.id = sphere.name = "sphere";
-					    // sphere.addComponent("render", {
-					    //     type: "sphere",
-					    // });
+				    	const sphere = new Entity("sphere");
+					    sphere.id = sphere.name = "sphere";
+					    sphere.addComponent("model", {
+					        type: "sphere",
+					        // layers: [textlayer.id]
+					    });
 					    // sphere.render.layers = [textlayer.id];
-				    	// this.app.root.addChild(sphere);
-				    	// console.log("sphere", sphere);
+					    sphere.model.material = red;
+			    		sphere.setLocalScale(10, 10, 10);	
+				    	//this.app.root.addChild(sphere);
+				    	console.log("sphere", sphere.model.meshInstances);
 				    	// sphere.render.material.opacity = 0.4;
+				    	// 
+				    	const smi = sphere.model.meshInstances[0];
+				    	smi.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
+							return -100;
+							// return cameraPosition.z>cameraForward.z? -100:100;
+						}.bind(this);
 
 					const camera = new Entity();
 				    camera.addComponent("camera", {
@@ -731,7 +808,14 @@ export default class MetaWim {
 	////////////////////////
 	// GETTERS / SETTERS
 	////////////////////////
-	
+		
+		/**
+		 * [callAction description]
+		 * @param  {[type]} action   [description]
+		 * @param  {[type]} newValue [description]
+		 * @param  {[type]} oldValue [description]
+		 * @return {[type]}          [description]
+		 */
 		callAction(action,newValue,oldValue) {
 
 			switch(action) {
@@ -796,14 +880,24 @@ export default class MetaWim {
 
 		}
 
-
 		/**
-		 * [createLabels description]
+		 * [createGlobe description]
 		 * @return {[type]} [description]
 		 */
-		createLabels() {
-			
+		createGlobe() {
+
+			this.globe = new Globe({
+				name: "globe"
+				,index: -100
+				,layers: this.app.scene.layers
+				,graphicsDevice: this.app.graphicsDevice
+				,controls: this.ui !== null
+				,useLayers: this.useLayers
+				,blades: this.blades
+			})
+
 		}
+
 
 
 		/**
@@ -835,6 +929,15 @@ export default class MetaWim {
     			// Blade Entity
     			this.app.root.addChild(this.blades[b].getEntity());
     		}
+
+		}
+
+		/**
+		 * [addGlobe description]
+		 */
+		addGlobe() {
+
+			this.app.root.addChild(this.globe.getEntity());
 
 		}
 
