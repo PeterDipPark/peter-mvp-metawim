@@ -13,7 +13,7 @@
 	        body {
 	            margin: 0;
 	            overflow: hidden;
-	            background-color: black;
+	            background-color: white;
 				/*display: flex;
 				flex-direction: row;
 				justify-content: flex-start;
@@ -37,9 +37,13 @@
 	        canvas {
 	        	height: 100%;
 	        	width: 100vw;
+	        	-moz-user-select: none;
+				  -webkit-user-select: none;
+				  -ms-user-select: none;
+				  user-select: none;
 	        }
 	    </style>	    
-		<script src="metawim.js?v=26" ></script>
+		<script src="metawim.js?v=27" ></script>
 	</head>
 	<body>
 		<div id="ui"></div>

@@ -13,6 +13,7 @@ import {
 			Vec3,
 			BoundingSphere,
 			Ray,
+			Color,
 			// TEST
 				// BLEND_NONE,
 				// BLEND_NORMAL,
@@ -81,13 +82,12 @@ export default class Blade {
 				,graphicsDevice: this.graphicsDevice
 			});
 
-
-			// Camera Postion for this blade
-				// this.cameraPosition = Vec3.ZERO;
+			// Z transalation
+				this.tz = -fixFloat(this.index/1000);
 
 			// Label Postion - Ray intersection Spehere
-				this.intersectSphere = new BoundingSphere(new Vec3(0,0,0), 3);
-				// this.intersectOpacitySphere = new BoundingSphere(new Vec3(0,0,0), 3.5);
+				this.intersectSphere = new BoundingSphere(new Vec3(0,0,this.tz), 3);
+				this.intersectEdgeSphere = new BoundingSphere(new Vec3(0,0,this.tz), 2.15);
 
 
 			// Morphing
@@ -319,20 +319,28 @@ export default class Blade {
 		 */
 		translateBlade(v) {
 
+			// Translate Entity
 			const p = this.entity.getPosition();
 			const s = Math.abs(v) < 1 ? (v<0?-1:1) : v;			
 			this.entity.setPosition(p.x, p.y, -(fixFloat(this.index/1000)*s));
 
+			// Translate Bounding Spheres
+			this.intersectSphere.center.copy(this.entity.getPosition());
+			this.intersectEdgeSphere.center.copy(this.entity.getPosition());
 		}
 
 		/**
-		 * [getLabelPostion description]
+		 * [getLabelPosition description]
 		 * @return {[type]} [description]
 		 */
-		getLabelPostion() {		
+		getLabelPosition() {		
 			
-			// Ray from ZERO through meshInstance Center
-			const ray = new Ray(new Vec3(0,0,0), this.meshInstance.aabb.center);
+			// Ray from entity center through meshInstance 
+			const p = this.entity.getPosition();
+			const c = this.meshInstance.aabb.center
+			const r = new Vec3();
+			r.sub2(c, p);
+			const ray = new Ray(p, r);
 			// Point to receive intersection
 			let point = new Vec3(0,0,0);
 			// Sphere to intersect
@@ -342,6 +350,26 @@ export default class Blade {
 
 		}
 
+		/**
+		 * [getLabelEdgePosition description]
+		 * @return {[type]} [description]
+		 */
+		getLabelEdgePosition() {		
+			
+			// Ray from entity center through meshInstance 
+			const p = this.entity.getPosition();
+			const c = this.meshInstance.aabb.center
+			const r = new Vec3();
+			r.sub2(c, p);
+			const ray = new Ray(p, r);
+			// Point to receive intersection
+			let point = new Vec3(0,0,0);
+			// Sphere to intersect
+			const interects = this.intersectEdgeSphere.intersectsRay(ray, point);
+			// Return
+			return (interects===true)?point:null;
+
+		}
 
 		/**
 		 * [setLabelText description]
@@ -534,11 +562,8 @@ export default class Blade {
 			}
 
 			// PUSH in Z-dir so we stack blades
-				// this.entity.translate(0, 0, (this.index/1000));
-				// this.entity.translate(0, 0, -fixFloat(this.index/1000));
 
-				this.entity.translate(0, 0, -fixFloat(this.index/1000));			
-		
+				this.entity.translate(0, 0, this.tz);
 		}
 
 		/**

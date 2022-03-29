@@ -11,6 +11,7 @@
 	"scripts": {
 		"test": "tbd",
 		"build-metawim": "rollup -c rollup.metawim-config.js",
+		"build-metawim-dev": "rollup -c rollup.metawim-dev-config.js -w",
 		"build-algowim": "rollup -c rollup.algowim-config.js"
 	},
 	"dependencies": {

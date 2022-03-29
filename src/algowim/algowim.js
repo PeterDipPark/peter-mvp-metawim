@@ -217,6 +217,16 @@ export default class AlgoWim {
 				// Make Sure Container is relative
 				this.container.style.position = "relative";
 
+				// Common Styles 
+				const PpPcStyle = installStyles(`	
+					#pp, #pc {
+						-moz-user-select: none;
+						-webkit-user-select: none;
+						-ms-user-select: none;
+						user-select: none;
+					}
+				`);
+				
 				// ProtoPie
 				this.ppIframe = document.createElement('iframe');
 				this.ppIframe.scrolling = "no"

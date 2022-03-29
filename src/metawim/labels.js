@@ -34,11 +34,25 @@ export default class CanvasLabels {
 				assets 
 				,pixelRatio
 				,camera
+				,layers
+				,app
 			} = props;
 			this.assets = assets;
 			this.pixelRatio = pixelRatio;
 			this.cameraInstance = camera;
 			this.camera = null;
+			this.layers = layers;
+			this.app = app;
+
+			// Name
+			this.name = "bladelables";
+
+			// Layer for lables
+			this.layer = null;
+
+			// Labels Line layer
+			this.labelsLineLayer = this.layers.getLayerByName("World");
+			this.labelsLineColor = new Color(0.113725490196078, 0.56078431372549, 0.8, 0.8);
 
 			// Screen
 			this.screen = null;
@@ -61,6 +75,9 @@ export default class CanvasLabels {
 		 * @return {[type]} [description]
 		 */
 		init() {
+
+			// Create Top most layer
+			this.createLayer();
 
 			// Create Reference Camera so we can worldToSpace coords - DO WE NEED THIS
 			this.createReferenceCamera();
@@ -93,7 +110,11 @@ export default class CanvasLabels {
 	////////////////////////
 	// GETTERS / SETTERS
 	////////////////////////
-	
+		
+		/**
+		 * [getReferenceCamera description]
+		 * @return {[type]} [description]
+		 */
 		getReferenceCamera() {
 			return this.referenceCamera;
 		}
@@ -150,13 +171,13 @@ export default class CanvasLabels {
 				for (let id in this.labels)	{
 
 					// Get Label Postions
-					const labelPos = this.labels[id].object.getLabelPostion();
+					const labelPos = this.labels[id].object.getLabelPosition();
 
 					// No intersection
 					if (labelPos === null) return;
 
 					// Get Vec3 screen position
-					const screenPos = this.camera.worldToScreen(this.labels[id].object.getLabelPostion(), this.screen.screen);
+					const screenPos = this.camera.worldToScreen(labelPos, this.screen.screen);
 
 					// Take pixel ration into account
 					screenPos.x *= this.pixelRatio;
@@ -181,7 +202,12 @@ export default class CanvasLabels {
 			        // Update Text
 			        this.updateLabelText(id);
 
+			        // Update Line
+			        const start = this.labels[id].object.getLabelEdgePosition();					
+					this.app.drawLine(start,labelPos, this.labelsLineColor, false, this.labelsLineLayer);
+
 				}
+
 			} catch(error) {
 				console.error("updateLabels failed", error);
 			}
@@ -213,24 +239,46 @@ export default class CanvasLabels {
 		        label.text.element.text = labelText;
 		        // Resize frame to match text width
 		    	label.frame.element.width = label.text.element.textWidth + 10;
-		    }	    	
+		    	label.frame.element.height = label.text.element.textHeight + 5;
+		    }	
 	    }
 
 	    
 	////////////////////////
 	// METHODS
 	////////////////////////
-	
-		// ??? - do we need front facing reference camera
+
+		/**
+		 * [createLayer description]
+		 * @return {[type]} [description]
+		 */
+		createLayer() {
+
+    		const uiLayer = this.layers.getLayerByName("UI");
+    		const idx = this.layers.getTransparentIndex(uiLayer);
+			this.layer = new Layer();
+			this.layer.id = this.layer.name = this.name;
+			this.layer.opaqueSortMode = SORTMODE_MANUAL;
+			this.layer.transparentSortMode = SORTMODE_MANUAL;
+			this.layer.passThrough = true;
+			this.layer.clearDepthBuffer = true;
+			this.layers.insert(this.layer, idx+1);
+
+		}
+
+		/**
+		 * [createReferenceCamera description]
+		 * @return {[type]} [description]
+		 */
 		createReferenceCamera() {
 
 			this.referenceCamera = new Entity();
 			this.referenceCamera.addComponent("camera", {
 		        clearColorBuffer: false
 				,clearDepthBuffer: true
-				,priority:2
+				,priority:10
 		    });
-		    this.referenceCamera.camera.layers = [];
+		    this.referenceCamera.camera.layers = [this.layer.id];
 		    this.referenceCamera.translate(0, 0, 20.2);
 			// this.referenceCamera.lookAt(Vec3.ZERO);
 			
@@ -260,7 +308,6 @@ export default class CanvasLabels {
 				referenceResolution: new Vec2(2000, 2500),
 				screenSpace: true,
 			});
-
 		}
 
 		/**
@@ -311,9 +358,10 @@ export default class CanvasLabels {
 		            anchor:  new Vec4(0, 0, 0, 0), // CENTER: new Vec4(0.5, 0.5, 0.5, 0.5), // ORIG: new Vec4(0, 0, 0, 0),
 		            width: 70,
 		            height: 20,
-		            opacity: 0.8,
+		            opacity: 1,
 		            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
 		            type: ELEMENTTYPE_IMAGE,
+		            layers: [this.layer.id]
 		        });
 	        	this.screen.addChild(frame);
 
@@ -330,11 +378,13 @@ export default class CanvasLabels {
         			autoHeight: false,
         			enableMarkup: true,
 		            type: ELEMENTTYPE_TEXT,
+		            layers: [this.layer.id]
 		        });
 		        frame.addChild(text);
-		    
+
 		    // Resize frame to match text width
 		        frame.element.width = text.element.textWidth + 10;
+		        frame.element.height = text.element.textHeight + 5;
 
         	// Add to object
 		        this.labels[id] = {

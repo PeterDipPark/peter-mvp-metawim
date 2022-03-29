@@ -111,6 +111,8 @@ export default class MetaWim {
 					assets: this.app.assets
 					,pixelRatio: this.app.graphicsDevice.maxPixelRatio
 					,camera: this.scene.getCameraInstance()
+					,layers: this.app.scene.layers
+					,app: this.app
 				});
 
 				// All (Blades) Controls
@@ -868,6 +870,7 @@ export default class MetaWim {
 					,bladeRotationOffset: this.rotationOffset
 					,bladeRotation: {x:0,y:0,z:rot}
 					,useLayers: this.useLayers
+					,app: this.app
 				});
 				// Rotate
 				// rot-=this.rotationStep;
@@ -936,8 +939,8 @@ export default class MetaWim {
 		 */
 		addGlobe() {
 
-			// Spehere
-				// this.app.root.addChild(this.globe.getEntity());
+			// Sphere
+				this.app.root.addChild(this.globe.getEntity());
 			// Image
 				this.app.root.addChild(this.globe.getImage());
 				this.app.root.addChild(this.globe.getImageCamera());
@@ -951,11 +954,13 @@ export default class MetaWim {
 
 			// Add Labels Screen
 			this.app.root.addChild(this.labels.getScreen());
-
+			// Create Lables
 			this.labels.createLabels(this.blades);
+			// Add Lables Camera 
+			this.app.root.addChild(this.labels.getReferenceCamera());
 			
 			// Start updates
-			this.labels.start();
+			this.labels.start();			
 
 		}
 
