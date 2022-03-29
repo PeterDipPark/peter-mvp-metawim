@@ -9,16 +9,15 @@ import {
 			StandardMaterial,
 			Material,
 			BLEND_PREMULTIPLIED,
-			gfx,
-			//
 			Texture,
 			PIXELFORMAT_R8_G8_B8_A8,
 			FILTER_LINEAR_MIPMAP_LINEAR,
 			FILTER_LINEAR,
-			ADDRESS_CLAMP_TO_EDGE
-				// 
-				,Vec2, Vec3, Vec4, ELEMENTTYPE_IMAGE
-
+			ADDRESS_CLAMP_TO_EDGE,
+			Vec2,
+			Vec3,
+			Vec4,
+			ELEMENTTYPE_IMAGE
 		} from 'playcanvas';
 
 
@@ -93,6 +92,9 @@ export default class Globe {
 			// Create Entity
 			this.createEntity();
 
+			// Create Image
+			this.createImage();
+
 		}
 
 	////////////////////////
@@ -107,12 +109,21 @@ export default class Globe {
 			return this.entity;
 		}
 
-		getReferenceCamera() {
-			return this.referenceCamera;
+		/**
+		 * [getImageCamera description]
+		 * @return {[type]} [description]
+		 */
+		getImageCamera() {
+			return this.imageCamera;
 		}
 
-
-		
+		/**
+		 * [getImage description]
+		 * @return {[type]} [description]
+		 */
+		getImage() {
+			return this.image;
+		}		
 
 	////////////////////////
 	// METHODS
@@ -128,13 +139,11 @@ export default class Globe {
 			this.material = new StandardMaterial();
 
 			// Props
-				// this.material.diffuse.set(1, 1, 1);
-				// this.material.diffuseMap = this.getTexture();
-				this.material.opacityMap = this.getTexture();
-
-
+			this.material.diffuse.set(1, 1, 1);
+				// this.material.diffuseMap = this.getTexture(); // opaque
+				// this.material.opacityMap = this.getTexture(); // transparent
 			this.material.blendType = BLEND_PREMULTIPLIED;
-			this.material.opacity = 0.8;
+			this.material.opacity = 0.1;
 			this.material.depthTest = true;
 			this.material.depthWrite = true;
 
@@ -150,26 +159,31 @@ export default class Globe {
 
 		}
 
+		/**
+		 * [getTexture description]
+		 * @return {[type]} [description]
+		 */
 		getTexture () {
-		  // var texture = new gfx.Texture(this.graphicsDevice);
-
+		  	
+			// const texture = new gfx.Texture(this.graphicsDevice);
 			const texture = new Texture(this.graphicsDevice, {
-	        	format: PIXELFORMAT_R8_G8_B8_A8,
-	        	autoMipmap: true
+	        	format: PIXELFORMAT_R8_G8_B8_A8
+	        	// ,autoMipmap: true
+	        	,anisotropy: this.graphicsDevice.maxAnisotropy
 	        	// ,mipmaps: true
 	        	// ,premultiplyAlpha: true
 	        
 	    	});
-		  var img = new Image();
-		  img.onload = function () {
-		    texture.minFilter = gfx.FILTER_LINEAR; //FILTER_LINEAR;
-		    texture.magFilter = gfx.FILTER_LINEAR; //FILTER_LINEAR;
-		    texture.addressU = gfx.ADDRESS_CLAMP_TO_EDGE;
-		    texture.addressV = gfx.ADDRESS_CLAMP_TO_EDGE;
-		    texture.setSource(img);
-		  };
-		  img.src = this.getImgData();
-		  return texture;
+			const img = new Image();
+			img.onload = function () {
+				texture.minFilter = FILTER_LINEAR;
+				texture.magFilter = FILTER_LINEAR;
+				texture.addressU = ADDRESS_CLAMP_TO_EDGE;
+				texture.addressV = ADDRESS_CLAMP_TO_EDGE;
+				texture.setSource(img);
+			};
+			img.src = this.getImgData();
+			return texture;
 		}
 
 		getImgData () { 
@@ -232,55 +246,6 @@ export default class Globe {
 		createEntity() {
 
 
-			// get the world layer index
-	    		const worldLayer = this.layers.getLayerByName("World");
-	    		const idx = this.layers.getTransparentIndex(worldLayer);
-
-				// Create Custom Layer that will holde the entity
-					this.layer = new Layer();
-					this.layer.id = this.layer.name = "globeimage";
-					this.layer.opaqueSortMode = SORTMODE_MANUAL;
-					this.layer.transparentSortMode = SORTMODE_MANUAL;
-					this.layer.passThrough = true;
-					this.layer.clearDepthBuffer = true;
-					// this.layer.shaderPass = SHADER_DEPTH;
-					this.layers.insert(this.layer, idx+1);
-
-				// Create Entity
-				// 	this.entity = new Entity();
-				// 	this.entity.name = this.name;
-				// 	this.entity.addComponent("render", {
-				// 	    meshInstances: [this.meshInstance],
-				// 	});
-
-				// // Add Cutom layer to Entity
-				// 	this.entity.render.layers = [this.layer.id];
-
-				this.createReferenceCamera();
-
-			this.entity= new Entity();
-			        this.entity.addComponent("element", {
-			            pivot: new Vec2(0.5, 0.5), // CENTER: new Vec2(0.5, 0.5), // ORIG: new Vec2(0.5, 0),
-			            anchor:  new Vec4(0.5, 0.5, 0.5, 0.5), // CENTER: new Vec4(0.5, 0.5, 0.5, 0.5), // ORIG: new Vec4(0, 0, 0, 0),
-						// width: 733,
-						// height: 733,
-						autoWidth: false,
-						autoHeight: false,
-				        autoFitWidth: true,
-				        autoFitHeight: true,
-			            // opacity: 0.8,
-			            // color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
-			            texture: this.getTexture(),
-			            type: ELEMENTTYPE_IMAGE,
-			            layers: [this.layer.id]
-			        });
-			        this.entity.setLocalPosition(new Vec3(0,0,0));
-			        this.entity.setLocalScale(0.313, 0.313, 0.313);
-
-			        // console.log("this.entity",this.entity);
-
-			/*
-
 			if (this.useLayers === true) {
 
 				// get the world layer index
@@ -324,22 +289,58 @@ export default class Globe {
 				this.entity.translate(0, 0, -fixFloat(((bladesCount/2))/1000));		
 				// this.entity.setLocalScale(1, 1, 0);
 			
-			*/
+		
+		}
+
+		/**
+		 * [createImage description]
+		 * @return {[type]} [description]
+		 */
+		createImage() {
+
+			// Create Layer for Image
+	    		const worldLayer = this.layers.getLayerByName("World");
+	    		const idx = this.layers.getTransparentIndex(worldLayer);
+				this.imageLayer = new Layer();
+				this.imageLayer.id = this.imageLayer.name = "globeimage";
+				this.imageLayer.opaqueSortMode = SORTMODE_MANUAL;
+				this.imageLayer.transparentSortMode = SORTMODE_MANUAL;
+				this.imageLayer.passThrough = true;
+				this.imageLayer.clearDepthBuffer = true;
+				this.layers.insert(this.imageLayer, idx+1);
+
+			// Create Camera for Layer
+				this.imageCamera = new Entity();
+				this.imageCamera.addComponent("camera", {
+			        clearColorBuffer: false
+					,clearDepthBuffer: true
+					,priority:2
+			    });
+			    this.imageCamera.camera.layers = [this.imageLayer.id];
+			    this.imageCamera.translate(0, 0, 20.2);
+				// this.imageCamera.lookAt(Vec3.ZERO);
+
+			// Create Image for Layer
+				this.image = new Entity();
+					this.image.addComponent("element", {
+					pivot: new Vec2(0.5, 0.5), // CENTER: new Vec2(0.5, 0.5), // ORIG: new Vec2(0.5, 0),
+					anchor:  new Vec4(0.5, 0.5, 0.5, 0.5), // CENTER: new Vec4(0.5, 0.5, 0.5, 0.5), // ORIG: new Vec4(0, 0, 0, 0),
+					// width: 733,
+					// height: 733,
+					autoWidth: false,
+					autoHeight: false,
+					autoFitWidth: true,
+					autoFitHeight: true,
+					// opacity: 0.8,
+					// color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
+					texture: this.getTexture(),
+					type: ELEMENTTYPE_IMAGE,
+					layers: [this.imageLayer.id]
+				});
+				this.image.setLocalPosition(new Vec3(0,0,0));
+				this.image.setLocalScale(0.313, 0.313, 0.313);
+
 		}
 
 
-		createReferenceCamera() {
-
-			this.referenceCamera = new Entity();
-			this.referenceCamera.addComponent("camera", {
-		        clearColorBuffer: false
-				,clearDepthBuffer: true
-				,priority:2
-		    });
-		    this.referenceCamera.camera.layers = [this.layer.id];
-		    this.referenceCamera.translate(0, 0, 20.2);
-			// this.referenceCamera.lookAt(Vec3.ZERO);
-			
-
-		}
 }

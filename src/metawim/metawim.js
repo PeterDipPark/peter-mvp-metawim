@@ -936,8 +936,11 @@ export default class MetaWim {
 		 */
 		addGlobe() {
 
-			this.app.root.addChild(this.globe.getEntity());
-			this.app.root.addChild(this.globe.getReferenceCamera());
+			// Spehere
+				// this.app.root.addChild(this.globe.getEntity());
+			// Image
+				this.app.root.addChild(this.globe.getImage());
+				this.app.root.addChild(this.globe.getImageCamera());
 
 		}
 
