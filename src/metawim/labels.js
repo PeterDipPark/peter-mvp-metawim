@@ -10,7 +10,9 @@ import {
 	Layer,
 	SORTMODE_MANUAL,
 	ElementInput,
-	Color
+	Color,
+		// TEST
+		gfx
 } from 'playcanvas';
 
 
@@ -257,8 +259,7 @@ export default class CanvasLabels {
 			this.screen.addComponent("screen", {
 				referenceResolution: new Vec2(2000, 2500),
 				screenSpace: true,
-			});			
-
+			});
 
 		}
 

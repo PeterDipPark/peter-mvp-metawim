@@ -236,7 +236,6 @@ export default class MetaWim {
 	    	// DEV Test
 	    		
 	    		//this.devTest();
-
 	    }
 
 	////////////////////////
@@ -938,6 +937,7 @@ export default class MetaWim {
 		addGlobe() {
 
 			this.app.root.addChild(this.globe.getEntity());
+			this.app.root.addChild(this.globe.getReferenceCamera());
 
 		}
 
