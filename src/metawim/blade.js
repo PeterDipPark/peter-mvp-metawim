@@ -221,6 +221,8 @@ export default class Blade {
 		        // Set Rotation
 		        this.entity.setLocalRotation(this.quads.f);
 		        
+		        // Test set Verticals
+		        this.setVerticals();
 		    }
 		}
 
@@ -361,7 +363,7 @@ export default class Blade {
 			
 			// Ray from entity center through meshInstance 
 			const p = this.entity.getPosition();
-			const c = this.meshInstance.aabb.center
+			const c = this.meshInstance.aabb.center;
 			const r = new Vec3();
 			r.sub2(c, p);
 			const ray = new Ray(p, r);
@@ -371,6 +373,37 @@ export default class Blade {
 			const interects = this.intersectEdgeSphere.intersectsRay(ray, point);
 			// Return
 			return (interects===true)?point:null;
+
+		}
+
+		setVerticals() {
+
+			
+			const p = this.getLabelPosition();
+
+			const quads_y = {	
+				x: new Quat()
+				,y: new Quat()
+				,z: new Quat()
+				,f: new Quat()
+			};
+			const rotation_y = {
+				x: this.rotation.x,
+				y: this.rotation.y,
+				z: this.rotation.z
+			}
+			// quads_y.x.setFromEulerAngles(360%(360+rotation_y.x+90), 0, 0);
+			// quads_y.y.setFromEulerAngles(0, 360%(360+rotation_y.y+90), 0);			
+			// quads_y.z.setFromEulerAngles(0, 0, 360%(360+rotation_y.z+90));
+			// quads_y.f.setFromEulerAngles(0, 0, 0);			
+			quads_y.x.setFromEulerAngles(rotation_y.x, 0, 0,);
+			quads_y.y.setFromEulerAngles(0, rotation_y.y, 0);			
+			quads_y.z.setFromEulerAngles(0, 0, rotation_y.z);
+			quads_y.f.setFromEulerAngles(0, 90, 0);	
+
+			quads_y.f.mul(quads_y.y).mul(quads_y.x).mul(quads_y.z);	  	
+		
+			this.verticalY = quads_y.f.transformVector(p);
 
 		}
 

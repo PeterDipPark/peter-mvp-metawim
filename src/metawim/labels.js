@@ -7,6 +7,7 @@ import {
 	Vec3,
 	Vec4,
 	Quat,
+	Mat4,
 	Layer,
 	SORTMODE_MANUAL,
 	Color,
@@ -107,8 +108,10 @@ export default class CanvasLabels {
 			// Test 
 			setTimeout(function() {
 				 this.labels['blade1'].object.setLabelEnabled("axis", true);
+				 // this.labels['blade2'].object.setLabelEnabled("axis", true);
 				 console.log(this.labels['blade1'].object.getLabelEnabled("axis"))
-			}.bind(this), 5000);
+				 console.log(this.labels['blade1'].object.entity);
+			}.bind(this), 2000);
 
 		}
 	////////////////////////
@@ -317,30 +320,86 @@ export default class CanvasLabels {
 	    				this.app.drawLine(start,end, this.labelsLineAxisColor, false, this.labelsLineLayer);
 
 	    			// Draw Y
-		    // 			const quads_y = {	
-						// 	x: new Quat()
-						// 	,y: new Quat()
-						// 	,z: new Quat()
-						// 	,f: new Quat()
-						// };
-						// const rotation_y = {
-						// 	x: 0,
-						// 	y: 90,
-						// 	z: 0
-						// }
-						// quads_y.y.setFromEulerAngles(0, rotation_y.y, 0);
-				  //       quads_y.x.setFromEulerAngles(rotation_y.x, 0, 0);
-				  //       quads_y.z.setFromEulerAngles(0, 0, rotation_y.z);
-				  //       quads_y.f.setFromEulerAngles(0, 0, 0);
-				  //       quads_y.f.mul(quads_y.y).mul(quads_y.x).mul(quads_y.z);	    			
-						const qy = new Quat().setFromEulerAngles(0, 90, 0);
-						// const start_y = quads_y.f.transformVector(start);
-						// const end_y = quads_y.f.transformVector(end);
-						const start_y = qy.transformVector(start);
-						const end_y = qy.transformVector(end);
-		    			this.app.drawLine(start_y,end_y, this.labelsLineAxisColor, false, this.labelsLineLayer);
+
+	    					// Get Start
+							start = new Vec3();
+							start.copy(label.object.verticalY);
+							start.mulScalar(-0.75);
+			    		// Get End
+							end = new Vec3();
+							end.copy(label.object.verticalY);
+							end.mulScalar(0.75);
+
+
+							// const quads_y = {	
+							// 	x: new Quat()
+							// 	,y: new Quat()
+							// 	,z: new Quat()
+							// 	,f: new Quat()
+							// };
+							// const rotation_y = {
+							// 	x: label.object.rotation.x,
+							// 	y: label.object.rotation.y,
+							// 	z: label.object.rotation.z
+							// }
+							// quads_y.y.setFromEulerAngles(0, rotation_y.y, 0);
+							// quads_y.x.setFromEulerAngles(rotation_y.x, 0, 0);
+							// quads_y.z.setFromEulerAngles(0, 0, rotation_y.z);
+							// quads_y.f.setFromEulerAngles(0, 0, 0);
+							// quads_y.f.mul(quads_y.y).mul(quads_y.x).mul(quads_y.z);	    			
+							// // const qy = new Quat().setFromEulerAngles(0,90,0);
+							// // 
+							// // var a = new Quat().setFromEulerAngles(label.object.rotation.x,label.object.rotation.y,label.object.rotation.z);
+							// // var b = new Quat().setFromEulerAngles(0, 90, 0);
+							// // var r = new Quat();
+							// // var ok = r.mul2(a, b);
+							// let start_y = new Vec3();
+							// const start_y_r = quads_y.f.transformVector(start, start_y);
+							// let end_y = new Vec3();
+							// const end_y_r = quads_y.f.transformVector(end, end_y);
+							
+							// let qy = new Quat();
+							// const qqy = qy.setFromAxisAngle(Vec3.RIGHT, 90); 
+
+
+							
+
+							// let eulers = new Vec3()
+							// const rt = label.object.entity.getLocalRotation().clone();
+							// rt.getEulerAngles(eulers);
+
+							// //console.log(eulers);
+
+							// const qy = new Quat().setFromEulerAngles(0,90,0);
+
+							// var r = new Quat();
+							// r.mul2(rt, qy);
+
+
+							// const qy = new Quat().setFromEulerAngles(0,90,0);
+							// const start_y = qy.transformVector(new Vec3(start.x,0,start.z));
+							// const end_y = qy.transformVector(new Vec3(end.x,0,end.z));
+
+							
+
+							// const qy = new Mat4().setFromEulerAngles(0,90,0);		
+							// // const qy = new Mat4().setFromAxisAngle(Vec3.UP, 90);							
+							// const start_y = qy.transformPoint(start); //new Vec3(start.x,0,start.z));
+							// const end_y = qy.transformPoint(end); //new Vec3(end.x,0,end.z));
+
+							
+			    			this.app.drawLine(start,end, new Color(0,1,0), false, this.labelsLineLayer);
 
 		    		// Draw Z
+		    			// Get Start
+							start = new Vec3();
+							start.copy(position);
+							start.mulScalar(-0.75);
+			    		// Get End
+							end = new Vec3();
+							end.copy(position);
+							end.mulScalar(0.75);
+
 		    // 			const quads_z = {	
 						// 	x: new Quat()
 						// 	,y: new Quat()
@@ -348,8 +407,8 @@ export default class CanvasLabels {
 						// 	,f: new Quat()
 						// };
 						// const rotation_z = {
-						// 	x: 0,
-						// 	y: 0,
+						// 	x: label.object.rotation.x,
+						// 	y: label.object.rotation.y,
 						// 	z: 90
 						// }
 						// quads_z.y.setFromEulerAngles(0, rotation_z.y, 0);
@@ -357,12 +416,13 @@ export default class CanvasLabels {
 				  //       quads_z.z.setFromEulerAngles(0, 0, rotation_z.z);
 				  //       quads_z.f.setFromEulerAngles(0, 0, 0);
 				  //       quads_z.f.mul(quads_z.y).mul(quads_z.x).mul(quads_z.z);
-	    				const qz = new Quat().setFromEulerAngles(0, 0, 90);
+	    				const qz = new Quat().setFromEulerAngles(0,0,90); //label.object.rotation.x, label.object.rotation.y, label.object.rotation.z+90);
 						// const start_z = quads_z.f.transformVector(start);
 						// const end_z = quads_z.f.transformVector(end);
+						
 						const start_z = qz.transformVector(start);
 						const end_z = qz.transformVector(end);
-	    				this.app.drawLine(start_z,end_z, this.labelsLineAxisColor, false, this.labelsLineLayer);
+	    				this.app.drawLine(start_z,end_z, new Color(1,0,0), false, this.labelsLineLayer);
 
 	    		}
 
