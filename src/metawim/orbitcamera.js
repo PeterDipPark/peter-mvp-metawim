@@ -206,6 +206,8 @@ const CreateOrbitCamera = ({...props}) => {
 					,priority: 1
 
 					// ,flipFaces: true
+					
+					// ,frustumCulling: true
 
 					// ,nearClip: 1
 					// ,farClip: 100
@@ -217,37 +219,43 @@ const CreateOrbitCamera = ({...props}) => {
 
 				if (this.useLayers  === true) {
 
-					const layers = this.entity.camera.layers;
-					for (var i = 1; i < this.layerCount+1; i++) {
-						layers.push("blade"+i);
-					};		
-					this.entity.camera.layers = layers;
+					// Separate Layers
+					
+						const layers = this.entity.camera.layers;
+						for (var i = 1; i < this.layerCount+1; i++) {
+							layers.push("blade"+i);
+						};		
+						this.entity.camera.layers = layers;
 
-					// for (var i = 1; i < this.layerCount+1; i++) {
-					// 	var entity = new pc.Entity();
-					// 	entity.addComponent('camera', {
-					// 	    // nearClip: 1,
-					// 	    // farClip: 100,
-					// 	    // fov: 55
-					// 	    //
-					// 	    // clearColorBuffer: true
-					// 		// ,clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
-					// 	    // ,clearDepthBuffer: true
-						    
-					// 	    clearDepthBuffer: false
-					// 	    ,priority: i
-					// 	    // ,projection: pc.PROJECTION_ORTHOGRAPHIC
-					// 	    // ,frustumCulling: true
-					// 	    ,clearColorBuffer: false
-					// 	    // ,cullFaces: false
-						    
-					// 	});
-					// 	entity.camera.layers = ["blade"+i];				
+					// Separate Cameras
 
-					// 	this.entity.addChild(entity);
-					// };		
+						// for (var i = 1; i < this.layerCount+1; i++) {
+						// 	var entity = new pc.Entity();
+						// 	entity.addComponent('camera', {
+						// 	    // nearClip: 1,
+						// 	    // farClip: 100,
+						// 	    // fov: 55
+						// 	    //
+						// 	    // clearColorBuffer: true
+						// 		// ,clearColor: new pc.Color(0.2, 0.2, 0.2, 0) // new pc.Color(0.2, 0.2, 0.2),
+						// 	    // ,clearDepthBuffer: true
+							    
+						// 	    clearDepthBuffer: false
+						// 	    ,priority: i
+						// 	    // ,projection: pc.PROJECTION_ORTHOGRAPHIC
+						// 	    // ,frustumCulling: true
+						// 	    ,clearColorBuffer: false
+						// 	    // ,cullFaces: false
+							    
+						// 	});
+						// 	entity.camera.layers = ["blade"+i];				
+
+						// 	this.entity.addChild(entity);
+						// };		
 				
 				}
+
+
 
 			// TEST - each layer will have its own camera with the priority
 				
@@ -451,6 +459,13 @@ const CreateOrbitCamera = ({...props}) => {
 	    position.add(this.pivotPoint);
 	    this.entity.setPosition(position);
 	    
+	    // Test Position
+	    // if (position.z < 0) {
+	    // 	console.log("-");
+	    // } else {
+	    // 	console.log("+");
+	    // }
+
 	    // Update labels on Camera update (app.on)
 	    this.updateLabels();	    
 

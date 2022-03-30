@@ -6,13 +6,10 @@ import {
 	Vec2,
 	Vec3,
 	Vec4,
-	SCALEMODE_BLEND,
+	Quat,
 	Layer,
 	SORTMODE_MANUAL,
-	ElementInput,
 	Color,
-		// TEST
-		gfx
 } from 'playcanvas';
 
 
@@ -52,7 +49,8 @@ export default class CanvasLabels {
 
 			// Labels Line layer
 			this.labelsLineLayer = this.layers.getLayerByName("World");
-			this.labelsLineColor = new Color(0.113725490196078, 0.56078431372549, 0.8, 0.8);
+			this.labelsLineInfoColor = new Color(0.113725490196078, 0.56078431372549, 0.8, 0.8);
+			this.labelsLineAxisColor = new Color(0, 0, 0, 0.3);
 
 			// Screen
 			this.screen = null;
@@ -106,6 +104,12 @@ export default class CanvasLabels {
 			this.hookCamera();
 			
 
+			// Test 
+			setTimeout(function() {
+				 this.labels['blade1'].object.setLabelEnabled("axis", true);
+				 console.log(this.labels['blade1'].object.getLabelEnabled("axis"))
+			}.bind(this), 5000);
+
 		}
 	////////////////////////
 	// GETTERS / SETTERS
@@ -122,7 +126,7 @@ export default class CanvasLabels {
 		setOpacity(id, d, p) {
 
 			//console.log(d,p);
-			this.getLabel(id).frame.element.opacity = d===true?0:1;
+			this.getLabel(id).info.frame.element.opacity = d===true?0:1;
 
 			// const v = 
 			// if (direction === true && position.z < -1 || direction === false && position.z > -1) {
@@ -132,7 +136,7 @@ export default class CanvasLabels {
 			// 	lbl.setOpacity("test", 0.8);
 			// }
 
-			// this.getLabel(id).frame.element.opacity = v;
+			// this.getLabel(id).info.frame.element.opacity = v;
 		}
 
 		/**
@@ -169,6 +173,15 @@ export default class CanvasLabels {
 
 			try {
 				for (let id in this.labels)	{
+					
+					// Is Enabled
+						// Update
+						this.labels[id].info.frame.enabled = this.labels[id].object.getLabelEnabled("info");
+						this.labels[id].axis.frame.enabled = this.labels[id].object.getLabelEnabled("axis");
+						// Check						
+						if (this.labels[id].object.getLabelEnabled("info") === false && this.labels[id].object.getLabelEnabled("axis") === false) continue;
+
+						
 
 					// Get Label Postions
 					const labelPos = this.labels[id].object.getLabelPosition();
@@ -203,8 +216,9 @@ export default class CanvasLabels {
 			        this.updateLabelText(id);
 
 			        // Update Line
-			        const start = this.labels[id].object.getLabelEdgePosition();					
-					this.app.drawLine(start,labelPos, this.labelsLineColor, false, this.labelsLineLayer);
+			  //       const start = this.labels[id].object.getLabelEdgePosition();					
+					// this.app.drawLine(start,labelPos, this.labelsLineInfoColor, false, this.labelsLineLayer);
+					this.updateLabelLine(id, labelPos);
 
 				}
 
@@ -221,8 +235,19 @@ export default class CanvasLabels {
 	     * @return {[type]}          [description]
 	     */
 	    updateLabelPosition(id, position) {
+	    	
+	    	// Label 
 	    	const label = this.getLabel(id);
-	    	label.frame.setLocalPosition(position);
+
+	    	// Info
+	    	if (label.object.getLabelEnabled("info") === true) {
+	    		label.info.frame.setLocalPosition(position);
+	    	}
+
+	    	// Axis
+	    	if (label.object.getLabelEnabled("axis") === true) {
+	    		label.axis.frame.setLocalPosition(position);
+	    	}
 	    }
 
 	    /**
@@ -234,15 +259,114 @@ export default class CanvasLabels {
 	    	
 	    	const label = this.getLabel(id);
 	    	const labelText = label.object.getLabelText();
-		    if (labelText!==label.text.element.text) {
-		        // Set new text
-		        label.text.element.text = labelText;
-		        // Resize frame to match text width
-		    	label.frame.element.width = label.text.element.textWidth + 10;
-		    	label.frame.element.height = label.text.element.textHeight + 5;
-		    }	
+
+	    	// Info
+	    	if (label.object.getLabelEnabled("info") === true) {
+			    if (labelText!==label.info.text.element.text) {
+			        // Set new text
+			        label.info.text.element.text = labelText;
+			        // Resize frame to match text width
+			    	label.info.frame.element.width = label.info.text.element.textWidth + 10;
+			    	label.info.frame.element.height = label.info.text.element.textHeight + 5;
+			    }	
+			}
+
+			// Axis
+	    	if (label.object.getLabelEnabled("axis") === true) {
+			    if (labelText!==label.axis.text.element.text) {
+			        // Set new text
+			        label.axis.text.element.text = labelText;
+			        // Resize frame to match text width
+			    	label.axis.frame.element.width = label.axis.text.element.textWidth + 10;
+			    	label.axis.frame.element.height = label.axis.text.element.textHeight + 5;
+			    }	
+			}
 	    }
 
+	    updateLabelLine(id, position) {
+	    	
+	    	// Label 
+	    	const label = this.getLabel(id);
+
+	    	// Line points
+	    	let start, end;
+
+	    	// Info
+	    	 	if (label.object.getLabelEnabled("info") === true) {
+
+	    	 		// Get Start
+	    	 		start = label.object.getLabelEdgePosition();
+	    			// Draw
+	    			this.app.drawLine(start,position, this.labelsLineInfoColor, false, this.labelsLineLayer);
+
+	    	 	}
+
+	    	// Axis 
+	    		if (label.object.getLabelEnabled("axis") === true) {
+
+	    			// Get Start
+						start = new Vec3();
+						start.copy(position);
+						start.mulScalar(-0.75);
+		    		// Get End
+						end = new Vec3();
+						end.copy(position);
+						end.mulScalar(0.75);
+
+	    			// Draw X
+	    				this.app.drawLine(start,end, this.labelsLineAxisColor, false, this.labelsLineLayer);
+
+	    			// Draw Y
+		    // 			const quads_y = {	
+						// 	x: new Quat()
+						// 	,y: new Quat()
+						// 	,z: new Quat()
+						// 	,f: new Quat()
+						// };
+						// const rotation_y = {
+						// 	x: 0,
+						// 	y: 90,
+						// 	z: 0
+						// }
+						// quads_y.y.setFromEulerAngles(0, rotation_y.y, 0);
+				  //       quads_y.x.setFromEulerAngles(rotation_y.x, 0, 0);
+				  //       quads_y.z.setFromEulerAngles(0, 0, rotation_y.z);
+				  //       quads_y.f.setFromEulerAngles(0, 0, 0);
+				  //       quads_y.f.mul(quads_y.y).mul(quads_y.x).mul(quads_y.z);	    			
+						const qy = new Quat().setFromEulerAngles(0, 90, 0);
+						// const start_y = quads_y.f.transformVector(start);
+						// const end_y = quads_y.f.transformVector(end);
+						const start_y = qy.transformVector(start);
+						const end_y = qy.transformVector(end);
+		    			this.app.drawLine(start_y,end_y, this.labelsLineAxisColor, false, this.labelsLineLayer);
+
+		    		// Draw Z
+		    // 			const quads_z = {	
+						// 	x: new Quat()
+						// 	,y: new Quat()
+						// 	,z: new Quat()
+						// 	,f: new Quat()
+						// };
+						// const rotation_z = {
+						// 	x: 0,
+						// 	y: 0,
+						// 	z: 90
+						// }
+						// quads_z.y.setFromEulerAngles(0, rotation_z.y, 0);
+				  //       quads_z.x.setFromEulerAngles(rotation_z.x, 0, 0);
+				  //       quads_z.z.setFromEulerAngles(0, 0, rotation_z.z);
+				  //       quads_z.f.setFromEulerAngles(0, 0, 0);
+				  //       quads_z.f.mul(quads_z.y).mul(quads_z.x).mul(quads_z.z);
+	    				const qz = new Quat().setFromEulerAngles(0, 0, 90);
+						// const start_z = quads_z.f.transformVector(start);
+						// const end_z = quads_z.f.transformVector(end);
+						const start_z = qz.transformVector(start);
+						const end_z = qz.transformVector(end);
+	    				this.app.drawLine(start_z,end_z, this.labelsLineAxisColor, false, this.labelsLineLayer);
+
+	    		}
+
+	    }
 	    
 	////////////////////////
 	// METHODS
@@ -351,45 +475,92 @@ export default class CanvasLabels {
 			// Group - TBD
 				// See: https://playcanvas.github.io/#/user-interface/layout-group
 			
-			// Background
-				const frame = new Entity();
-		        frame.addComponent("element", {
-		            pivot: new Vec2(0.5, 0.5), // CENTER: new Vec2(0.5, 0.5), // ORIG: new Vec2(0.5, 0),
-		            anchor:  new Vec4(0, 0, 0, 0), // CENTER: new Vec4(0.5, 0.5, 0.5, 0.5), // ORIG: new Vec4(0, 0, 0, 0),
-		            width: 70,
-		            height: 20,
-		            opacity: 1,
-		            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
-		            type: ELEMENTTYPE_IMAGE,
-		            layers: [this.layer.id]
-		        });
-	        	this.screen.addChild(frame);
+			// Info
+			
+				// Background
+					const frameInfo = new Entity();
+			        frameInfo.addComponent("element", {
+			            pivot: new Vec2(0.5, 0.5), // CENTER: new Vec2(0.5, 0.5), // ORIG: new Vec2(0.5, 0),
+			            anchor:  new Vec4(0, 0, 0, 0), // CENTER: new Vec4(0.5, 0.5, 0.5, 0.5), // ORIG: new Vec4(0, 0, 0, 0),
+			            width: 70,
+			            height: 20,
+			            opacity: 1,
+			            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
+			            type: ELEMENTTYPE_IMAGE,
+			            layers: [this.layer.id]
+			        });
+		        	this.screen.addChild(frameInfo);
 
-	        // Text
-	        	const text = new Entity();
-		        text.addComponent("element", {
-		            pivot: new Vec2(0.5, 0.5),
-		            anchor: new Vec4(0, 0.4, 1, 0.55),
-		            margin: new Vec4(0, 0, 0, 0),
-		            fontAsset: this.assets.find("customfont").id,
-		            fontSize: 14,
-		            text: `${string}`,
-		            autoWidth: false,
-        			autoHeight: false,
-        			enableMarkup: true,
-		            type: ELEMENTTYPE_TEXT,
-		            layers: [this.layer.id]
-		        });
-		        frame.addChild(text);
+		        // Text
+		        	const textInfo = new Entity();
+			        textInfo.addComponent("element", {
+			            pivot: new Vec2(0.5, 0.5),
+			            anchor: new Vec4(0, 0.4, 1, 0.55),
+			            margin: new Vec4(0, 0, 0, 0),
+			            fontAsset: this.assets.find("customfont").id,
+			            fontSize: 14,
+			            text: `${string}`,
+			            autoWidth: false,
+	        			autoHeight: false,
+	        			enableMarkup: true,
+			            type: ELEMENTTYPE_TEXT,
+			            layers: [this.layer.id]
+			        });
+			        frameInfo.addChild(textInfo);
 
-		    // Resize frame to match text width
-		        frame.element.width = text.element.textWidth + 10;
-		        frame.element.height = text.element.textHeight + 5;
+			    // Resize frame to match text width
+			        frameInfo.element.width = textInfo.element.textWidth + 10;
+			        frameInfo.element.height = textInfo.element.textHeight + 5;
+
+			// Axis
+			
+				// Background
+					const frameAxis = new Entity();
+			        frameAxis.addComponent("element", {
+			            pivot: new Vec2(0.5, 0.5), // CENTER: new Vec2(0.5, 0.5), // ORIG: new Vec2(0.5, 0),
+			            anchor:  new Vec4(0, 0, 0, 0), // CENTER: new Vec4(0.5, 0.5, 0.5, 0.5), // ORIG: new Vec4(0, 0, 0, 0),
+			            width: 70,
+			            height: 20,
+			            opacity: 1,
+			            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
+			            type: ELEMENTTYPE_IMAGE,
+			            layers: [this.layer.id]
+			        });
+		        	this.screen.addChild(frameAxis);
+
+		        // Text
+		        	const textAxis = new Entity();
+			        textAxis.addComponent("element", {
+			            pivot: new Vec2(0.5, 0.5),
+			            anchor: new Vec4(0, 0.4, 1, 0.55),
+			            margin: new Vec4(0, 0, 0, 0),
+			            fontAsset: this.assets.find("customfont").id,
+			            fontSize: 14,
+			            text: `${string}`,
+			            autoWidth: false,
+	        			autoHeight: false,
+	        			enableMarkup: true,
+			            type: ELEMENTTYPE_TEXT,
+			            layers: [this.layer.id]
+			        });
+			        frameAxis.addChild(textAxis);
+
+			    // Resize frame to match text width
+			        frameAxis.element.width = textAxis.element.textWidth + 10;
+			        frameAxis.element.height = textAxis.element.textHeight + 5;
+
+
 
         	// Add to object
 		        this.labels[id] = {
-		        	frame: frame,
-		        	text: text,
+		        	info: {
+						frame: frameInfo,
+						text: textInfo,
+					},
+					axis: {
+						frame: frameAxis,
+						text: textAxis,
+					},
 		        	object: object
 		        }
 		}

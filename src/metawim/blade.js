@@ -72,8 +72,17 @@ export default class Blade {
 			this.useLayers = useLayers || false;
 
 
-			// Label Text
-			this.bladeLabel = this.name;
+			// Label
+			this.bladeLabelText = this.name;
+			// this.bladeLabelEnabled = true;
+			this.bladeLabelEnabled =  {
+				info: false,
+				axis: false,
+			}
+
+			// Label Postion - Ray intersection Spehere			
+			this.intersectEdgeSphere = new BoundingSphere(new Vec3(0,0,this.tz), 2.15);
+			this.intersectEdgeSphereOffset = 1.395348837;
 
 			// Create Material
 			this.material = new Material({
@@ -82,16 +91,12 @@ export default class Blade {
 				,graphicsDevice: this.graphicsDevice
 			});
 
-			// Z transalation
-				this.tz = -fixFloat(this.index/1000);
-
-			// Label Postion - Ray intersection Spehere
-				this.intersectSphere = new BoundingSphere(new Vec3(0,0,this.tz), 3);
-				this.intersectEdgeSphere = new BoundingSphere(new Vec3(0,0,this.tz), 2.15);
-
 
 			// Morphing
 			this.morphing = this.meshMorphsIndex.reduce((acc,curr)=> (acc[curr.id]=0,acc),{}); // default is 0
+
+			// Z transalation
+			this.tz = -fixFloat(this.index/1000);
 
 			// Rotation
 			this.rotation = {
@@ -324,8 +329,7 @@ export default class Blade {
 			const s = Math.abs(v) < 1 ? (v<0?-1:1) : v;			
 			this.entity.setPosition(p.x, p.y, -(fixFloat(this.index/1000)*s));
 
-			// Translate Bounding Spheres
-			this.intersectSphere.center.copy(this.entity.getPosition());
+			// Translate Bounding Sphere
 			this.intersectEdgeSphere.center.copy(this.entity.getPosition());
 		}
 
@@ -335,18 +339,17 @@ export default class Blade {
 		 */
 		getLabelPosition() {		
 			
-			// Ray from entity center through meshInstance 
-			const p = this.entity.getPosition();
-			const c = this.meshInstance.aabb.center
-			const r = new Vec3();
-			r.sub2(c, p);
-			const ray = new Ray(p, r);
-			// Point to receive intersection
-			let point = new Vec3(0,0,0);
-			// Sphere to intersect
-			const interects = this.intersectSphere.intersectsRay(ray, point);
-			// Return
-			return (interects===true)?point:null;
+			// Get Edge
+			const edge = this.getLabelEdgePosition();
+			if (edge === null) return null;
+
+			// Offset Labels
+			const offset = new Vec3(); 
+			offset.copy(edge);
+			offset.mulScalar(this.intersectEdgeSphereOffset);
+
+			// Return offset point
+			return offset;			
 
 		}
 
@@ -376,7 +379,7 @@ export default class Blade {
 		 * @param {[type]} s [description]
 		 */
 		setLabelText(s) {
-			this.bladeLabel = s;
+			this.bladeLabelText = s;
 		}
 
 		/**
@@ -384,9 +387,32 @@ export default class Blade {
 		 * @return {[type]} [description]
 		 */
 		getLabelText() {
-			return this.bladeLabel;
+			return this.bladeLabelText;
 		}
 
+		/**
+		 * [setLabelEnabled description]
+		 * @param {[type]} b [description]
+		 */
+		setLabelEnabled(type, b) {
+			this.bladeLabelEnabled[type] = (b === true)
+		}
+
+		/**
+		 * [getLabelEnabled description]
+		 * @return {[type]} [description]
+		 */
+		getLabelEnabled(opt_type) {
+			return (opt_type)?this.bladeLabelEnabled[opt_type]:this.bladeLabelEnabled;
+		}
+
+
+		// setLabelType(s) {
+		// 	this.bladeLabelType = s;
+		// }
+		// getLabelType() {
+		// 	return this.bladeLabelType;
+		// }
 
 		// setCamarePosition(p) {
 		// 	// Revert camera Y
@@ -497,13 +523,16 @@ export default class Blade {
 			// TRANSPARENCY DEPTH PATCH
 				
 				//  WORKING when useLayers === false BUT doesn't work for tilted meshes
-					this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
-						// console.log(cameraPosition, cameraForward);
-						// this.setCamarePosition(cameraForward);
-						// this.setCameraDirection(cameraPosition.z);
-						const z = this.entity.getPosition().z < 0 ? 1:-1;
-						return cameraPosition.z>cameraForward.z? z*this.index:z*-this.index;
-					}.bind(this);
+					if (this.useLayers !== true) {
+
+						this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
+							// console.log(cameraPosition, cameraForward);
+							// this.setCamarePosition(cameraForward);
+							// this.setCameraDirection(cameraPosition.z);
+							const z = this.entity.getPosition().z < 0 ? 1:-1;
+							return cameraPosition.z>cameraForward.z? z*this.index:z*-this.index;
+						}.bind(this);
+					}
 		
 				// TBD				
 					// this.meshInstance.calculateSortDistance = function(meshInstance, cameraPosition, cameraForward) {
