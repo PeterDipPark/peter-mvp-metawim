@@ -405,6 +405,51 @@ export default class SceneControls {
 								,type: "separate"
 							};
 
+						// Y fold - Blades
+							
+							// Label
+							const foldbladesLabelContainer = document.createElement("DIV");
+							const foldbladesLabel = new Label({
+								enabled: true,
+								height: null,
+								text: "fold blades",
+								tabIndex:0,
+								width:null
+							});
+							foldbladesLabelContainer.appendChild(foldbladesLabel.dom);
+							sceneStateContainer.appendChild(foldbladesLabelContainer);
+
+							// Button
+							const foldbladesObserver = new Observer({progress: 0});
+							// Observer Callback is set from the main class
+							// stateObserver.on('progress:set', function(value) {
+							// 	console.log("value 4", value);
+							// }.bind(this));							
+
+							const foldbladesSlider = new SliderInput({
+							    enabled: true, 
+								height: null,
+								max: 90,
+								min: -90,				
+								binding: new BindingTwoWay(),
+								pre: 0,
+								value: 0,
+								sliderMax: 90,
+								sliderMin: -90,
+								step: 0,
+								tabIndex: 0,
+								width: null
+							});
+							foldbladesSlider.link(foldbladesObserver,'progress');
+							sceneStateContainer.appendChild(foldbladesSlider.dom);
+
+							// Add
+							this.controls.observers["bladesfold"] = {
+								idx: "blades"
+								,observer: foldbladesObserver
+								,type: "fold"
+							};
+
 					// Add State to States Container
 					sceneContainer.appendChild(sceneStateContainer);
 

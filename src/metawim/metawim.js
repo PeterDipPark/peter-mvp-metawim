@@ -824,6 +824,15 @@ export default class MetaWim {
 					// Reset MetaWim Orbit Camera to Initial State
 					this.scene.resetCamera();
 					break;
+				case "pc-blades-fold":
+					// Rotate All blades in Y direction inward or outward
+					console.log("fold", newValue);
+					for (let b in this.blades) {
+						// const rot = fixFloat((this.blades[b].getBladeRotation("y") + newValue) % 360); // from entity
+						// this.blades[b].setRotation({["y"]:rot}, "y");
+						this.blades[b].setFolding(newValue);
+					}
+					break;
 			}
 
 		}
@@ -1025,11 +1034,22 @@ export default class MetaWim {
 
 									break;
 
+								case "fold":
+
+									switch(this.idx) {
+										case "blades":
+											// Rotate blades in Y direction											
+											this.scope.callAction("pc-blades-fold", newValue);
+											break;
+									}
+
+									break;
+
 								case "separate":
 
 									switch(this.idx) {
 										case "blades":
-											// Change material depth write
+											// Separate blades in Z direction
 											for (let b in this.scope.blades) {
 												this.scope.blades[b].translateBlade(newValue);
 											}

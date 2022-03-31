@@ -15,6 +15,7 @@ import {
 			Ray,
 			Color,
 			Mat4,
+			math,
 			// TEST
 				// BLEND_NONE,
 				// BLEND_NORMAL,
@@ -249,6 +250,80 @@ export default class Blade {
 		    }
 		}
 
+		setFolding(a) {
+
+			// Set Folding Rotation
+			
+				// const my = new Mat4().setFromAxisAngle(this.entity.forward, -90);
+				// const eulers = my.getEulerAngles();
+
+				// var position = this.entity.getPosition();
+				// var target = this.meshInstance.aabb.center;				
+				// var up = this.entity.up;
+				// var m = new Mat4().setLookAt(position, target, up);
+							
+				// console.warn("eulers", m, m.getEulerAngles());
+				
+				const rot = fixFloat((this.getBladeRotation("y") + a) % 360); // from entity
+
+				console.warn("rot y", this.entity.getLocalEulerAngles().y);
+
+				const c = new Vec3();
+				c.copy(this.meshInstance.aabb.center);
+				const t = this.getLabelPosition();
+				const my = new Mat4().setFromAxisAngle(this.entity.up, a-this.entity.getLocalEulerAngles().y);			
+				const r = my.transformPoint(t);
+
+				// const r = this.getLabelVerticals("z");
+
+// 				var vecA = r.normalize();
+// var vecB = new Vec3();
+// vecB.copy(this.entity.getPosition()).normalize();
+
+// var dot = vecA.dot(vecB);
+// var angleInRadians = Math.acos(dot);
+// var angle = angleInRadians * math.RAD_TO_DEG;
+// console.log(angle);
+
+let m = new Mat4();
+
+Quat.prototype.lookAt = function(from, to, up) {
+    m.setLookAt(from, to, up || Vec3.UP)
+    this.setFromMat4(m)
+    return this
+}
+
+const p = this.entity.getPosition();
+// const cc = new Vec3();
+// 			cc.sub2(c, p);
+
+let targetRotation = new Quat().lookAt(p, r, this.entity.up);
+// let targetRotation2 = new Quat().lookAt(p, r, this.entity.right);
+// let targetRotation = new Quat();
+// targetRotation.mul(targetRotation1).mul(targetRotation2);
+// let targetRotation = new Quat().lookAt(c, r, this.entity.up);
+// let targetRotation = new Quat().lookAt(cc, r, this.entity.up);
+console.log("\t",targetRotation.getEulerAngles());
+
+this.entity.setLocalRotation(targetRotation);
+// this.setRotation(targetRotation.getEulerAngles())
+
+
+				// Calculate		        
+		        // this.quads.y.setFromEulerAngles(0, this.rotation.y, 0);
+		        // this.quads.x.setFromEulerAngles(this.rotation.x, 0, 0);
+		        // this.quads.z.setFromEulerAngles(0, 0, this.rotation.z);
+		        // this.quads.f.setFromEulerAngles(0, a, 0);
+		        // this.quads.f.mul(this.quads.y).mul(this.quads.x).mul(this.quads.z);
+
+		        // // Set Rotation
+		        // this.entity.setLocalRotation(this.quads.f);
+		        
+		        // // Update Label Verticals
+		        // this.setLabelVerticals();
+
+		}
+
 		/**
 		 * [getRotation description]
 		 * @param  {[type]} opt_key [description]
@@ -420,12 +495,12 @@ export default class Blade {
 			this.bladeLabelVerticals.x = new Vec3().copy(p);
 
 			// Y
-			const qz = new Mat4().setFromAxisAngle(this.entity.up, -90);			
-			this.bladeLabelVerticals.y = qz.transformPoint(p);
+			const mz = new Mat4().setFromAxisAngle(this.entity.up, -90);			
+			this.bladeLabelVerticals.y = mz.transformPoint(p);
 
 			// Z
-			const qy = new Mat4().setFromAxisAngle(this.entity.forward, -90);			
-			this.bladeLabelVerticals.z = qy.transformPoint(p);
+			const my = new Mat4().setFromAxisAngle(this.entity.forward, -90);			
+			this.bladeLabelVerticals.z = my.transformPoint(p);
 
 		}
 
