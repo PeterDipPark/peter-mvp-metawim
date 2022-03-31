@@ -235,6 +235,7 @@ export default class Blade {
 						this.controls.getControls().observers[opt_control[i]].observer.set('progress', coords[opt_control[i]]);
 					};
 				} else {
+					console.warn(opt_control, this.controls.getControls().observers);
 					this.controls.getControls().observers[opt_control].observer.set('progress', coords[opt_control]); 
 				}
 			} else {
@@ -280,10 +281,16 @@ export default class Blade {
 			
 			// Rotate Entity
 			this.entity.setLocalRotation(targetRotation);
-			// Store Rotation 
-			this.rotation = { ...this.rotation, ...targetRotationAngles }; //...this.entity.getLocalEulerAngles() };	
+			// Store Rotation - THIS DOESN'T WORK FOR state invoked rotation (those are called one by one so it will end up in different state)
+			this.rotation = { x: fixFloat(targetRotationAngles.x), y: fixFloat(targetRotationAngles.y), z: fixFloat(targetRotationAngles.z) }; //...this.entity.getLocalEulerAngles() };
 			// Update Verticals
 			this.setLabelVerticals();
+
+			// if (this.name === "blade1") {
+			// 	console.log("targetRotationAngles", targetRotationAngles);
+			// 	console.log("\tthis.entity.getLocalEulerAngles()", this.entity.getLocalEulerAngles());
+			// 	console.log("\t\tthis.rotation", this.rotation);
+			// }
 
 		}
 
