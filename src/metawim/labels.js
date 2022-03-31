@@ -50,8 +50,11 @@ export default class CanvasLabels {
 
 			// Labels Line layer
 			this.labelsLineLayer = this.layers.getLayerByName("World");
+			this.labelsFrameInfoColor = new Color(0.113725490196078, 0.56078431372549, 0.8, 1);
 			this.labelsLineInfoColor = new Color(0.113725490196078, 0.56078431372549, 0.8, 0.8);
+			this.labelsFrameAxisColor = new Color(0, 0, 0, 1); //new Color(0.701960784313725, 0.701960784313725, 0.701960784313725, 1);
 			this.labelsLineAxisColor = new Color(0, 0, 0, 0.3);
+			this.labelsLineAxisInset = 0.87;
 
 			// Screen
 			this.screen = null;
@@ -106,12 +109,12 @@ export default class CanvasLabels {
 			
 
 			// Test 
-			setTimeout(function() {
-				 this.labels['blade1'].object.setLabelEnabled("axis", true);
-				 // this.labels['blade2'].object.setLabelEnabled("axis", true);
-				 console.log(this.labels['blade1'].object.getLabelEnabled("axis"))
-				 console.log(this.labels['blade1'].object.entity);
-			}.bind(this), 2000);
+			// setTimeout(function() {
+			// 	 this.labels['blade1'].object.setLabelEnabled("axis", true);
+			// 	 // this.labels['blade2'].object.setLabelEnabled("axis", true);
+			// 	 // console.log(this.labels['blade1'].object.getLabelEnabled("axis"))
+			// 	 console.log(this.labels['blade1']);
+			// }.bind(this), 2000);
 
 		}
 	////////////////////////
@@ -178,49 +181,122 @@ export default class CanvasLabels {
 				for (let id in this.labels)	{
 					
 					// Is Enabled
+						
 						// Update
 						this.labels[id].info.frame.enabled = this.labels[id].object.getLabelEnabled("info");
-						this.labels[id].axis.frame.enabled = this.labels[id].object.getLabelEnabled("axis");
+						for (let a in this.labels[id].axis) {
+							this.labels[id].axis[a].frame.enabled = this.labels[id].object.getLabelEnabled("axis"); 
+						}
 						// Check						
 						if (this.labels[id].object.getLabelEnabled("info") === false && this.labels[id].object.getLabelEnabled("axis") === false) continue;
 
 						
-
 					// Get Label Postions
-					const labelPos = this.labels[id].object.getLabelPosition();
+					const labelPos = this.labels[id].object.getLabelVerticals("x");
 
 					// No intersection
-					if (labelPos === null) return;
+					if (labelPos === null) continue;
 
-					// Get Vec3 screen position
-					const screenPos = this.camera.worldToScreen(labelPos, this.screen.screen);
+					// account for screen scaling
+			        const scale = this.screen.screen.scale;
 
-					// Take pixel ration into account
-					screenPos.x *= this.pixelRatio;
-		        	screenPos.y *= this.pixelRatio;
+					// Info
+					if (this.labels[id].object.getLabelEnabled("info") === true) {
 
-		        	// account for screen scaling
-		        	const scale = this.screen.screen.scale;
+						// Get Vec3 screen position
+						const screenPos = this.camera.worldToScreen(labelPos, this.screen.screen);
 
-		        	// invert the y position
-		        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
+						// Take pixel ration into account
+						screenPos.x *= this.pixelRatio;
+			        	screenPos.y *= this.pixelRatio;			        	
 
-		        	// New Postion
-		        	const entityPos = new Vec3(
-			            screenPos.x / scale,
-			           	screenPos.y / scale,
-			            screenPos.z / scale
-			        );
+			        	// invert the y position
+			        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
 
-			        // Update Postion
-			        this.updateLabelPosition(id, entityPos);
+			        	// New Postion
+			        	const entityPos = new Vec3(
+				            screenPos.x / scale,
+				           	screenPos.y / scale,
+				            screenPos.z / scale
+				        );
+
+				        // Update Postion
+				        this.updateLabelPosition("info", id, entityPos);
+
+			    	}	
+
+			    	// Axis
+					if (this.labels[id].object.getLabelEnabled("axis") === true) {
+
+						let axisPosition;	    		
+			    		for (let a in this.labels[id].axis) {
+			    						    			
+			    			// Reset
+			    			axisPosition = null;
+
+			    			// Calc
+			    			switch(a) {
+			    				case "x":	
+			    					axisPosition = new Vec3();
+									axisPosition.copy(this.labels[id].object.getLabelVerticals("x"));
+									axisPosition.mulScalar(this.labelsLineAxisInset);
+			    					break;
+			    				case "-x":
+			    					axisPosition = new Vec3();
+									axisPosition.copy(this.labels[id].object.getLabelVerticals("x"));
+									axisPosition.mulScalar(-this.labelsLineAxisInset);
+			    					break;
+			    				case "y":	
+			    					axisPosition = new Vec3();
+									axisPosition.copy(this.labels[id].object.getLabelVerticals("y"));
+									axisPosition.mulScalar(this.labelsLineAxisInset);
+			    					break;
+			    				case "-y":
+			    					axisPosition = new Vec3();
+									axisPosition.copy(this.labels[id].object.getLabelVerticals("y"));
+									axisPosition.mulScalar(-this.labelsLineAxisInset);
+			    					break;
+			    				case "z":	
+			    					axisPosition = new Vec3();
+									axisPosition.copy(this.labels[id].object.getLabelVerticals("z"));
+									axisPosition.mulScalar(this.labelsLineAxisInset);
+			    					break;
+			    				case "-z":
+			    					axisPosition = new Vec3();
+									axisPosition.copy(this.labels[id].object.getLabelVerticals("z"));
+									axisPosition.mulScalar(-this.labelsLineAxisInset);
+			    					break;
+			    			}
+
+			    			// Set
+			    			if (axisPosition !== null) {
+				    			// Get Vec3 screen position
+								const screenPos = this.camera.worldToScreen(axisPosition, this.screen.screen);
+
+								// Take pixel ration into account
+								screenPos.x *= this.pixelRatio;
+					        	screenPos.y *= this.pixelRatio;			        	
+
+					        	// invert the y position
+					        	screenPos.y = this.screen.screen.resolution.y - screenPos.y;
+
+					        	// New Postion
+					        	const entityPos = new Vec3(
+						            screenPos.x / scale,
+						           	screenPos.y / scale,
+						            screenPos.z / scale
+						        );
+
+						        // Update Postion
+						        this.updateLabelPosition(a, id, entityPos);
+					        }			
+			    		}
+					}
 
 			        // Update Text
 			        this.updateLabelText(id);
 
 			        // Update Line
-			  //       const start = this.labels[id].object.getLabelEdgePosition();					
-					// this.app.drawLine(start,labelPos, this.labelsLineInfoColor, false, this.labelsLineLayer);
 					this.updateLabelLine(id, labelPos);
 
 				}
@@ -237,19 +313,19 @@ export default class CanvasLabels {
 	     * @param  {[type]} position [description]
 	     * @return {[type]}          [description]
 	     */
-	    updateLabelPosition(id, position) {
+	    updateLabelPosition(type, id, position) {
 	    	
 	    	// Label 
 	    	const label = this.getLabel(id);
 
 	    	// Info
-	    	if (label.object.getLabelEnabled("info") === true) {
+	    	if (type === "info" && label.object.getLabelEnabled("info") === true) {
 	    		label.info.frame.setLocalPosition(position);
 	    	}
 
 	    	// Axis
-	    	if (label.object.getLabelEnabled("axis") === true) {
-	    		label.axis.frame.setLocalPosition(position);
+	    	if (type !== "info" && label.object.getLabelEnabled("axis") === true) {
+	    		label.axis[type].frame.setLocalPosition(position);	    		
 	    	}
 	    }
 
@@ -260,11 +336,14 @@ export default class CanvasLabels {
 	     */
 	    updateLabelText(id) {
 	    	
-	    	const label = this.getLabel(id);
-	    	const labelText = label.object.getLabelText();
+	    	// Label
+	    	const label = this.getLabel(id);	    	
 
 	    	// Info
 	    	if (label.object.getLabelEnabled("info") === true) {
+
+	    		const labelText = label.object.getLabelText();
+
 			    if (labelText!==label.info.text.element.text) {
 			        // Set new text
 			        label.info.text.element.text = labelText;
@@ -276,23 +355,35 @@ export default class CanvasLabels {
 
 			// Axis
 	    	if (label.object.getLabelEnabled("axis") === true) {
-			    if (labelText!==label.axis.text.element.text) {
-			        // Set new text
-			        label.axis.text.element.text = labelText;
-			        // Resize frame to match text width
-			    	label.axis.frame.element.width = label.axis.text.element.textWidth + 10;
-			    	label.axis.frame.element.height = label.axis.text.element.textHeight + 5;
-			    }	
+
+	    		const verticalText = label.object.getLabelVerticlasText();
+
+	    		for (let a in label.axis) {
+	    			if (verticalText[a]!==label.axis[a].text.element.text) {
+			        	// Set new text
+			        	label.axis[a].text.element.text = verticalText[a];
+			        	// Resize frame to match text width
+			    		label.axis[a].frame.element.width = label.axis[a].text.element.textWidth + 10;
+			    		label.axis[a].frame.element.height = label.axis[a].text.element.textHeight + 5;
+			    	}	
+	    		}
+
 			}
 	    }
 
+	    /**
+	     * [updateLabelLine description]
+	     * @param  {[type]} id       [description]
+	     * @param  {[type]} position [description]
+	     * @return {[type]}          [description]
+	     */
 	    updateLabelLine(id, position) {
 	    	
 	    	// Label 
 	    	const label = this.getLabel(id);
 
 	    	// Line points
-	    	let start, end;
+	    	let vertical, start, end;
 
 	    	// Info
 	    	 	if (label.object.getLabelEnabled("info") === true) {
@@ -307,90 +398,8 @@ export default class CanvasLabels {
 	    	// Axis 
 	    		if (label.object.getLabelEnabled("axis") === true) {
 
-	    			// Get Start
-						start = new Vec3();
-						start.copy(position);
-						start.mulScalar(-0.75);
-		    		// Get End
-						end = new Vec3();
-						end.copy(position);
-						end.mulScalar(0.75);
-
-	    			// Draw X
-	    				this.app.drawLine(start,end, this.labelsLineAxisColor, false, this.labelsLineLayer);
-
-	    			// Draw Y
-
-	    					// Get Start
-							start = new Vec3();
-							start.copy(label.object.verticalY);
-							start.mulScalar(-0.75);
-			    		// Get End
-							end = new Vec3();
-							end.copy(label.object.verticalY);
-							end.mulScalar(0.75);
-
-
-							// const quads_y = {	
-							// 	x: new Quat()
-							// 	,y: new Quat()
-							// 	,z: new Quat()
-							// 	,f: new Quat()
-							// };
-							// const rotation_y = {
-							// 	x: label.object.rotation.x,
-							// 	y: label.object.rotation.y,
-							// 	z: label.object.rotation.z
-							// }
-							// quads_y.y.setFromEulerAngles(0, rotation_y.y, 0);
-							// quads_y.x.setFromEulerAngles(rotation_y.x, 0, 0);
-							// quads_y.z.setFromEulerAngles(0, 0, rotation_y.z);
-							// quads_y.f.setFromEulerAngles(0, 0, 0);
-							// quads_y.f.mul(quads_y.y).mul(quads_y.x).mul(quads_y.z);	    			
-							// // const qy = new Quat().setFromEulerAngles(0,90,0);
-							// // 
-							// // var a = new Quat().setFromEulerAngles(label.object.rotation.x,label.object.rotation.y,label.object.rotation.z);
-							// // var b = new Quat().setFromEulerAngles(0, 90, 0);
-							// // var r = new Quat();
-							// // var ok = r.mul2(a, b);
-							// let start_y = new Vec3();
-							// const start_y_r = quads_y.f.transformVector(start, start_y);
-							// let end_y = new Vec3();
-							// const end_y_r = quads_y.f.transformVector(end, end_y);
-							
-							// let qy = new Quat();
-							// const qqy = qy.setFromAxisAngle(Vec3.RIGHT, 90); 
-
-
-							
-
-							// let eulers = new Vec3()
-							// const rt = label.object.entity.getLocalRotation().clone();
-							// rt.getEulerAngles(eulers);
-
-							// //console.log(eulers);
-
-							// const qy = new Quat().setFromEulerAngles(0,90,0);
-
-							// var r = new Quat();
-							// r.mul2(rt, qy);
-
-
-							// const qy = new Quat().setFromEulerAngles(0,90,0);
-							// const start_y = qy.transformVector(new Vec3(start.x,0,start.z));
-							// const end_y = qy.transformVector(new Vec3(end.x,0,end.z));
-
-							
-
-							// const qy = new Mat4().setFromEulerAngles(0,90,0);		
-							// // const qy = new Mat4().setFromAxisAngle(Vec3.UP, 90);							
-							// const start_y = qy.transformPoint(start); //new Vec3(start.x,0,start.z));
-							// const end_y = qy.transformPoint(end); //new Vec3(end.x,0,end.z));
-
-							
-			    			this.app.drawLine(start,end, new Color(0,1,0), false, this.labelsLineLayer);
-
-		    		// Draw Z
+	    			// X
+	    			
 		    			// Get Start
 							start = new Vec3();
 							start.copy(position);
@@ -399,30 +408,38 @@ export default class CanvasLabels {
 							end = new Vec3();
 							end.copy(position);
 							end.mulScalar(0.75);
+		    			// Draw	    			
+		    				this.app.drawLine(start,end, this.labelsLineAxisColor, false, this.labelsLineLayer);
 
-		    // 			const quads_z = {	
-						// 	x: new Quat()
-						// 	,y: new Quat()
-						// 	,z: new Quat()
-						// 	,f: new Quat()
-						// };
-						// const rotation_z = {
-						// 	x: label.object.rotation.x,
-						// 	y: label.object.rotation.y,
-						// 	z: 90
-						// }
-						// quads_z.y.setFromEulerAngles(0, rotation_z.y, 0);
-				  //       quads_z.x.setFromEulerAngles(rotation_z.x, 0, 0);
-				  //       quads_z.z.setFromEulerAngles(0, 0, rotation_z.z);
-				  //       quads_z.f.setFromEulerAngles(0, 0, 0);
-				  //       quads_z.f.mul(quads_z.y).mul(quads_z.x).mul(quads_z.z);
-	    				const qz = new Quat().setFromEulerAngles(0,0,90); //label.object.rotation.x, label.object.rotation.y, label.object.rotation.z+90);
-						// const start_z = quads_z.f.transformVector(start);
-						// const end_z = quads_z.f.transformVector(end);
-						
-						const start_z = qz.transformVector(start);
-						const end_z = qz.transformVector(end);
-	    				this.app.drawLine(start_z,end_z, new Color(1,0,0), false, this.labelsLineLayer);
+	    			// Y
+
+	    				// Get Vertical
+	    					vertical = label.object.getLabelVerticals("y");
+	    				// Get Start
+							start = new Vec3();
+							start.copy(vertical);
+							start.mulScalar(-0.75);
+			    		// Get End
+							end = new Vec3();
+							end.copy(vertical);
+							end.mulScalar(0.75);
+						// Draw							
+			    			this.app.drawLine(start,end, this.labelsLineAxisColor, false, this.labelsLineLayer);
+
+		    		// Z
+		    			
+		    			// Get Vertical
+	    					vertical = label.object.getLabelVerticals("z");
+		    			// Get Start
+							start = new Vec3();
+							start.copy(vertical);
+							start.mulScalar(-0.75);
+			    		// Get End
+							end = new Vec3();
+							end.copy(vertical);
+							end.mulScalar(0.75);
+						// Draw
+	    					this.app.drawLine(start,end, this.labelsLineAxisColor, false, this.labelsLineLayer);
 
 	    		}
 
@@ -530,11 +547,65 @@ export default class CanvasLabels {
 				const id = object.name;
 
 			// Text
-				const string = object.getLabelText();
+				const stringLabel = object.getLabelText();
+				const stringAxis = object.getLabelVerticlasText();
 
 			// Group - TBD
 				// See: https://playcanvas.github.io/#/user-interface/layout-group
+						
+
+			// Axis
 			
+				const axis = {}
+
+				for (let a in stringAxis) {
+
+					// Background
+						const frameAxis = new Entity();
+				        frameAxis.addComponent("element", {
+				            pivot: new Vec2(0.5, 0.5), // CENTER: new Vec2(0.5, 0.5), // ORIG: new Vec2(0.5, 0),
+				            anchor:  new Vec4(0, 0, 0, 0), // CENTER: new Vec4(0.5, 0.5, 0.5, 0.5), // ORIG: new Vec4(0, 0, 0, 0),
+				            width: 70,
+				            height: 20,
+				            opacity: 1,
+				            color: this.labelsFrameAxisColor,
+				            type: ELEMENTTYPE_IMAGE,
+				            layers: [this.layer.id]
+				        });
+			        	frameAxis.enabled = object.getLabelEnabled("axis");
+			        	this.screen.addChild(frameAxis);
+
+			        	
+
+			        // Text
+			        	const textAxis = new Entity();
+				        textAxis.addComponent("element", {
+				            pivot: new Vec2(0.5, 0.5),
+				            anchor: new Vec4(0, 0.4, 1, 0.55),
+				            margin: new Vec4(0, 0, 0, 0),
+				            fontAsset: this.assets.find("customfont").id,
+				            fontSize: 14,
+				            text: `${stringAxis[a]}`,
+				            autoWidth: false,
+		        			autoHeight: false,
+		        			enableMarkup: false,
+				            type: ELEMENTTYPE_TEXT,
+				            layers: [this.layer.id]
+				        });
+				        frameAxis.addChild(textAxis);
+
+				    // Resize frame to match text width
+				        frameAxis.element.width = textAxis.element.textWidth + 10;
+				        frameAxis.element.height = textAxis.element.textHeight + 5;
+
+				    // Add
+				    	
+				    	axis[a] = {
+				    		frame: frameAxis,
+				    		text: textAxis
+				    	};
+				}
+
 			// Info
 			
 				// Background
@@ -545,10 +616,11 @@ export default class CanvasLabels {
 			            width: 70,
 			            height: 20,
 			            opacity: 1,
-			            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
+			            color: this.labelsFrameInfoColor,
 			            type: ELEMENTTYPE_IMAGE,
 			            layers: [this.layer.id]
 			        });
+			        frameInfo.enabled = object.getLabelEnabled("info");
 		        	this.screen.addChild(frameInfo);
 
 		        // Text
@@ -559,10 +631,10 @@ export default class CanvasLabels {
 			            margin: new Vec4(0, 0, 0, 0),
 			            fontAsset: this.assets.find("customfont").id,
 			            fontSize: 14,
-			            text: `${string}`,
+			            text: `${stringLabel}`,
 			            autoWidth: false,
 	        			autoHeight: false,
-	        			enableMarkup: true,
+	        			enableMarkup: false,
 			            type: ELEMENTTYPE_TEXT,
 			            layers: [this.layer.id]
 			        });
@@ -572,55 +644,13 @@ export default class CanvasLabels {
 			        frameInfo.element.width = textInfo.element.textWidth + 10;
 			        frameInfo.element.height = textInfo.element.textHeight + 5;
 
-			// Axis
-			
-				// Background
-					const frameAxis = new Entity();
-			        frameAxis.addComponent("element", {
-			            pivot: new Vec2(0.5, 0.5), // CENTER: new Vec2(0.5, 0.5), // ORIG: new Vec2(0.5, 0),
-			            anchor:  new Vec4(0, 0, 0, 0), // CENTER: new Vec4(0.5, 0.5, 0.5, 0.5), // ORIG: new Vec4(0, 0, 0, 0),
-			            width: 70,
-			            height: 20,
-			            opacity: 1,
-			            color: new Color(0.113725490196078, 0.56078431372549, 0.8, 1),
-			            type: ELEMENTTYPE_IMAGE,
-			            layers: [this.layer.id]
-			        });
-		        	this.screen.addChild(frameAxis);
-
-		        // Text
-		        	const textAxis = new Entity();
-			        textAxis.addComponent("element", {
-			            pivot: new Vec2(0.5, 0.5),
-			            anchor: new Vec4(0, 0.4, 1, 0.55),
-			            margin: new Vec4(0, 0, 0, 0),
-			            fontAsset: this.assets.find("customfont").id,
-			            fontSize: 14,
-			            text: `${string}`,
-			            autoWidth: false,
-	        			autoHeight: false,
-	        			enableMarkup: true,
-			            type: ELEMENTTYPE_TEXT,
-			            layers: [this.layer.id]
-			        });
-			        frameAxis.addChild(textAxis);
-
-			    // Resize frame to match text width
-			        frameAxis.element.width = textAxis.element.textWidth + 10;
-			        frameAxis.element.height = textAxis.element.textHeight + 5;
-
-
-
         	// Add to object
 		        this.labels[id] = {
 		        	info: {
 						frame: frameInfo,
 						text: textInfo,
 					},
-					axis: {
-						frame: frameAxis,
-						text: textAxis,
-					},
+					axis: axis,
 		        	object: object
 		        }
 		}

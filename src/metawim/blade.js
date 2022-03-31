@@ -14,6 +14,7 @@ import {
 			BoundingSphere,
 			Ray,
 			Color,
+			Mat4,
 			// TEST
 				// BLEND_NONE,
 				// BLEND_NORMAL,
@@ -74,10 +75,31 @@ export default class Blade {
 
 			// Label
 			this.bladeLabelText = this.name;
-			// this.bladeLabelEnabled = true;
 			this.bladeLabelEnabled =  {
 				info: false,
 				axis: false,
+			}
+
+				// Temp - test labels
+				if (this.name === "blade1") {
+					this.bladeLabelEnabled.axis = true;
+				}
+				if (this.name === "blade4") {
+					this.bladeLabelEnabled.info = true;
+				}
+
+			this.bladeLabelVerticalsText = {
+				"-x": 	this.name+" -x",
+				"x": 	this.name+" x",				
+				"-y": 	this.name+" -y",
+				"y": 	this.name+" y",
+				"-z": 	this.name+" -z",				
+				"z": 	this.name+" z",				
+			}
+			this.bladeLabelVerticals = {
+				x: new Quat(),
+				y: new Quat(),
+				z: new Quat()
 			}
 
 			// Label Postion - Ray intersection Spehere			
@@ -110,6 +132,7 @@ export default class Blade {
 				,z: new Quat()
 				,f: new Quat()
 			};
+
 
 			// Create Controls
 			this.hasControls = (controls === true);
@@ -221,8 +244,8 @@ export default class Blade {
 		        // Set Rotation
 		        this.entity.setLocalRotation(this.quads.f);
 		        
-		        // Test set Verticals
-		        this.setVerticals();
+		        // Update Label Verticals
+		        this.setLabelVerticals();
 		    }
 		}
 
@@ -376,34 +399,33 @@ export default class Blade {
 
 		}
 
-		setVerticals() {
+		/**
+		 * [getLabelVerticals description]
+		 * @param  {[type]} opt_axis [description]
+		 * @return {[type]}          [description]
+		 */
+		getLabelVerticals(opt_axis) {
+			return (opt_axis)?this.bladeLabelVerticals[opt_axis]:this.bladeLabelVerticals;
+		}
 
-			
+		/**
+		 * [setLabelVerticals description]
+		 */
+		setLabelVerticals() {
+
+			// Intersection point for label
 			const p = this.getLabelPosition();
 
-			const quads_y = {	
-				x: new Quat()
-				,y: new Quat()
-				,z: new Quat()
-				,f: new Quat()
-			};
-			const rotation_y = {
-				x: this.rotation.x,
-				y: this.rotation.y,
-				z: this.rotation.z
-			}
-			// quads_y.x.setFromEulerAngles(360%(360+rotation_y.x+90), 0, 0);
-			// quads_y.y.setFromEulerAngles(0, 360%(360+rotation_y.y+90), 0);			
-			// quads_y.z.setFromEulerAngles(0, 0, 360%(360+rotation_y.z+90));
-			// quads_y.f.setFromEulerAngles(0, 0, 0);			
-			quads_y.x.setFromEulerAngles(rotation_y.x, 0, 0,);
-			quads_y.y.setFromEulerAngles(0, rotation_y.y, 0);			
-			quads_y.z.setFromEulerAngles(0, 0, rotation_y.z);
-			quads_y.f.setFromEulerAngles(0, 90, 0);	
+			// X
+			this.bladeLabelVerticals.x = new Vec3().copy(p);
 
-			quads_y.f.mul(quads_y.y).mul(quads_y.x).mul(quads_y.z);	  	
-		
-			this.verticalY = quads_y.f.transformVector(p);
+			// Y
+			const qz = new Mat4().setFromAxisAngle(this.entity.up, -90);			
+			this.bladeLabelVerticals.y = qz.transformPoint(p);
+
+			// Z
+			const qy = new Mat4().setFromAxisAngle(this.entity.forward, -90);			
+			this.bladeLabelVerticals.z = qy.transformPoint(p);
 
 		}
 
@@ -424,6 +446,28 @@ export default class Blade {
 		}
 
 		/**
+		 * [setLabelVerticlasText description]
+		 * @param {[type]} s            [description]
+		 * @param {[type]} opt_vertical [description]
+		 */
+		setLabelVerticlasText(s, opt_vertical) {
+			if (opt_vertical) {
+				this.bladeLabelVerticalsText[opt_vertical] = s;
+			} else {
+				this.bladeLabelVerticalsText = s; // object
+			}
+		}
+
+		/**
+		 * [getLabelVerticlasText description]
+		 * @param  {[type]} opt_vertical [description]
+		 * @return {[type]}              [description]
+		 */
+		getLabelVerticlasText(opt_vertical) {
+			return (opt_vertical)?this.bladeLabelVerticalsText[opt_vertical]:this.bladeLabelVerticalsText;
+		}
+
+		/**
 		 * [setLabelEnabled description]
 		 * @param {[type]} b [description]
 		 */
@@ -439,13 +483,6 @@ export default class Blade {
 			return (opt_type)?this.bladeLabelEnabled[opt_type]:this.bladeLabelEnabled;
 		}
 
-
-		// setLabelType(s) {
-		// 	this.bladeLabelType = s;
-		// }
-		// getLabelType() {
-		// 	return this.bladeLabelType;
-		// }
 
 		// setCamarePosition(p) {
 		// 	// Revert camera Y
@@ -626,6 +663,10 @@ export default class Blade {
 			// PUSH in Z-dir so we stack blades
 
 				this.entity.translate(0, 0, this.tz);
+
+			// SET label verticals
+				
+				this.setLabelVerticals();
 		}
 
 		/**

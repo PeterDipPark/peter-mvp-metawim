@@ -17,7 +17,6 @@ pc.GraphNode.prototype.lookAtReverse = function () {
 ```
 * DO: pc - global offset slider (see: https://www.dropbox.com/s/12nkuhkpl11jhu3/globe.mp4?dl=0 at 0:22)
 * DO: pc - umbrella effect (Y folding of blades)
-* DO: pc - blades' axis with label: 3 axises xyz as super thin hardly noticeable hairlines see attached , these should be permanently linked to the blades meaning they orbit with the global blade structure, they are not linked to a static xyz space. These axises will help indicate which blade is what. These axises would have a (dynamic) floating label attached to each end of axis.
 * DO: page - flexible size with locked aspect ratio
 * DO: page - Having a series of predefined global states selected via a list/dropdown(the iPhone stuff etc)
 * DO: pp blades transparency and blending (feel: https://www.youtube.com/watch?v=2N66nmEZiH8)
@@ -27,6 +26,7 @@ We might want to implement this too as an additional option to fade in via a sli
 See: https://www.dropbox.com/s/12nkuhkpl11jhu3/globe.mp4?dl=0
 
 ### DONE:
+* DONE: pc - blades' axis with label: 3 axises xyz as super thin hardly noticeable hairlines see attached , these should be permanently linked to the blades meaning they orbit with the global blade structure, they are not linked to a static xyz space. These axises will help indicate which blade is what. These axises would have a (dynamic) floating label attached to each end of axis.
 * DONE (review): pc - floating labels (PC, PP), http://phone.playcanvas.com/ 
 * DONE (review): pc - static transparency sphere to indicate global world and picking blades reflection (transpSphere.png). See https://www.dropbox.com/s/zoh4i24aa4m4rny/transpSphere.png?dl=0
 * DONE: model orbit/rotation drag
