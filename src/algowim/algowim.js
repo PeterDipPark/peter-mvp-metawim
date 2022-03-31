@@ -359,6 +359,10 @@ export default class AlgoWim {
 									dom.innerHTML = newValue === -1 ? dom.getAttribute("data-algowim-unlocked"):dom.getAttribute("data-algowim-locked");
 									this.pcCanvas.style.pointerEvents = newValue === -1 ? "none":"auto";
 									break;
+								case "pc-blades-fold":
+									// Fold Blades in Y directions inwards or outwards
+									this.metawim.callAction(action, newValue, oldValue);
+									break;
 								case "pp-opacity":
 									// Change PP element opacity
 									if (this.ppIframe !== null && this.ppIframe.style !== undefined) {

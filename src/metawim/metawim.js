@@ -825,11 +825,8 @@ export default class MetaWim {
 					this.scene.resetCamera();
 					break;
 				case "pc-blades-fold":
-					// Rotate All blades in Y direction inward or outward
-					console.log("fold", newValue);
+					// Rotate All blades in Y direction inwards or outwards
 					for (let b in this.blades) {
-						// const rot = fixFloat((this.blades[b].getBladeRotation("y") + newValue) % 360); // from entity
-						// this.blades[b].setRotation({["y"]:rot}, "y");
 						this.blades[b].setFolding(newValue);
 					}
 					break;
