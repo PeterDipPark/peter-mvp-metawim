@@ -134,7 +134,7 @@ export default class Blade {
 				,f: new Quat()
 			};
 
-			// Qaud extension for Y folding
+			// Qaud extension for Y folding (Src: https://github.com/whydoidoit/vectormath/blob/master/from-to-rotation.js)
 			let m = new Mat4();
 			Quat.prototype.lookAt = function(from, to, up) {
 			    m.setLookAt(from, to, up || Vec3.UP)
