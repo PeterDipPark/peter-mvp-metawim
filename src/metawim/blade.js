@@ -235,7 +235,6 @@ export default class Blade {
 						this.controls.getControls().observers[opt_control[i]].observer.set('progress', coords[opt_control[i]]);
 					};
 				} else {
-					console.warn(opt_control, this.controls.getControls().observers);
 					this.controls.getControls().observers[opt_control].observer.set('progress', coords[opt_control]); 
 				}
 			} else {
@@ -465,13 +464,13 @@ export default class Blade {
 			// X
 			this.bladeLabelVerticals.x = new Vec3().copy(p);
 
-			// Y
-			const mz = new Mat4().setFromAxisAngle(this.entity.up, -90);			
-			this.bladeLabelVerticals.y = mz.transformPoint(p);
-
 			// Z
+			const mz = new Mat4().setFromAxisAngle(this.entity.up, -90);			
+			this.bladeLabelVerticals.z = mz.transformPoint(p);
+
+			// Y
 			const my = new Mat4().setFromAxisAngle(this.entity.forward, -90);			
-			this.bladeLabelVerticals.z = my.transformPoint(p);
+			this.bladeLabelVerticals.y = my.transformPoint(p);
 
 		}
 
