@@ -23,6 +23,13 @@ const CreateMouseInput = ({...props}) => {
 	    description: 'How fast the camera moves in and out. Higher is faster'
 	});
 
+	MouseInput.attributes.add('rightClickToPan', {
+	    type: 'boolean', 
+	    default: false, 
+	    title: 'Enable right-click to Pan', 
+	    description: 'If enabled Pan on the right-click move.'
+	});
+
 	MouseInput.attributes.add('algowimControls', {
 	    type: 'object', 
 	    default: algowimControls, 
@@ -42,18 +49,11 @@ const CreateMouseInput = ({...props}) => {
 	           self.onMouseOut(e);
 	        };
 
-	        // CUSTOM
-	        	// this.app.mouse._target.addEventListener('pointerdown', this.onMouseDown.bind(this), false);
-	        	// this.app.mouse._target.addEventListener('pointerup', this.onMouseUp.bind(this), false);
-	        	// console.log(this.app.mouse);
-	        	
-	        	// this.app.mouse.wasPressed(MOUSEBUTTON_LEFT, this.onMousePressed, this);
-
-	        // ORIG
-	        	this.app.mouse.on(pc.EVENT_MOUSEDOWN, this.onMouseDown, this);
-	        	this.app.mouse.on(pc.EVENT_MOUSEUP, this.onMouseUp, this);	        
-	        	this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
-	        	this.app.mouse.on(pc.EVENT_MOUSEWHEEL, this.onMouseWheel, this);
+	        // Add listeners
+        	this.app.mouse.on(pc.EVENT_MOUSEDOWN, this.onMouseDown, this);
+        	this.app.mouse.on(pc.EVENT_MOUSEUP, this.onMouseUp, this);	        
+        	this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
+        	this.app.mouse.on(pc.EVENT_MOUSEWHEEL, this.onMouseWheel, this);
 
 	        // Listen to when the mouse travels out of the window
 	        window.addEventListener('mouseout', onMouseOut, false);
@@ -64,8 +64,6 @@ const CreateMouseInput = ({...props}) => {
 	            this.app.mouse.off(pc.EVENT_MOUSEUP, this.onMouseUp, this);
 	            this.app.mouse.off(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
 	            this.app.mouse.off(pc.EVENT_MOUSEWHEEL, this.onMouseWheel, this);
-
-	            // this.app.mouse.wasPressed(MOUSEBUTTON_LEFT, this.onMousePressed, this);
 
 	            window.removeEventListener('mouseout', onMouseOut, false);
 	        });
@@ -137,9 +135,11 @@ const CreateMouseInput = ({...props}) => {
 	        } break;
 	            
 	        case pc.MOUSEBUTTON_MIDDLE: 
-	        // case pc.MOUSEBUTTON_RIGHT: {
-	        //     this.panButtonDown = true;
-	        // } break;
+	        case pc.MOUSEBUTTON_RIGHT: {
+	            if (this.rightClickToPan === true) {
+	            	this.panButtonDown = true;
+	        	}
+	        } break;
 	    }
 	};
 
@@ -165,9 +165,11 @@ const CreateMouseInput = ({...props}) => {
 	        } break;
 	            
 	        case pc.MOUSEBUTTON_MIDDLE: 
-	        // case pc.MOUSEBUTTON_RIGHT: {
-	        //     this.panButtonDown = false;            
-	        // } break;
+	        case pc.MOUSEBUTTON_RIGHT: {
+	        	if (this.rightClickToPan === true) {
+	            	this.panButtonDown = false;
+	        	}
+	        } break;
 	    }
 	};
 

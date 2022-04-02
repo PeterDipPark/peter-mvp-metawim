@@ -23,6 +23,13 @@ const CreateTouchInput = ({...props}) => {
 	    description: 'How fast the camera moves in and out. Higher is faster'
 	});
 
+	TouchInput.attributes.add('twoTouchesToPan', {
+	    type: 'boolean', 
+	    default: false, 
+	    title: 'Enable Pan on two touch points', 
+	    description: 'If enabled Pan on the two touch points move.'
+	});
+
 	// initialize code called once per entity
 	TouchInput.prototype.initialize = function() {
 	    this.orbitCamera = this.entity.script.orbitCamera;
@@ -76,16 +83,12 @@ const CreateTouchInput = ({...props}) => {
 	    if (touches.length == 1) {
 	        this.lastTouchPoint.set(touches[0].x, touches[0].y);
 	    
-	    } else if (touches.length == 2) {
+	    } else if (touches.length == 2 && this.twoTouchesToPan === true) {
 	        // If there are 2 touches on the screen, then set the pinch distance
 	        this.lastPinchDistance = this.getPinchDistance(touches[0], touches[1]);
 	        this.calcMidPoint(touches[0], touches[1], this.lastPinchMidPoint);
 	    }
 
-	    // Double Touch (Do we need this for touch devices? onMouseUp might work as well. Test! )
-	    // if (event.event.type === "touchstart") {
-	    // 	this.orbitCamera.clickPressed = true;
-	    // }
 
 
 	};
@@ -131,7 +134,7 @@ const CreateTouchInput = ({...props}) => {
 	        
 	        this.lastTouchPoint.set(touch.x, touch.y);
 	    
-	    } else if (touches.length == 2) {
+	    } else if (touches.length == 2 && this.twoTouchesToPan === true) {
 	        // Calculate the difference in pinch distance since the last event
 	        var currentPinchDistance = this.getPinchDistance(touches[0], touches[1]);
 	        var diffInPinchDistance = currentPinchDistance - this.lastPinchDistance;
