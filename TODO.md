@@ -28,7 +28,7 @@
 
 ### DO:
 
-* DO: pc - global offset slider (see: https://www.dropbox.com/s/12nkuhkpl11jhu3/globe.mp4?dl=0 at 0:22)
+* DO: pc - global offset slider (see: [globe-offset-opacity](nfo/pc_globe-offset-opacityblending.mov) or https://www.dropbox.com/s/12nkuhkpl11jhu3/globe.mp4?dl=0 at 0:22) 
 * DO: pc - blades transparency and blending (feel: https://www.youtube.com/watch?v=2N66nmEZiH8). Now we we are setting depth manually for each blades via this.meshInstance.calculateSortDistance callback. It solves the problem partialy and failing when blades intersects, i.e. when higher depth blades is rotated behind lower depth blade or vice-versa. Test with lookAt and reverseLooktAt (https://playcanvas.com/editor/code/678321?tabs=29887007,29886994) to solve transparency depth issue (this won't work. we need solve the case when 2 blades intersect)
 * DO: pc - "beauty factor" like https://www.youtube.com/watch?v=2N66nmEZiH8&t=1s
 
