@@ -4,6 +4,13 @@
 ## Page
 
 * DO: page - flexible size with locked aspect ratio
+* DO: page - perimeter/circular string of 16 buttons a bit lower to provide more space for WIMstar.
+* DO: page - There are now a vertical stack of buttons to the left and to the right. They are activated/slide in by tapping/clicking a rounded half circle button lett and right.
+* DO: page - [PDF attached](nfo/wim-page-specs_01.pdf) and a link to [demo clip](https://www.dropbox.com/s/zgpkjwaujsubmnd/wim222.mov?dl=0) where I click around in a very rough draft but still animated. I assume we can update icons and labels at the very end.
+* DO: page - There are other dedicated screens added to the main screen 3D(WIMstar/2D WIMstar)…these include 
+	1. the GLOBAL SETTINGS screen for defining a low level settings utilizing content in a `hidden Y axis` space basically determining the area in which the Blades should be angled along Y axis. 
+	2. the BIAS screen providing additional controls by shrinking the size of the WIMstar.
+	3. There are additional screens not visualized in this doc…I am currently working on final content for these.
 * DO: page - Having a series of predefined global states selected via a list/dropdown (the iPhone stuff etc)
 
 
