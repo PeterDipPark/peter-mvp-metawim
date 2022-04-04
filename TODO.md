@@ -14,7 +14,7 @@
 		* move all or some controls to WF page - so the controls that need to overlay 2D and 3D wimstart will be on the top, partially covering wimstars
 		* toggle orbit option on/off - we already have such a toggle button in my metawim example now
 		* or combination of above 2 options
-	* Accuracy on best "time-effort" basis 3.
+	* Accuracy on best "time-effort" basis 
 3. CMS:
 	* I suggest using AWS now. It might take a day or 2 to finalize existing code but will be solid and won't need additional patching and WF workarounds
 4. Syncing messages between platforms
