@@ -2,13 +2,88 @@
 
 ## Top priorities
 
+1. 2D wimstart (working):
+	* Messaging is available and ready to be wired up as needed (based on UI and/or logic)
+	* Infoboxes are not implemented  (I assume this can be pushed to a later stage?)
+	* Revolving "compass" indicator  (I assume this can be pushed to a later stage?)
+2. 3D wimstart (working):
+	* Messaging is available and ready to be wired up as needed (based on UI and/or logic)
+	* Offsets - will mostly likely require additional morph targets (I assume this can be pushed to later stage)
+	* Opacity - intersecting blades don't blend correctly
+	* Orbit control - here we need to be aware that if 3D wimstart orbiting is enabled, 2d wimstart can't receive pointer (mouse/touch) events. So there are 2 options:
+		* move all or some controls to WF page - so the controls that need to overlay 2D and 3D wimstart will be on top covering wimstars
+		* toggle orbit option on/off - we such a button in the my metawim example now
+		* or combination of above 2 options
+	* Accuracy on best "time-effort" basis 3. CMS:
+	* I suggest using AWS now. It might take a day or 2 to setup to finalize existings code but will be done and won't need additional patching and WF workarounds
+4. Syncing messages between platforms
+	* Messaging is available among all 3 platforms and ready to be wired up as needed (based on UI and/or logic)
+5. MetaWIM (UI)
+	* I haven't seen your live WF page (can you please share the link to page or WF project?) but from what you have mentioned and judging by the clip, I would rather rebuild the mockup myself due to complexity, sizing and performance concerns. It should not take too much time as I won't bother with the styling at this stage. That can be appended later.
+6. Logic
+	* Free "wim-ing" - OK (From my perspective this is just an input/output algorithm. Even though it can be complex it is still I/O script that we can tweak and polish once the all parts are setup)
+	* Predefined tracks - same as above but with preset states and guide layer
+7. SlideIn columns
+	* part of UI
+	* nav options will interact with all/some platforms (PP/PC/WF)
+8. Precondition (Bias settings)
+	* part of UI
+	* controls will interact with all/some platforms (PP/PC/WF) 9. Global Settings
+	* Will need to create new PP scene for that
+10. Final design polish
+	* TBD
+
+
+### Info#1
+
+1. 2D wimstar(editing platform) working
+2. 3D wimstar working Except offsets
+3. CMS (AWS or wf?) - Decide based on estimated scope - AWS existing...if slovakia regenerates the MetaWIM structure...should it be WF or AWS?
+4. Syncing messages between platforms...conveying the feel of one WIM spec evolving...and visualized within multiple uniforms
+5. MetaWIM - Estimate scope. Decision whether to remake. Sweden has a WF cms structure and UX done...non optimal coding/performance...will turn out problematic due to sluggishness and limited possibility for expanding Items etc (rebuild)
+6. Logic - Degree of implementing for proto. Goal is 3 preset user tracks with possible deviations plus a “free mode” with (semi?) random results. Defined a strategy of simple predefined ̈tracks ̈with limited deviations throughout the process. feedback...or Proposal for a simple v1 proto logic? Proposal sent with this doc.
+7. The slideIN columns holding nav buttons for triggering sections. Part of this is the IMPORt slide in page... Not a priority atm. Brief Sent
+8. Preconditions. Brief sent.
+9. Final design polish and fine-tune actions/messages between sections
+
+### Info#2 - See [PDF specs](https://www.dropbox.com/s/uz34t9pheulvofp/MetaWIMbrief.pdf?dl=0) and [Screencase](https://www.dropbox.com/s/dn4mkjeo52vtmgq/metaWIMpage.mov?dl=0)
+
+* page (WF, metawim) ...but the MetaWIM is an integral part of the full landscape...we need to decide you you can replicate my MetaWIM fairly easily. The biggest problem with my setup is that it is not optimized in terms of weight...the design stretches Items, Collections to limits causing friction of performance , expansion etc....
+	* Slide in columns
+	* Preconditions - Based on 2D wimstar, adding extra dials and sliders. Benchmarking slider/dropdowns. Define yourself and your preconditions
+	* WIMshop (Sweden) - mainly for show, possibly define a connection to cms Add extra elements. Assign external resources
+* PP/WF: The 2D version(or rather the Global Setting page definition of) the angling along Z(or Y I think in your world).
+	* Showing ZY plane, user may drag shapes to define Z axis blade angles
+	* Set macro criteria at kick off. Resolution for various areas of blades. We dont do this per blade but rather by 4 groups sop that adjacent blades adapt similar levels of resolution
+
+
 * Complete message sync between platforms
-* Slide in columns
-* Cms/cms sync according to my sketch
+	* Seamless experience across the landscape of pages and platforms. This means it is more important to finalize a shallow functional multi screen/platform experience
+than creating a deeper, accurate, elaborate and sophisticated prototype at the cost of not conveying the holistic landscape.
+	* The most important factor is to produce a fairly seamless experience moving across the 2D Wimstar, 3D Wimstar and MetaWIM...this is the most profound
+workflow...the user will edit in 2D wimstar, review concrete results in MetaWIM, glance at 3D wimstar and then tweak settings in global Settings and preferences
+etc...before exporting to final WIMspec and move on....
+
+
+
+
 * Define the exact strategy for limited logic(need your input here)…simply put I need to set up 3 person based workflows, possible to replicate step by step(a guiding process)
-* The one correct path for each of these should have 4 alternative deviations…at least at some of the steps , to allow us to demonstrate alternative (less optimal )paths 
-* Then there is “free swimming” …if no logic strategy at all here the user will just be served random content.
-* The 2D version(or rather the Global Setting page definition of) the angling along Z(or Y I think in your world).
+	* The one correct path for each of these should have 4 alternative deviations…at least at some of the steps , to allow us to demonstrate alternative (less optimal )paths 
+	* Then there is “free swimming” …if no logic strategy at all here the user will just be served random content.
+	* Logic is absolutely desirable...but if the level of logic we wish for is not possible within scope, we rely on ̈3 user tracks where the app hints towards next
+step(preferably through some type of intelligent process recognizing the current global status...if possible)....or at the lowest level we offer a text based step by step description that we assume the user will execute perfectly. The polarized landscape of sophistication sits between credible Logic and a manual text based guiding process...and in between there is a ̈status-aware ̈inherent guiding process that recognizes current state and advises next step according to a preset path
+	* MetaWIM - 3 separate user tracks; 3 same structure sections: WHY, WHAT, HOW; 16 (blade) sections; Plus various content sections - Full specification including mapping of abstract to concrete (SWEDEN, Possibly regenerated by slovakia)
+	* WIMSpec - Same content as MetaWIM in a more comprehensive design, deeper content...; Complete comprehensive presentation ready for export (SWEDEN, Possibly regenerated by slovakia) 
+
+
+
+* Accuracy at any touch point is really not a priority...put it this way, it is more important there is a logical functional landscape that functions as a whole...meaning for example if >I go from 2D wimstar to 3D wimstar the synchronized profile is fairly well executed...(for example here we may leave out the off set functionality for 3D wimstar if this is too complex atm). Discrepancies between the exact scaling of blades etc and consistent updating across 2D wimstr, 3D wimstar and metawim is not absolutely crucial...again it is the
+overall experience ...a fluid workflow balancing circles and moving sliders , dials ...and revising an instant MetaWIM specification...this is the overall target.
+
+
+* Cms/cms sync according to my sketch
+	* CMS I have produced a WF cms for the MetaWIM spec (and another for final WIMspec...this one will live autonomously) 
+
 
 ## Page
 
