@@ -4,25 +4,29 @@
 
 1. 2D wimstart (working):
 	* Messaging is available and ready to be wired up as needed (based on UI and/or logic)
-	* Infoboxes are not implemented  (I assume this can be pushed to a later stage?)
-	* Revolving "compass" indicator  (I assume this can be pushed to a later stage?)
+	* Infoboxes are not implemented  (Can we push this after the UI/CMS/Logic part?)
+	* Revolving "compass" indicator  (Can we push this after the UI/CMS/Logic part?)
 2. 3D wimstart (working):
 	* Messaging is available and ready to be wired up as needed (based on UI and/or logic)
 	* Offsets - will mostly likely require additional morph targets (I assume this can be pushed to later stage)
-	* Opacity - intersecting blades don't blend correctly
-	* Orbit control - here we need to be aware that if 3D wimstart orbiting is enabled, 2d wimstart can't receive pointer (mouse/touch) events. So there are 2 options:
-		* move all or some controls to WF page - so the controls that need to overlay 2D and 3D wimstart will be on top covering wimstars
-		* toggle orbit option on/off - we such a button in the my metawim example now
+	* Opacity - intersecting blades don't blend correctly (I assume this can be pushed to later stage)
+	* Orbit control - here we need to be aware that if 3D wimstart orbiting is enabled, 2D wimstart can't receive pointer (mouse/touch) events. So there are 2 options:
+		* move all or some controls to WF page - so the controls that need to overlay 2D and 3D wimstart will be on the top, partially covering wimstars
+		* toggle orbit option on/off - we already have such a toggle button in my metawim example now
 		* or combination of above 2 options
-	* Accuracy on best "time-effort" basis 3. CMS:
-	* I suggest using AWS now. It might take a day or 2 to setup to finalize existings code but will be done and won't need additional patching and WF workarounds
+	* Accuracy on best "time-effort" basis 3.
+3. CMS:
+	* I suggest using AWS now. It might take a day or 2 to finalize existing code but will be solid and won't need additional patching and WF workarounds
 4. Syncing messages between platforms
 	* Messaging is available among all 3 platforms and ready to be wired up as needed (based on UI and/or logic)
 5. MetaWIM (UI)
 	* I haven't seen your live WF page (can you please share the link to page or WF project?) but from what you have mentioned and judging by the clip, I would rather rebuild the mockup myself due to complexity, sizing and performance concerns. It should not take too much time as I won't bother with the styling at this stage. That can be appended later.
 6. Logic
-	* Free "wim-ing" - OK (From my perspective this is just an input/output algorithm. Even though it can be complex it is still I/O script that we can tweak and polish once the all parts are setup)
-	* Predefined tracks - same as above but with preset states and guide layer
+	* Free "wim-ing" - OK (From my perspective this is just an input/output algorithm. Even though it can become complex, it is still I/O script that we can tweak and polish once the all parts are setup)
+	* Predefined tracks - same as above but with preset states and guidance layer
+	* At this stage it is hard to comment how exactly we produce user experience but will have more suggestions once the UI/CMS is set up. The general idea is the same as we discussed earlier: we collect all inputs, build an array of parameters that will serve as a "decision" matrix for outputs (metawim and wimstart states). This I/O script can be then hooked to respective UI views:
+		* Results will be populated to wimstars and metawim views
+		* I assume the logic builder view for defining parameters will be available only to "admin". I already have one version of logic builder designed in the AWS page so most likely will enhance that to meet the final requirements.
 7. SlideIn columns
 	* part of UI
 	* nav options will interact with all/some platforms (PP/PC/WF)
@@ -46,7 +50,7 @@
 8. Preconditions. Brief sent.
 9. Final design polish and fine-tune actions/messages between sections
 
-### Info#2 - See [PDF specs](https://www.dropbox.com/s/uz34t9pheulvofp/MetaWIMbrief.pdf?dl=0) and [Screencase](https://www.dropbox.com/s/dn4mkjeo52vtmgq/metaWIMpage.mov?dl=0)
+### Info#2 - See [PDF specs](https://www.dropbox.com/s/dc1uc23r5lnqtxj/MetaWIMbrief2.pdf?dl=0) and [Screencast](https://www.dropbox.com/s/dn4mkjeo52vtmgq/metaWIMpage.mov?dl=0)
 
 * page (WF, metawim) ...but the MetaWIM is an integral part of the full landscape...we need to decide you you can replicate my MetaWIM fairly easily. The biggest problem with my setup is that it is not optimized in terms of weight...the design stretches Items, Collections to limits causing friction of performance , expansion etc....
 	* Slide in columns
