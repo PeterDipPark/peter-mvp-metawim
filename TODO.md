@@ -20,6 +20,7 @@
 4. Syncing messages between platforms
 	* Messaging is available among all 3 platforms and ready to be wired up as needed (based on UI and/or logic)
 5. MetaWIM (UI)
+	* See [info](nfo/page-elements.png) - Tabs/parts are all labeled with a description of their own current state. ¨For example Tab3 Hi En Effect Focus¨. Means this tab is tab No3 in the row, it holds Hi Energy content and is the Effect tab(in a series of 3 tabs,..the other two preceding it are tab Signal and tab Modulation) When final all tabs/parts will be displaying 1/3 of a coherent message, read out completely by reading a full row. The text is retrieved form the headlines of cms items. The basic idea is that the 3 tabs double as openers of deeper content(the container foldout)…and also constitutes a concrete coherent headline describing the Row they sit in..and by that also the corresponding wimBlade. The 16 rows will collectively read like a book page, describing the outline of the concept.
 	* I haven't seen your live WF page (can you please share the link to page or WF project?) but from what you have mentioned and judging by the clip, I would rather rebuild the mockup myself due to complexity, sizing and performance concerns. It should not take too much time as I won't bother with the styling at this stage. That can be appended later.
 6. Logic
 	* Free "wim-ing" - OK (From my perspective this is just an input/output algorithm. Even though it can become complex, it is still I/O script that we can tweak and polish once the all parts are setup)
